@@ -17,11 +17,12 @@ import PropTypes from 'prop-types'
 
 class PageTitle extends React.Component {
   render () {
-    const { title, rightComponent, shadow } = this.props
+    const { title, leftComponent, rightComponent, shadow } = this.props
     return (
       <div className={'nopadding'}>
         <div className={'uk-width-1-1 page-title dt-borderBottom pl-25 uk-clearfix' + (!shadow ? ' noshadow' : '')}>
           <p className={'uk-float-left'}>{title}</p>
+          <div className={'uk-float-left uk-clearfix uk-width-1-3'}>{leftComponent}</div>
           <div className={'uk-float-right uk-clearfix uk-width-1-2'}>{rightComponent}</div>
         </div>
       </div>
@@ -32,6 +33,7 @@ class PageTitle extends React.Component {
 PageTitle.propTypes = {
   title: PropTypes.string.isRequired,
   shadow: PropTypes.bool,
+  leftComponent: PropTypes.element,
   rightComponent: PropTypes.element
 }
 

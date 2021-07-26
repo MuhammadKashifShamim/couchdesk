@@ -28,6 +28,10 @@ import helpers from 'lib/helpers'
 class FilterTicketsModal extends React.Component {
   constructor (props) {
     super(props)
+
+    // FIXME: hack
+    const filter = document.getElementById('tickets-container').getAttribute('data-filter')
+    this.filter = filter ? JSON.parse(filter) : {}
   }
 
   componentDidMount () {
@@ -41,7 +45,7 @@ class FilterTicketsModal extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.unloadGroups()
+    // this.props.unloadGroups()
     this.props.unloadAccounts()
   }
 
@@ -120,7 +124,7 @@ class FilterTicketsModal extends React.Component {
         <form className={'uk-form-stacked'} onSubmit={e => this.onSubmit(e)}>
           <div className='uk-margin-medium-bottom'>
             <label>Subject</label>
-            <input type='text' name={'subject'} className={'md-input'} />
+            <input type='text' name={'subject'} className={'md-input'} defaultValue={this.filter.subject} />
           </div>
           <div className='uk-grid uk-grid-collapse uk-margin-small-bottom'>
             <div className='uk-width-1-2' style={{ padding: '0 15px 0 0' }}>
@@ -133,6 +137,7 @@ class FilterTicketsModal extends React.Component {
                 name='filterDate_Start'
                 type='text'
                 data-uk-datepicker={"{format:'" + helpers.getShortDateFormat() + "'}"}
+                defaultValue={this.filter.date && this.filter.date.start}
               />
             </div>
             <div className='uk-width-1-2' style={{ padding: '0 0 0 15px' }}>
@@ -145,6 +150,7 @@ class FilterTicketsModal extends React.Component {
                 name='filterDate_End'
                 type='text'
                 data-uk-datepicker={"{format:'" + helpers.getShortDateFormat() + "'}"}
+                defaultValue={this.filter.date && this.filter.date.end}
               />
             </div>
           </div>
@@ -153,7 +159,13 @@ class FilterTicketsModal extends React.Component {
               <label htmlFor='filterStatus' className='uk-form-label' style={{ paddingBottom: 0, marginBottom: 0 }}>
                 Status
               </label>
-              <SingleSelect items={statuses} showTextbox={false} multiple={true} ref={r => (this.statusSelect = r)} />
+              <SingleSelect
+                items={statuses}
+                showTextbox={false}
+                multiple={true}
+                ref={r => (this.statusSelect = r)}
+                defaultValue={this.filter.status}
+              />
             </div>
           </div>
           <div className='uk-grid uk-grid-collapse uk-margin-small-bottom'>
@@ -161,7 +173,13 @@ class FilterTicketsModal extends React.Component {
               <label htmlFor='filterStatus' className='uk-form-label' style={{ paddingBottom: 0, marginBottom: 0 }}>
                 Ticket Tags
               </label>
-              <SingleSelect items={tags} showTextbox={true} multiple={true} ref={r => (this.tagsSelect = r)} />
+              <SingleSelect
+                items={tags}
+                showTextbox={true}
+                multiple={true}
+                ref={r => (this.tagsSelect = r)}
+                defaultValue={this.filter.tags}
+              />
             </div>
           </div>
           <div className='uk-grid uk-grid-collapse uk-margin-small-bottom'>
@@ -169,7 +187,13 @@ class FilterTicketsModal extends React.Component {
               <label htmlFor='filterStatus' className='uk-form-label' style={{ paddingBottom: 0, marginBottom: 0 }}>
                 Ticket Type
               </label>
-              <SingleSelect items={types} showTextbox={false} multiple={true} ref={r => (this.typesSelect = r)} />
+              <SingleSelect
+                items={types}
+                showTextbox={false}
+                multiple={true}
+                ref={r => (this.typesSelect = r)}
+                defaultValue={this.filter.types}
+              />
             </div>
           </div>
           <div className='uk-grid uk-grid-collapse uk-margin-small-bottom'>
@@ -182,6 +206,7 @@ class FilterTicketsModal extends React.Component {
                 showTextbox={false}
                 multiple={true}
                 ref={r => (this.assigneeSelect = r)}
+                defaultValue={this.filter.assignee}
               />
             </div>
           </div>
@@ -190,7 +215,13 @@ class FilterTicketsModal extends React.Component {
               <label htmlFor='filterStatus' className='uk-form-label' style={{ paddingBottom: 0, marginBottom: 0 }}>
                 Groups
               </label>
-              <SingleSelect items={groups} showTextbox={false} multiple={true} ref={r => (this.groupSelect = r)} />
+              <SingleSelect
+                items={groups}
+                showTextbox={false}
+                multiple={true}
+                ref={r => (this.groupSelect = r)}
+                defaultValue={this.filter.groups}
+              />
             </div>
           </div>
           <div className='uk-modal-footer uk-text-right'>

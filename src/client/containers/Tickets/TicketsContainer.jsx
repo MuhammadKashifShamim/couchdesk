@@ -23,6 +23,7 @@ import axios from 'axios'
 import { fetchTickets, deleteTicket, ticketEvent, unloadTickets, ticketUpdated } from 'actions/tickets'
 import { fetchSearchResults } from 'actions/search'
 import { showModal } from 'actions/common'
+import { fetchGroups, unloadGroups } from 'actions/groups'
 
 import PageTitle from 'components/PageTitle'
 import Table from 'components/Table'
@@ -36,6 +37,7 @@ import DropdownTrigger from 'components/Dropdown/DropdownTrigger'
 import Dropdown from 'components/Dropdown'
 import DropdownItem from 'components/Dropdown/DropdownItem'
 import DropdownSeparator from 'components/Dropdown/DropdownSeperator'
+import SingleSelect from 'components/SingleSelect'
 
 import helpers from 'lib/helpers'
 import socket from 'lib/socket'
@@ -61,6 +63,7 @@ class TicketsContainer extends React.Component {
     socket.socket.on('$trudesk:client:ticket:deleted', this.onTicketDeleted)
 
     this.props.fetchTickets({ limit: 50, page: this.props.page, type: this.props.view, filter: this.props.filter })
+    this.props.fetchGroups()
   }
 
   componentDidUpdate () {
@@ -92,6 +95,7 @@ class TicketsContainer extends React.Component {
     anime.remove('tr.overdue td')
     this.timeline = null
     this.props.unloadTickets()
+    this.props.unloadGroups()
     socket.socket.off('$trudesk:client:ticket:created', this.onTicketCreated)
     socket.socket.off('$trudesk:client:ticket:updated', this.onTicketUpdated)
     socket.socket.off('$trudesk:client:ticket:deleted', this.onTicketDeleted)
@@ -246,11 +250,68 @@ class TicketsContainer extends React.Component {
       </div>
     )
 
+    const groups = this.props.groupsState.groups
+      .map(g => {
+        return { text: g.get('name'), value: g.get('_id') }
+      })
+      .toArray()
+
     return (
       <div>
         <PageTitle
           title={'Tickets'}
           shadow={false}
+          leftComponent={
+            <div style={{ 'margin': '8px 0 0 15px' }}>
+              <SingleSelect
+                items={groups}
+                showTextbox={false}
+                multiple={true}
+                defaultValue={this.props.filter.groups}
+                onSelectChange={() => {
+                  let queryString = '?f=1'
+
+                  if (this.props.filter.date) {
+                    if (this.props.filter.date.start) queryString += `&ds=${this.props.filter.date.start}`
+                    if (this.props.filter.date.end) queryString += `&de=${this.props.filter.date && this.props.filter.date.start}`
+                  }
+
+                  if (this.props.filter.subject) queryString += `&fs=${this.props.filter.subject}`
+
+                  if (this.props.filter.status) {
+                    this.props.filter.status.forEach((i) => {
+                      queryString += `&st=${i}`
+                    })
+                  }
+
+                  if (this.props.filter.types) {
+                    this.props.filter.types.forEach((i) => {
+                      queryString += `&tt=${i}`
+                    })
+                  }
+
+                  if (this.props.filter.tags) {
+                    this.props.filter.tags.forEach((i) => {
+                      queryString += `&tag=${i}`
+                    })
+                  }
+
+                  each(this.groupSelect.value, i => {
+                    queryString += `&gp=${i}`
+                  })
+
+                  if (this.props.filter.assignee) {
+                    this.props.filter.assignee.forEach((i) => {
+                      queryString += `&au=${i}`
+                    })
+                  }
+
+                  History.pushState(null, null, `/tickets/filter/${queryString}&r=${Math.floor(Math.random() * (99999 - 1 + 1)) + 1}`)
+                }}
+                ref={r => (this.groupSelect = r)}
+              />
+            </div>
+          }
           rightComponent={
             <div>
               <div className={'uk-float-right'}>
@@ -368,8 +429,8 @@ class TicketsContainer extends React.Component {
 
                 const updated = ticket.get('updated')
                   ? helpers.formatDate(ticket.get('updated'), helpers.getShortDateFormat()) +
-                    ', ' +
-                    helpers.formatDate(ticket.get('updated'), helpers.getTimeFormat())
+                  ', ' +
+                  helpers.formatDate(ticket.get('updated'), helpers.getTimeFormat())
                   : '--'
 
                 const dueDate = ticket.get('dueDate')
@@ -460,7 +521,10 @@ TicketsContainer.propTypes = {
   showModal: PropTypes.func.isRequired,
   fetchSearchResults: PropTypes.func.isRequired,
   common: PropTypes.object.isRequired,
-  filter: PropTypes.object.isRequired
+  filter: PropTypes.object.isRequired,
+  groupsState: PropTypes.object.isRequired,
+  fetchGroups: PropTypes.func.isRequired,
+  unloadGroups: PropTypes.func.isRequired
 }
 
 TicketsContainer.defaultProps = {
@@ -476,10 +540,11 @@ const mapStateToProps = state => ({
   prevPage: state.ticketsState.prevPage,
   nextPage: state.ticketsState.nextPage,
   loading: state.ticketsState.loading,
-  common: state.common
+  common: state.common,
+  groupsState: state.groupsState
 })
 
 export default connect(
   mapStateToProps,
-  { fetchTickets, deleteTicket, ticketEvent, unloadTickets, ticketUpdated, fetchSearchResults, showModal }
+  { fetchTickets, deleteTicket, ticketEvent, unloadTickets, ticketUpdated, fetchSearchResults, showModal, fetchGroups, unloadGroups }
 )(TicketsContainer)

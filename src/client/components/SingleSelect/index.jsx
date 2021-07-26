@@ -45,7 +45,7 @@ class SingleSelect extends React.Component {
   }
 
   onSelectChange (e) {
-    if (e.target.value === '') return
+    if (!this.props.multiple && e.target.value === '') return
 
     if (this.props.multiple) this.value = this.select.selectize.items
     else this.value = e.target.value
@@ -75,7 +75,12 @@ class SingleSelect extends React.Component {
       // Populate Options & Add existing selected values
       this.select.selectize.addOption(this.props.items)
       this.select.selectize.refreshOptions(false)
-      this.select.selectize.addItem(this.value, true)
+
+      if (this.props.multiple) {
+        this.select.selectize.addItems(this.value, true)
+      } else {
+        this.select.selectize.addItem(this.value, true)
+      }
 
       // Force an update of each item from items prop
       each(this.props.items, function (i) {

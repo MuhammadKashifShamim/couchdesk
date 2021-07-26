@@ -80,18 +80,6 @@ ticketsController.getByStatus = function (req, res, next) {
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
-  var processor = {}
-  processor.title = 'Tickets'
-  processor.nav = 'tickets'
-  processor.subnav = 'tickets-'
-  processor.renderpage = 'tickets'
-  processor.pagetype = 'active'
-  processor.object = {
-    limit: 50,
-    page: page,
-    status: []
-  }
-
   var fullUrl = url.format({
     protocol: req.protocol,
     host: req.get('host'),
@@ -116,9 +104,25 @@ ticketsController.getByStatus = function (req, res, next) {
       break
   }
 
+  var filter = {
+    status: [s]
+  }
+
+  var processor = {}
+  processor.title = 'Tickets'
+  processor.nav = 'tickets'
+  processor.subnav = 'tickets-'
+  processor.renderpage = 'tickets'
+  processor.pagetype = 'active'
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: [s],
+    filter: filter
+  }
   processor.subnav += tType
   processor.pagetype = tType
-  processor.object.status.push(s)
 
   req.processor = processor
   return next()
@@ -164,18 +168,24 @@ ticketsController.getAssigned = function (req, res, next) {
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
+  var filter = {
+    assignee: [req.user._id]
+  }
+
   var processor = {}
   processor.title = 'Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-assigned'
   processor.renderpage = 'tickets'
   processor.pagetype = 'assigned'
+  processor.filter = 
   processor.object = {
     limit: 50,
     page: page,
     status: [0, 1, 2],
     assignedSelf: true,
-    user: req.user._id
+    user: req.user._id,
+    filter: filter
   }
 
   req.processor = processor
@@ -195,18 +205,24 @@ ticketsController.getUnassigned = function (req, res, next) {
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
+  var filter = {
+    unassigned: true
+  }
+
   var processor = {}
   processor.title = 'Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-unassigned'
   processor.renderpage = 'tickets'
   processor.pagetype = 'unassigned'
+  processor.filter = filter
   processor.object = {
     limit: 50,
     page: page,
     status: [0, 1, 2],
     unassigned: true,
-    user: req.user._id
+    user: req.user._id,
+    filter: filter
   }
 
   req.processor = processor
