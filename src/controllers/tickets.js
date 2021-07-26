@@ -178,15 +178,15 @@ ticketsController.getAssigned = function (req, res, next) {
   processor.subnav = 'tickets-assigned'
   processor.renderpage = 'tickets'
   processor.pagetype = 'assigned'
-  processor.filter = 
-  processor.object = {
-    limit: 50,
-    page: page,
-    status: [0, 1, 2],
-    assignedSelf: true,
-    user: req.user._id,
-    filter: filter
-  }
+  processor.filter =
+    processor.object = {
+      limit: 50,
+      page: page,
+      status: [0, 1, 2],
+      assignedSelf: true,
+      user: req.user._id,
+      filter: filter
+    }
 
   req.processor = processor
 
@@ -291,6 +291,8 @@ ticketsController.filter = function (req, res, next) {
 
   req.processor = processor
 
+  res.cookie('groups', `${JSON.stringify(filter.groups || [])}`)
+
   return next()
 }
 
@@ -304,6 +306,18 @@ ticketsController.filter = function (req, res, next) {
 ticketsController.processor = function (req, res) {
   var processor = req.processor
   if (_.isUndefined(processor)) return res.redirect('/')
+
+  if (processor.pagetype !== 'filter' && (!processor.filter || !processor.filter.groups) && req.cookies.groups) {
+    var groups = JSON.parse(req.cookies.groups)
+    if (groups.length > 0) {
+      processor.filter = Object.assign({}, processor.filter, {
+        groups: groups
+      })
+      processor.object.filter = Object.assign({}, processor.object.filter, {
+        groups: groups
+      })
+    }
+  }
 
   var content = {}
   content.title = processor.title
@@ -770,7 +784,7 @@ ticketsController.uploadAttachment = function (req, res) {
   req.pipe(busboy)
 }
 
-function handleError (res, err) {
+function handleError(res, err) {
   if (err) {
     winston.warn(err)
     if (!err.status) res.status = 500
