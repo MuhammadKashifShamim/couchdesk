@@ -201,6 +201,23 @@ viewController.getData = function (request, cb) {
         })
       },
       function (callback) {
+        settingSchema.getSetting('gen:customloginbackground', function (err, hasCustomLoginBackground) {
+          viewdata.hasCustomLoginBackground = !!(!err && hasCustomLoginBackground && hasCustomLoginBackground.value)
+
+          if (!viewdata.hasCustomLoginBackground) {
+            return callback()
+          }
+
+          settingSchema.getSetting('gen:customloginbackgroundfilename', function (err, backgroundFileName) {
+            if (!err && backgroundFileName && !_.isUndefined(backgroundFileName.value)) {
+              viewdata.loginBackgroundImage = '/assets/' + backgroundFileName.value
+            }
+
+            return callback()
+          })
+        })
+      },
+      function (callback) {
         settingSchema.getSetting('gen:customfavicon', function (err, hasCustomFavicon) {
           viewdata.hasCustomFavicon = !!(!err && hasCustomFavicon && hasCustomFavicon.value)
           if (!viewdata.hasCustomFavicon) {

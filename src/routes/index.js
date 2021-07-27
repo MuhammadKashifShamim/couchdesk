@@ -279,6 +279,7 @@ function mainRoutes (router, middleware, controllers) {
   )
   router.post('/settings/general/uploadlogo', middleware.redirectToLogin, controllers.main.uploadLogo)
   router.post('/settings/general/uploadpagelogo', middleware.redirectToLogin, controllers.main.uploadPageLogo)
+  router.post('/settings/general/uploadloginbackground', middleware.redirectToLogin, controllers.main.uploadLoginBackground)
   router.post('/settings/general/uploadfavicon', middleware.redirectToLogin, controllers.main.uploadFavicon)
   router.get(
     '/settings/permissions',

@@ -167,7 +167,7 @@
     <script src="/js/vendor.js"></script>
     <script src="/js/truRequire.js"></script>
 </head>
-<body>
+<body{{#if loginBackground}} style="background: url({{loginBackground}}) no-repeat center center fixed; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover;"{{/if}}>
 <div class="alert-message {{#if flash}} {{else}} hide {{/if}} {{#if flash.success}} green {{/if}}">
     <p>{{#if flash.message}} {{{flash.message}}} {{else}} {{{flash}}}{{/if}}</p>
 </div>

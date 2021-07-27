@@ -65,6 +65,8 @@ util.getSettings = function (callback) {
     s.customLogoFilename = parseSetting(settings, 'gen:customlogofilename', '')
     s.hasCustomPageLogo = parseSetting(settings, 'gen:custompagelogo', false)
     s.customPageLogoFilename = parseSetting(settings, 'gen:custompagelogofilename', '')
+    s.hasCustomLoginBackground = parseSetting(settings, 'gen:customloginbackground', false)
+    s.customLoginBackgroundFilename = parseSetting(settings, 'gen:customloginbackgroundfilename', '')
     s.hasCustomFavicon = parseSetting(settings, 'gen:customfavicon', false)
     s.customFaviconFilename = parseSetting(settings, 'gen:customfaviconfilename', '')
 

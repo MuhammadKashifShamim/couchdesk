@@ -48,6 +48,10 @@ mainController.index = function (req, res) {
       content.pageLogo = '/assets/' + settings.customPageLogoFilename.value
     }
 
+    if (settings.hasCustomLoginBackground.value && settings.customLoginBackgroundFilename.value.length > 0) {
+      content.loginBackground =  '/assets/' + settings.customLoginBackgroundFilename.value
+    }
+
     content.bottom = 'Trudesk v' + pkg.version
 
     res.render('login', content)
@@ -750,6 +754,76 @@ mainController.uploadPageLogo = function (req, res) {
       if (err) return res.status(400).send('Failed to save setting to database')
 
       settingUtil.setSetting('gen:custompagelogofilename', object.filename, function (err) {
+        if (err) return res.status(400).send('Failed to save setting to database')
+
+        return res.send(object.filename)
+      })
+    })
+  })
+
+  req.pipe(busboy)
+}
+
+mainController.uploadLoginBackground = function (req, res) {
+  var fs = require('fs')
+  var settingUtil = require('../settings/settingsUtil')
+  var Busboy = require('busboy')
+  var busboy = new Busboy({
+    headers: req.headers,
+    limits: {
+      files: 1,
+      fileSize: 1024 * 1024 * 3 // 3mb
+    }
+  })
+
+  var object = {}
+  var error
+
+  busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+    if (mimetype.indexOf('image/') === -1) {
+      error = {
+        status: 400,
+        message: 'Invalid File Type'
+      }
+
+      return file.resume()
+    }
+
+    var savePath = path.join(__dirname, '../../public/uploads/assets')
+    if (!fs.existsSync(savePath)) fs.mkdirSync(savePath)
+
+    object.filePath = path.join(savePath, 'loginBackground' + path.extname(filename))
+    object.filename = 'loginBackground' + path.extname(filename)
+    object.mimetype = mimetype
+
+    file.on('limit', function () {
+      error = {
+        stats: 400,
+        message: 'File size too large. File size limit: 3mb'
+      }
+
+      return file.resume()
+    })
+
+    file.pipe(fs.createWriteStream(object.filePath))
+  })
+
+  busboy.once('finish', function () {
+    if (error) {
+      winston.warn(error)
+      return res.status(error.status).send(error.message)
+    }
+
+    if (_.isUndefined(object.filePath) || _.isUndefined(object.filename)) {
+      return res.status(400).send('Invalid image data')
+    }
+
+    if (!fs.existsSync(object.filePath)) return res.status(400).send('File failed to save to disk')
+
+    settingUtil.setSetting('gen:customloginbackground', true, function (err) {
+      if (err) return res.status(400).send('Failed to save setting to database')
+
+      settingUtil.setSetting('gen:customloginbackgroundfilename', object.filename, function (err) {
         if (err) return res.status(400).send('Failed to save setting to database')
 
         return res.send(object.filename)

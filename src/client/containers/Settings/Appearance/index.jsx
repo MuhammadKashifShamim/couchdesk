@@ -222,6 +222,26 @@ class AppearanceSettings extends React.Component {
         />
 
         <SettingItem
+          title='Login Background'
+          subtitle={
+            <div>
+              Upload background to display on login page.
+            </div>
+          }
+          component={
+            <UploadButtonWithX
+              buttonText={'Upload Background'}
+              uploadAction={'/settings/general/uploadloginbackground'}
+              extAllowed={'*.(jpg|jpeg|gif|png)'}
+              showX={this.getSettingsValue('hasCustomLoginBackground')}
+              onXClick={() => {
+                this.updateSetting('gen:customloginbackground', false, 'hasCustomLoginBackground')
+              }}
+            />
+          }
+        />
+
+        <SettingItem
           title='Favicon'
           subtitle={'Upload a custom favicon'}
           component={
