@@ -79,7 +79,7 @@ class Sidebar extends React.Component {
     const { activeItem, activeSubItem, sessionUser } = this.props
     return (
       <ul className='side-nav'>
-        {sessionUser && Helpers.canUser('agent:*', true) && (
+        {/* sessionUser && Helpers.canUser('agent:*', true) && (
           <SidebarItem
             text='Dashboard'
             icon='dashboard'
@@ -87,7 +87,7 @@ class Sidebar extends React.Component {
             class='navHome'
             active={activeItem === 'dashboard'}
           />
-        )}
+        ) */}
         {sessionUser && Helpers.canUser('tickets:view') && (
           <SidebarItem
             text='Tickets'
@@ -322,7 +322,7 @@ class Sidebar extends React.Component {
         )}
         <NavSeparator />
         <SidebarItem href='/about' icon='help' text='About' active={activeItem === 'about'} />
-        <SidebarItem href={'https://www.trudesk.io'} icon={'cloud'} text={'Cloud'} target={'_blank'} />
+        {/* <SidebarItem href={'https://www.trudesk.io'} icon={'cloud'} text={'Cloud'} target={'_blank'} /> */}
       </ul>
     )
   }

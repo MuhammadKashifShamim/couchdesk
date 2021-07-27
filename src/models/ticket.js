@@ -833,7 +833,7 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, callback) {
   var limit = !object.limit ? 10 : object.limit
   var page = !object.page ? 0 : object.page
   var _status = object.status
-console.log(object.filter)
+
   if (!_.isUndefined(object.filter) && !_.isUndefined(object.filter.groups)) {
     var g = _.map(grpId, '_id').map(String)
     grpId = _.intersection(object.filter.groups, g)

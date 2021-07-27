@@ -561,7 +561,9 @@ class SingleTicketContainer extends React.Component {
                     </ul>
                   </div>
                 </div>
-                <div className='page-content-right full-height scrollable'>
+                <div className='page-content-right full-height scrollable' style={{
+                  background: '#f7f8fa'
+                }}>
                   <div className='comments-wrapper'>
                     <IssuePartial
                       ticketId={this.ticket._id}
@@ -575,189 +577,196 @@ class SingleTicketContainer extends React.Component {
                       editorWindow={this.editorWindow}
                     />
 
-                    {/* Tabs */}
-                    {this.hasCommentsOrNotes && (
-                      <TruTabWrapper>
-                        <TruTabSelectors style={{ marginLeft: 110 }}>
-                          <TruTabSelector
-                            selectorId={0}
-                            label='All'
-                            active={true}
-                            showBadge={true}
-                            badgeText={this.commentsAndNotes.length}
-                          />
-                          <TruTabSelector
-                            selectorId={1}
-                            label='Comments'
-                            showBadge={true}
-                            badgeText={this.ticket ? this.ticket.comments && this.ticket.comments.length : 0}
-                          />
-                          {helpers.canUser('tickets:notes', true) && (
-                            <TruTabSelector
-                              selectorId={2}
-                              label='Notes'
-                              showBadge={true}
-                              badgeText={this.ticket ? this.ticket.notes && this.ticket.notes.length : 0}
-                            />
-                          )}
-                        </TruTabSelectors>
-
-                        {/* Tab Sections */}
-                        <TruTabSection sectionId={0} active={true}>
-                          <div className='all-comments'>
-                            {this.commentsAndNotes.map(item => (
-                              <CommentNotePartial
-                                key={item._id}
-                                ticketStatus={this.ticket.status}
-                                ticketSubject={this.ticket.subject}
-                                comment={item}
-                                isNote={item.isNote}
-                                dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
-                                onEditClick={() => {
-                                  this.editorWindow.openEditorWindow({
-                                    showSubject: false,
-                                    text: !item.isNote ? item.comment : item.note,
-                                    onPrimaryClick: data => {
-                                      if (item.isNote) socket.ui.setNoteText(this.ticket._id, item._id, data.text)
-                                      else socket.ui.setCommentText(this.ticket._id, item._id, data.text)
-                                    }
-                                  })
-                                }}
-                                onRemoveClick={() => {
-                                  if (!item.isNote) socket.ui.removeComment(this.ticket._id, item._id)
-                                  else socket.ui.removeNote(this.ticket._id, item._id)
-                                }}
+                    {(this.hasCommentsOrNotes || this.ticket.status !== 3) && (
+                      <div style={{
+                        background: '#fff',
+                        boxShadow: '0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%)',
+                        margin: '30px'
+                      }}>
+                        {/* Tabs */}
+                        {this.hasCommentsOrNotes && (
+                          <TruTabWrapper>
+                            <TruTabSelectors style={{ marginLeft: 110, width: 'calc(100% - 110px)' }}>
+                              <TruTabSelector
+                                selectorId={0}
+                                label='All'
+                                active={true}
+                                showBadge={true}
+                                badgeText={this.commentsAndNotes.length}
                               />
-                            ))}
-                          </div>
-                        </TruTabSection>
-                        <TruTabSection sectionId={1}>
-                          <div className='comments'>
-                            {this.ticket &&
-                              this.ticket.comments.map(comment => (
-                                <CommentNotePartial
-                                  key={comment._id}
-                                  ticketStatus={this.ticket.status}
-                                  ticketSubject={this.ticket.subject}
-                                  comment={comment}
-                                  dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
-                                  onEditClick={() => {
-                                    this.editorWindow.openEditorWindow({
-                                      showSubject: false,
-                                      text: comment.comment,
-                                      onPrimaryClick: data => {
-                                        socket.ui.setCommentText(this.ticket._id, comment._id, data.text)
-                                      }
-                                    })
-                                  }}
-                                  onRemoveClick={() => {
-                                    socket.ui.removeComment(this.ticket._id, comment._id)
-                                  }}
-                                />
-                              ))}
-                          </div>
-                        </TruTabSection>
-                        <TruTabSection sectionId={2}>
-                          <div className='notes'>
-                            {this.ticket &&
-                              this.ticket.notes.map(note => (
-                                <CommentNotePartial
-                                  key={note._id}
-                                  ticketStatus={this.ticket.status}
-                                  ticketSubject={this.ticket.subject}
-                                  comment={note}
-                                  isNote={true}
-                                  dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
-                                  onEditClick={() => {
-                                    this.editorWindow.openEditorWindow({
-                                      showSubject: false,
-                                      text: note.note,
-                                      onPrimaryClick: data => {
-                                        socket.ui.setNoteText(this.ticket._id, note._id, data.text)
-                                      }
-                                    })
-                                  }}
-                                  onRemoveClick={() => {
-                                    socket.ui.removeNote(this.ticket._id, note._id)
-                                  }}
-                                />
-                              ))}
-                          </div>
-                        </TruTabSection>
-                      </TruTabWrapper>
-                    )}
-
-                    {/* Comment / Notes Form */}
-                    {this.ticket.status !== 3 &&
-                      (helpers.canUser('comments:create', true) || helpers.canUser('tickets:notes', true)) && (
-                        <div className='uk-width-1-1 ticket-reply uk-clearfix'>
-                          <Avatar image={this.props.shared.sessionUser.image} showOnlineBubble={false} />
-                          <TruTabWrapper style={{ paddingLeft: 85 }}>
-                            <TruTabSelectors showTrack={false}>
-                              {helpers.canUser('comments:create', true) && (
-                                <TruTabSelector selectorId={0} label={'Comment'} active={true} />
-                              )}
+                              <TruTabSelector
+                                selectorId={1}
+                                label='Comments'
+                                showBadge={true}
+                                badgeText={this.ticket ? this.ticket.comments && this.ticket.comments.length : 0}
+                              />
                               {helpers.canUser('tickets:notes', true) && (
                                 <TruTabSelector
-                                  selectorId={1}
-                                  label={'Internal Note'}
-                                  active={!helpers.canUser('comments:create', true)}
+                                  selectorId={2}
+                                  label='Notes'
+                                  showBadge={true}
+                                  badgeText={this.ticket ? this.ticket.notes && this.ticket.notes.length : 0}
                                 />
                               )}
                             </TruTabSelectors>
-                            <TruTabSection
-                              sectionId={0}
-                              style={{ paddingTop: 0 }}
-                              active={helpers.canUser('comments:create', true)}
-                            >
-                              <form onSubmit={e => this.onCommentNoteSubmit(e, 'comment')}>
-                                <EasyMDE
-                                  allowImageUpload={true}
-                                  inlineImageUploadUrl={'/tickets/uploadmdeimage'}
-                                  inlineImageUploadHeaders={{ ticketid: this.ticket._id }}
-                                  ref={r => (this.commentMDE = r)}
-                                />
-                                <div className='uk-width-1-1 uk-clearfix' style={{ marginTop: 50 }}>
-                                  <div className='uk-float-right'>
-                                    <button
-                                      type='submit'
-                                      className='uk-button uk-button-accent'
-                                      style={{ padding: '10px 15px' }}
-                                    >
-                                      Post Comment
-                                    </button>
-                                  </div>
-                                </div>
-                              </form>
+
+                            {/* Tab Sections */}
+                            <TruTabSection sectionId={0} active={true}>
+                              <div className='all-comments'>
+                                {this.commentsAndNotes.map(item => (
+                                  <CommentNotePartial
+                                    key={item._id}
+                                    ticketStatus={this.ticket.status}
+                                    ticketSubject={this.ticket.subject}
+                                    comment={item}
+                                    isNote={item.isNote}
+                                    dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
+                                    onEditClick={() => {
+                                      this.editorWindow.openEditorWindow({
+                                        showSubject: false,
+                                        text: !item.isNote ? item.comment : item.note,
+                                        onPrimaryClick: data => {
+                                          if (item.isNote) socket.ui.setNoteText(this.ticket._id, item._id, data.text)
+                                          else socket.ui.setCommentText(this.ticket._id, item._id, data.text)
+                                        }
+                                      })
+                                    }}
+                                    onRemoveClick={() => {
+                                      if (!item.isNote) socket.ui.removeComment(this.ticket._id, item._id)
+                                      else socket.ui.removeNote(this.ticket._id, item._id)
+                                    }}
+                                  />
+                                ))}
+                              </div>
                             </TruTabSection>
-                            <TruTabSection
-                              sectionId={1}
-                              style={{ paddingTop: 0 }}
-                              active={!helpers.canUser('comments:create') && helpers.canUser('tickets:notes', true)}
-                            >
-                              <form onSubmit={e => this.onCommentNoteSubmit(e, 'note')}>
-                                <EasyMDE
-                                  allowImageUpload={true}
-                                  inlineImageUploadUrl={'/tickets/uploadmdeimage'}
-                                  inlineImageUploadHeaders={{ ticketid: this.ticket._id }}
-                                  ref={r => (this.noteMDE = r)}
-                                />
-                                <div className='uk-width-1-1 uk-clearfix' style={{ marginTop: 50 }}>
-                                  <div className='uk-float-right'>
-                                    <button
-                                      type='submit'
-                                      className='uk-button uk-button-accent'
-                                      style={{ padding: '10px 15px' }}
-                                    >
-                                      Save Note
-                                    </button>
-                                  </div>
-                                </div>
-                              </form>
+                            <TruTabSection sectionId={1}>
+                              <div className='comments'>
+                                {this.ticket &&
+                                  this.ticket.comments.map(comment => (
+                                    <CommentNotePartial
+                                      key={comment._id}
+                                      ticketStatus={this.ticket.status}
+                                      ticketSubject={this.ticket.subject}
+                                      comment={comment}
+                                      dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
+                                      onEditClick={() => {
+                                        this.editorWindow.openEditorWindow({
+                                          showSubject: false,
+                                          text: comment.comment,
+                                          onPrimaryClick: data => {
+                                            socket.ui.setCommentText(this.ticket._id, comment._id, data.text)
+                                          }
+                                        })
+                                      }}
+                                      onRemoveClick={() => {
+                                        socket.ui.removeComment(this.ticket._id, comment._id)
+                                      }}
+                                    />
+                                  ))}
+                              </div>
+                            </TruTabSection>
+                            <TruTabSection sectionId={2}>
+                              <div className='notes'>
+                                {this.ticket &&
+                                  this.ticket.notes.map(note => (
+                                    <CommentNotePartial
+                                      key={note._id}
+                                      ticketStatus={this.ticket.status}
+                                      ticketSubject={this.ticket.subject}
+                                      comment={note}
+                                      isNote={true}
+                                      dateFormat={`${this.props.common.longDateFormat}, ${this.props.common.timeFormat}`}
+                                      onEditClick={() => {
+                                        this.editorWindow.openEditorWindow({
+                                          showSubject: false,
+                                          text: note.note,
+                                          onPrimaryClick: data => {
+                                            socket.ui.setNoteText(this.ticket._id, note._id, data.text)
+                                          }
+                                        })
+                                      }}
+                                      onRemoveClick={() => {
+                                        socket.ui.removeNote(this.ticket._id, note._id)
+                                      }}
+                                    />
+                                  ))}
+                              </div>
                             </TruTabSection>
                           </TruTabWrapper>
-                        </div>
-                      )}
+                        )}
+
+                        {/* Comment / Notes Form */}
+                        {this.ticket.status !== 3 && (helpers.canUser('comments:create', true) || helpers.canUser('tickets:notes', true)) && (
+                          <div className='uk-width-1-1 ticket-reply uk-clearfix'>
+                            <Avatar image={this.props.shared.sessionUser.image} showOnlineBubble={false} />
+                            <TruTabWrapper style={{ paddingLeft: 85 }}>
+                              <TruTabSelectors showTrack={false}>
+                                {helpers.canUser('comments:create', true) && (
+                                  <TruTabSelector selectorId={0} label={'Comment'} active={true} />
+                                )}
+                                {helpers.canUser('tickets:notes', true) && (
+                                  <TruTabSelector
+                                    selectorId={1}
+                                    label={'Internal Note'}
+                                    active={!helpers.canUser('comments:create', true)}
+                                  />
+                                )}
+                              </TruTabSelectors>
+                              <TruTabSection
+                                sectionId={0}
+                                style={{ paddingTop: 0 }}
+                                active={helpers.canUser('comments:create', true)}
+                              >
+                                <form onSubmit={e => this.onCommentNoteSubmit(e, 'comment')}>
+                                  <EasyMDE
+                                    allowImageUpload={true}
+                                    inlineImageUploadUrl={'/tickets/uploadmdeimage'}
+                                    inlineImageUploadHeaders={{ ticketid: this.ticket._id }}
+                                    ref={r => (this.commentMDE = r)}
+                                  />
+                                  <div className='uk-width-1-1 uk-clearfix' style={{ marginTop: 50 }}>
+                                    <div className='uk-float-right'>
+                                      <button
+                                        type='submit'
+                                        className='uk-button uk-button-accent'
+                                        style={{ padding: '10px 15px' }}
+                                      >
+                                        Post Comment
+                                      </button>
+                                    </div>
+                                  </div>
+                                </form>
+                              </TruTabSection>
+                              <TruTabSection
+                                sectionId={1}
+                                style={{ paddingTop: 0 }}
+                                active={!helpers.canUser('comments:create') && helpers.canUser('tickets:notes', true)}
+                              >
+                                <form onSubmit={e => this.onCommentNoteSubmit(e, 'note')}>
+                                  <EasyMDE
+                                    allowImageUpload={true}
+                                    inlineImageUploadUrl={'/tickets/uploadmdeimage'}
+                                    inlineImageUploadHeaders={{ ticketid: this.ticket._id }}
+                                    ref={r => (this.noteMDE = r)}
+                                  />
+                                  <div className='uk-width-1-1 uk-clearfix' style={{ marginTop: 50 }}>
+                                    <div className='uk-float-right'>
+                                      <button
+                                        type='submit'
+                                        className='uk-button uk-button-accent'
+                                        style={{ padding: '10px 15px' }}
+                                      >
+                                        Save Note
+                                      </button>
+                                    </div>
+                                  </div>
+                                </form>
+                              </TruTabSection>
+                            </TruTabWrapper>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

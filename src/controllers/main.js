@@ -105,7 +105,7 @@ mainController.loginPost = function (req, res, next) {
     }
     if (!user) return res.redirect('/')
 
-    var redirectUrl = '/dashboard'
+    var redirectUrl = '/tickets/assigned'
 
     if (req.session.redirectUrl) {
       redirectUrl = req.session.redirectUrl
@@ -141,7 +141,7 @@ mainController.l2AuthPost = function (req, res, next) {
 
     req.session.l2auth = 'totp'
 
-    var redirectUrl = '/dashboard'
+    var redirectUrl = '/tickets/assigned'
 
     if (req.session.redirectUrl) {
       redirectUrl = req.session.redirectUrl

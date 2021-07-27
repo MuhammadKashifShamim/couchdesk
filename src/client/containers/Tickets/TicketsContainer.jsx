@@ -41,7 +41,7 @@ import SingleSelect from 'components/SingleSelect'
 
 import helpers from 'lib/helpers'
 import socket from 'lib/socket'
-import anime from 'animejs'
+// import anime from 'animejs'
 import moment from 'moment-timezone'
 import SearchResults from 'components/SearchResults'
 
@@ -66,7 +66,7 @@ class TicketsContainer extends React.Component {
     this.props.fetchGroups()
   }
 
-  componentDidUpdate () {
+  /* componentDidUpdate () {
     if (this.timeline) {
       this.timeline.pause()
       this.timeline.seek(0)
@@ -89,11 +89,11 @@ class TicketsContainer extends React.Component {
     })
 
     this.timeline.play()
-  }
+  } */
 
   componentWillUnmount () {
-    anime.remove('tr.overdue td')
-    this.timeline = null
+    /* anime.remove('tr.overdue td')
+    this.timeline = null */
     this.props.unloadTickets()
     this.props.unloadGroups()
     socket.socket.off('$trudesk:client:ticket:created', this.onTicketCreated)
@@ -393,7 +393,7 @@ class TicketsContainer extends React.Component {
               <TableHeader key={3} width={'23%'} text={'Subject'} />,
               <TableHeader key={4} width={110} text={'Created'} />,
               <TableHeader key={5} width={125} text={'Requester'} />,
-              <TableHeader key={6} width={175} text={'Customer'} />,
+              <TableHeader key={6} width={175} text={'Group'} />,
               <TableHeader key={7} text={'Assignee'} />,
               <TableHeader key={8} width={110} text={'Due Date'} />,
               <TableHeader key={9} text={'Updated'} />
@@ -484,7 +484,61 @@ class TicketsContainer extends React.Component {
                       <span className={'uk-display-inline-block'}>{status()[0].toUpperCase()}</span>
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.get('uid')}</TableCell>
-                    <TableCell className={'vam nbb'}>{ticket.get('subject')}</TableCell>
+                    <TableCell className={'vam nbb'}>
+                      {ticket.get('subject')}
+                      <div className='tag-list uk-clearfix' style={{
+                        marginTop: '6px'
+                      }}>
+                        {ticket.get('type') && (
+                          <div style={{
+                            display: 'inline-block',
+                            float: 'left',
+                            fontSize: '12px',
+                            fontFamily: '"Roboto","Open Sans",sans-serif',
+                            padding: '0 8px',
+                            margin: '0 6px 6px 0',
+                            maxHeight: '20px',
+                            background: '#7a7f80',
+                            color: '#ffffff',
+                            borderRadius: '3px',
+                          }}>
+                            {ticket.get('type').get('name')}
+                          </div>
+                        )}
+                        {ticket.get('priority') && (
+                          <div style={{
+                            display: 'inline-block',
+                            float: 'left',
+                            fontSize: '12px',
+                            fontFamily: '"Roboto","Open Sans",sans-serif',
+                            padding: '0 8px',
+                            margin: '0 6px 6px 0',
+                            maxHeight: '20px',
+                            background: ticket.get('priority').get('htmlColor'),
+                            color: '#ffffff',
+                            borderRadius: '3px',
+                          }}>
+                            {ticket.get('priority').get('name')}
+                          </div>
+                        )}
+                        {ticket.get('tags').map(tag => (
+                          <div key={tag.get('_id')} style={{
+                            display: 'inline-block',
+                            float: 'left',
+                            fontSize: '12px',
+                            fontFamily: '"Roboto","Open Sans",sans-serif',
+                            padding: '0 8px',
+                            margin: '0 6px 6px 0',
+                            maxHeight: '20px',
+                            background: '#3498db',
+                            color: '#ffffff',
+                            borderRadius: '3px',
+                          }}>
+                            {tag.get('name')}
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
                     <TableCell className={'vam nbb'}>
                       {helpers.formatDate(ticket.get('date'), helpers.getShortDateFormat())}
                     </TableCell>

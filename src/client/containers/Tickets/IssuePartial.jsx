@@ -15,7 +15,7 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react'
 import { observable } from 'mobx'
-import clsx from 'clsx'
+// import clsx from 'clsx'
 
 import Avatar from 'components/Avatar/Avatar'
 import ReactHtmlParser from 'react-html-parser'
