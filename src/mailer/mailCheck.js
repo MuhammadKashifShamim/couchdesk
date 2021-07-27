@@ -127,9 +127,11 @@ function bindImapError () {
 function bindImapReady () {
   try {
     mailCheck.Imap.on('end', function () {
-      handleMessages(mailCheck.messages, function () {
-        mailCheck.Imap.destroy()
-      })
+      setTimeout(function () {
+        handleMessages(mailCheck.messages, function () {
+          mailCheck.Imap.destroy()
+        })
+      }, 2000)
     })
 
     mailCheck.Imap.on('ready', function () {

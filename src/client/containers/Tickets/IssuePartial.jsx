@@ -129,7 +129,11 @@ class IssuePartial extends React.Component {
         <Avatar image={this.owner.image} userId={this.owner._id} />
         {/* Issue */}
         <div className='issue-text'>
-          <h3 className='subject-text'>{this.subject}</h3>
+          <h3 className='subject-text' style={{
+            width: 'calc(100% - 60px)'
+          }}>
+            {this.subject}
+          </h3>
           <a href={`mailto:${this.owner.email}`}>
             {this.owner.fullname} &lt;{this.owner.email}&gt;
           </a>
