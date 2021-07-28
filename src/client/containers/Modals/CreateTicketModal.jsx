@@ -198,7 +198,7 @@ class CreateTicketModal extends React.Component {
             <Grid>
               {allowAgentUserTickets && (
                 <GridItem width={'1-3'}>
-                  <label className={'uk-form-label'}>Owner</label>
+                  <label className={'uk-form-label'}>Requestor</label>
                   <SingleSelect
                     showTextbox={true}
                     items={mappedAccounts}
