@@ -83,7 +83,8 @@ buildsass.build = function (callback) {
           primary: settings.colorPrimary.value,
           secondary: settings.colorSecondary.value,
           tertiary: settings.colorTertiary.value,
-          quaternary: settings.colorQuaternary.value
+          quaternary: settings.colorQuaternary.value,
+          tags_color: settings.colorTags.value
         },
         function (result) {
           save(result)

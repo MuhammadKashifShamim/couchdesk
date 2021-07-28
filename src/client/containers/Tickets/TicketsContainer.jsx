@@ -487,54 +487,19 @@ class TicketsContainer extends React.Component {
                     <TableCell className={'vam nbb'}>{ticket.get('uid')}</TableCell>
                     <TableCell className={'vam nbb'}>
                       {ticket.get('subject')}
-                      <div className='tag-list uk-clearfix' style={{
-                        marginTop: '6px'
-                      }}>
+                      <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
                         {ticket.get('type') && (
-                          <div style={{
-                            display: 'inline-block',
-                            float: 'left',
-                            fontSize: '12px',
-                            fontFamily: '"Roboto","Open Sans",sans-serif',
-                            padding: '3px 10px',
-                            margin: '0 6px 6px 0',
-                            maxHeight: '20px',
-                            background: '#7a7f80',
-                            color: '#ffffff',
-                            borderRadius: '3px',
-                          }}>
+                          <div className={'custom-tag type'}>
                             {ticket.get('type').get('name')}
                           </div>
                         )}
                         {ticket.get('priority') && (
-                          <div style={{
-                            display: 'inline-block',
-                            float: 'left',
-                            fontSize: '12px',
-                            fontFamily: '"Roboto","Open Sans",sans-serif',
-                            padding: '3px 10px',
-                            margin: '0 6px 6px 0',
-                            maxHeight: '20px',
-                            background: ticket.get('priority').get('htmlColor'),
-                            color: '#ffffff',
-                            borderRadius: '3px',
-                          }}>
+                          <div className={'custom-tag'} style={{ background: ticket.get('priority').get('htmlColor') }}>
                             {ticket.get('priority').get('name')}
                           </div>
                         )}
                         {ticket.get('tags').map(tag => (
-                          <div key={tag.get('_id')} style={{
-                            display: 'inline-block',
-                            float: 'left',
-                            fontSize: '12px',
-                            fontFamily: '"Roboto","Open Sans",sans-serif',
-                            padding: '3px 10px',
-                            margin: '0 6px 6px 0',
-                            maxHeight: '20px',
-                            background: '#3498db',
-                            color: '#ffffff',
-                            borderRadius: '3px',
-                          }}>
+                          <div key={tag.get('_id')} className={'custom-tag'}>
                             {tag.get('name')}
                           </div>
                         ))}
@@ -596,7 +561,8 @@ const mapStateToProps = state => ({
   nextPage: state.ticketsState.nextPage,
   loading: state.ticketsState.loading,
   common: state.common,
-  groupsState: state.groupsState
+  groupsState: state.groupsState,
+  settings: state.settings.settings
 })
 
 export default connect(

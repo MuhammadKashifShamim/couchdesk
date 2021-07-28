@@ -280,7 +280,7 @@ div#accountsTable_wrapper
       padding: 0 8px
       margin: 2px 0 0 2px
       max-height: 20px
-      background: #3498db
+      background: $tags_color
       color: #ffffff
       +borderRadius(3px)
 
@@ -544,3 +544,18 @@ tr.overdue td
 
 .initial-issue
   background: #ffffff
+
+.custom-tag
+  display: inline-block
+  float: left
+  fontSize: 12px
+  fontFamily: "Roboto","Open Sans",sans-serif
+  padding: 3px 10px
+  margin: 0 6px 6px 0
+  maxHeight: 20px
+  background: $tags_color
+  color: #ffffff
+  borderRadius: 3px
+
+.custom-tag.type
+  background: #7a7f80

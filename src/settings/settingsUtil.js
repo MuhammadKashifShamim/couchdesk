@@ -76,6 +76,7 @@ util.getSettings = function (callback) {
     s.colorSecondary = parseSetting(settings, 'color:secondary', '#f7f8fa')
     s.colorTertiary = parseSetting(settings, 'color:tertiary', '#E74C3C')
     s.colorQuaternary = parseSetting(settings, 'color:quaternary', '#E6E7E8')
+    s.colorTags = parseSetting(settings, 'color:tags', '#3498DB')
 
     s.defaultTicketType = parseSetting(settings, 'ticket:type:default', '')
     s.minSubjectLength = parseSetting(settings, 'ticket:minlength:subject', 10)

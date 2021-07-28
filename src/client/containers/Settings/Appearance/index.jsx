@@ -33,7 +33,8 @@ const colorMap = {
     primary: '#606771',
     secondary: '#f7f8fa',
     tertiary: '#e74c3c',
-    quaternary: '#e6e7e8'
+    quaternary: '#e6e7e8',
+    tags: '#3498db'
   },
   dark: {
     headerBG: '#242a31',
@@ -41,7 +42,8 @@ const colorMap = {
     primary: '#f6f7f8',
     secondary: '#2f3640',
     tertiary: '#e74c3c',
-    quaternary: '#454f5d'
+    quaternary: '#454f5d',
+    tags: '#3498db'
   },
   bluejean: {
     headerBG: '#112d4e',
@@ -49,7 +51,8 @@ const colorMap = {
     primary: '#112d4e',
     secondary: '#f9f7f7',
     tertiary: '#3f72af',
-    quaternary: '#dbe2ef'
+    quaternary: '#dbe2ef',
+    tags: '#3498db'
   },
   midnight: {
     headerBG: '#2c2e3e',
@@ -57,7 +60,8 @@ const colorMap = {
     primary: '#444a54',
     secondary: '#c8c8c8',
     tertiary: '#ee2b47',
-    quaternary: '#2c2e3e'
+    quaternary: '#2c2e3e',
+    tags: '#3498db'
   },
   moonlight: {
     headerBG: '#2e3238',
@@ -65,7 +69,8 @@ const colorMap = {
     primary: '#444a54',
     secondary: '#c8c8c8',
     tertiary: '#7971ea',
-    quaternary: '#444a54'
+    quaternary: '#444a54',
+    tags: '#3498db'
   },
   purplerain: {
     headerBG: '#393041',
@@ -73,7 +78,8 @@ const colorMap = {
     primary: '#393041',
     secondary: '#d2cbd8',
     tertiary: '#f67280',
-    quaternary: '#52455f'
+    quaternary: '#52455f',
+    tags: '#3498db'
   },
   sandstone: {
     headerBG: '#625757',
@@ -81,7 +87,8 @@ const colorMap = {
     primary: '#625757',
     secondary: '#dfdfdf',
     tertiary: '#ef5a5a',
-    quaternary: '#6f6363'
+    quaternary: '#6f6363',
+    tags: '#3498db'
   },
   winterfire: {
     headerBG: '#404969',
@@ -89,7 +96,8 @@ const colorMap = {
     primary: '#404969',
     secondary: '#ebf0f6',
     tertiary: '#ff7f50',
-    quaternary: '#4a5479'
+    quaternary: '#4a5479',
+    tags: '#3498db'
   }
 }
 
@@ -158,6 +166,10 @@ class AppearanceSettings extends React.Component {
       { selectedColor: colorMap[e.target.value].quaternary },
       this.quaternaryColorSelect.updateColorButton
     )
+    this.tagsColorSelect.setState(
+      { selectedColor: colorMap[e.target.value].tags },
+      this.tagsColorSelect.updateColorButton
+    )
   }
 
   saveColorScheme () {
@@ -167,7 +179,8 @@ class AppearanceSettings extends React.Component {
       { name: 'color:primary', value: this.primaryColorSelect.state.selectedColor },
       { name: 'color:secondary', value: this.secondaryColorSelect.state.selectedColor },
       { name: 'color:tertiary', value: this.tertiaryColorSelect.state.selectedColor },
-      { name: 'color:quaternary', value: this.quaternaryColorSelect.state.selectedColor }
+      { name: 'color:quaternary', value: this.quaternaryColorSelect.state.selectedColor },
+      { name: 'color:tags', value: this.tagsColorSelect.state.selectedColor }
     ]
 
     this.props.updateColorScheme(colors)
@@ -386,6 +399,21 @@ class AppearanceSettings extends React.Component {
                       this.quaternaryColorSelect = cs
                     }}
                     defaultColor={this.getSettingsValue('colorQuaternary')}
+                    parentClass={'uk-width-2-3 uk-float-right'}
+                  />
+                }
+              />
+            </ZoneBox>
+            <ZoneBox>
+              <SettingSubItem
+                title='Tags'
+                subtitle='Ticket tags color'
+                component={
+                  <ColorSelector
+                    ref={cs => {
+                      this.tagsColorSelect = cs
+                    }}
+                    defaultColor={this.getSettingsValue('colorTags')}
                     parentClass={'uk-width-2-3 uk-float-right'}
                   />
                 }
