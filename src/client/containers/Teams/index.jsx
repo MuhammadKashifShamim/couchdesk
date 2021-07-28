@@ -148,18 +148,20 @@ class TeamsContainer extends React.Component {
           title={'Teams'}
           shadow={true}
           rightComponent={
-            <div className={'uk-grid uk-grid-collapse'}>
-              <div className={'uk-width-1-1 mt-15 uk-text-right'}>
-                <Button
-                  text={'Create'}
-                  flat={false}
-                  small={true}
-                  waves={false}
-                  extraClass={'hover-accent'}
-                  onClick={e => this.onCreateTeamClick(e)}
-                />
+            helpers.canUser('teams:create', true) ? (
+              <div className={'uk-grid uk-grid-collapse'}>
+                <div className={'uk-width-1-1 mt-15 uk-text-right'}>
+                  <Button
+                    text={'Create'}
+                    flat={false}
+                    small={true}
+                    waves={false}
+                    extraClass={'hover-accent'}
+                    onClick={e => this.onCreateTeamClick(e)}
+                  />
+                </div>
               </div>
-            </div>
+            ) : undefined
           }
         />
         <PageContent id={'teams-page-content'} padding={0} paddingBottom={0}>

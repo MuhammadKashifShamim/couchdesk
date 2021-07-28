@@ -114,18 +114,26 @@ class AccountsContainer extends React.Component {
       this.props.accountsState.accounts &&
       this.props.accountsState.accounts.map(user => {
         const userImage = user.get('image') || 'defaultProfile.jpg'
-        let actionMenu = [<DropdownItem key={0} text={'Edit'} onClick={e => this.onEditAccountClicked(e, user)} />]
-        if (user.get('deleted'))
-          actionMenu.push(<DropdownItem key={2} text={'Enable'} onClick={e => this.onEnableAccountClicked(e, user)} />)
-        else
-          actionMenu.push(
-            <DropdownItem
-              key={1}
-              text={'Delete'}
-              extraClass={'uk-text-danger'}
-              onClick={e => this.onDeleteAccountClicked(e, user)}
-            />
-          )
+        let actionMenu;
+        if (helpers.canUser('accounts:update', true) || helpers.canUser('accounts:delete', true)) {
+          actionMenu = []
+          if (helpers.canUser('accounts:update', true)) {
+            actionMenu.push(<DropdownItem key={0} text={'Edit'} onClick={e => this.onEditAccountClicked(e, user)} />)
+            if (user.get('deleted'))
+              actionMenu.push(<DropdownItem key={2} text={'Enable'} onClick={e => this.onEnableAccountClicked(e, user)} />)
+          }
+          if (helpers.canUser('accounts:delete', true)) {
+            if (!user.get('deleted'))
+              actionMenu.push(
+                <DropdownItem
+                  key={1}
+                  text={'Delete'}
+                  extraClass={'uk-text-danger'}
+                  onClick={e => this.onDeleteAccountClicked(e, user)}
+                />
+              )
+          }
+        }
         const isAdmin = user.getIn(['role', 'isAdmin']) || false
         const isAgent = user.getIn(['role', 'isAgent']) || false
         const customer = !isAdmin && !isAgent
@@ -227,15 +235,17 @@ class AccountsContainer extends React.Component {
               {/*</div>*/}
               <div className={'uk-width-1-4 uk-push-3-4 mt-15 pr-20 uk-clearfix'}>
                 <ButtonGroup classNames={'uk-clearfix uk-float-right'}>
-                  <Button
-                    text={'Create'}
-                    hasDropdown={false}
-                    flat={false}
-                    small={true}
-                    waves={false}
-                    extraClass={'hover-accent'}
-                    onClick={() => this.props.showModal('CREATE_ACCOUNT')}
-                  />
+                  {helpers.canUser('accounts:create', true) && (
+                    <Button
+                      text={'Create'}
+                      hasDropdown={false}
+                      flat={false}
+                      small={true}
+                      waves={false}
+                      extraClass={'hover-accent'}
+                      onClick={() => this.props.showModal('CREATE_ACCOUNT')}
+                    />
+                  )}
                   {helpers.canUser('accounts:import', true) && (
                     <DropdownTrigger mode={'click'} pos={'bottom-right'} offset={5} extraClass={'uk-float-right'}>
                       <Button

@@ -130,18 +130,20 @@ class GroupsContainer extends React.Component {
         <PageTitle
           title={'Customer Groups'}
           rightComponent={
-            <div className={'uk-grid uk-grid-collapse'}>
-              <div className={'uk-width-1-1 mt-15 uk-text-right'}>
-                <Button
-                  text={'Create'}
-                  flat={false}
-                  small={true}
-                  waves={false}
-                  extraClass={'hover-accent'}
-                  onClick={() => this.onCreateGroupClick()}
-                />
+            helpers.canUser('groups:create', true) ? (
+              <div className={'uk-grid uk-grid-collapse'}>
+                <div className={'uk-width-1-1 mt-15 uk-text-right'}>
+                  <Button
+                    text={'Create'}
+                    flat={false}
+                    small={true}
+                    waves={false}
+                    extraClass={'hover-accent'}
+                    onClick={() => this.onCreateGroupClick()}
+                  />
+                </div>
               </div>
-            </div>
+            ) : undefined
           }
         />
         <PageContent padding={0} paddingBottom={0}>

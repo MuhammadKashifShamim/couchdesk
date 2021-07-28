@@ -67,18 +67,20 @@ class DepartmentsContainer extends React.Component {
           title={'Departments'}
           shadow={false}
           rightComponent={
-            <div className={'uk-grid uk-grid-collapse'}>
-              <div className={'uk-width-1-1 mt-15 uk-text-right'}>
-                <Button
-                  text={'Create'}
-                  flat={false}
-                  small={true}
-                  waves={false}
-                  extraClass={'hover-accent'}
-                  onClick={() => this.onCreateDepartmentClick()}
-                />
+            helpers.canUser('departments:create', true) ? (
+              <div className={'uk-grid uk-grid-collapse'}>
+                <div className={'uk-width-1-1 mt-15 uk-text-right'}>
+                  <Button
+                    text={'Create'}
+                    flat={false}
+                    small={true}
+                    waves={false}
+                    extraClass={'hover-accent'}
+                    onClick={() => this.onCreateDepartmentClick()}
+                  />
+                </div>
               </div>
-            </div>
+            ) : undefined
           }
         />
         <PageContent padding={0}>
