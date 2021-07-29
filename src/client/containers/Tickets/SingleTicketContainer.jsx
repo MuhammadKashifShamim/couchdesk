@@ -239,7 +239,7 @@ class SingleTicketContainer extends React.Component {
           return { text: group.get('name'), value: group.get('_id') }
         }).toArray()
       : []
-console.log(mappedGroups)
+
     const mappedTypes = this.props.common.ticketTypes
       ? this.props.common.ticketTypes.map(type => {
           return { text: type.name, value: type._id, raw: type }
