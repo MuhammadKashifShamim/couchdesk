@@ -18,6 +18,7 @@ import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 import sortBy from 'lodash/sortBy'
 import union from 'lodash/union'
+import uniqBy from 'lodash/uniqBy'
 
 import { transferToThirdParty } from 'actions/tickets'
 import { fetchGroups, unloadGroups } from 'actions/groups'
@@ -234,9 +235,9 @@ class SingleTicketContainer extends React.Component {
 
   render () {
     const mappedGroups = this.props.groupsState
-      ? this.props.groupsState.groups.map(group => {
+      ? uniqBy(this.props.groupsState.groups.map(group => {
           return { text: group.get('name'), value: group.get('_id') }
-        })
+        }), 'value')
       : []
 
     const mappedTypes = this.props.common.ticketTypes
