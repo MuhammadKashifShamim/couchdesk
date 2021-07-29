@@ -235,10 +235,15 @@ class SingleTicketContainer extends React.Component {
 
   render () {
     const mappedGroups = this.props.groupsState
-      ? this.props.groupsState.groups.map(group => {
-          return { text: group.get('name'), value: group.get('_id') }
-        }).toArray()
-      : []
+      ? uniqBy(
+          this.props.groupsState.groups
+            .map((group) => {
+              return { text: group.get('name'), value: group.get('_id') };
+            })
+            .toArray(),
+          'value',
+        )
+      : [];
 
     const mappedTypes = this.props.common.ticketTypes
       ? this.props.common.ticketTypes.map(type => {
