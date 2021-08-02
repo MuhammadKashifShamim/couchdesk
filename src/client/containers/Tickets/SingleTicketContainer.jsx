@@ -243,7 +243,7 @@ class SingleTicketContainer extends React.Component {
             .toArray(),
           'value',
         )
-      : [];
+      : []
 
     const mappedTypes = this.props.common.ticketTypes
       ? this.props.common.ticketTypes.map(type => {
