@@ -1768,7 +1768,7 @@ define([
         var role = _.find(r, function (_role) {
           return _role._id.toString() === extRole._id.toString()
         })
-        if (!_.isUndefined(role) && role.isAdmin) return true
+        if (!_.isUndefined(role) && (role.isAdmin || role.isAgent)) return true
       }
     }
 
