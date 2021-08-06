@@ -487,8 +487,8 @@ class TicketsContainer extends React.Component {
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.get('uid')}</TableCell>
                     <TableCell className={'vam nbb'}>
-                      <Avatar image={ticket.getIn(['owner', 'image'])} userId={ticket.getIn(['owner', '_id'])} />
-                      <div style={{ marginLeft: '68px' }}>
+                      <Avatar image={ticket.getIn(['owner', 'image'])} userId={ticket.getIn(['owner', '_id'])} size={40} />
+                      <div style={{ marginLeft: '58px' }}>
                         {ticket.get('subject')}
                         <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
                           {ticket.get('type') && (
