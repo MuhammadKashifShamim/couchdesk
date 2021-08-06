@@ -38,6 +38,7 @@ import Dropdown from 'components/Dropdown'
 import DropdownItem from 'components/Dropdown/DropdownItem'
 import DropdownSeparator from 'components/Dropdown/DropdownSeperator'
 import SingleSelect from 'components/SingleSelect'
+import Avatar from 'components/Avatar/Avatar'
 
 import helpers from 'lib/helpers'
 import socket from 'lib/socket'
@@ -486,23 +487,26 @@ class TicketsContainer extends React.Component {
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.get('uid')}</TableCell>
                     <TableCell className={'vam nbb'}>
-                      {ticket.get('subject')}
-                      <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
-                        {ticket.get('type') && (
-                          <div className={'custom-tag type'}>
-                            {ticket.get('type').get('name')}
-                          </div>
-                        )}
-                        {ticket.get('priority') && (
-                          <div className={'custom-tag'} style={{ background: ticket.get('priority').get('htmlColor') }}>
-                            {ticket.get('priority').get('name')}
-                          </div>
-                        )}
-                        {ticket.get('tags').map(tag => (
-                          <div key={tag.get('_id')} className={'custom-tag'}>
-                            {tag.get('name')}
-                          </div>
-                        ))}
+                      <Avatar image={ticket.getIn(['owner', 'image'])} userId={ticket.getIn(['owner', '_id'])} />
+                      <div style={{ marginLeft: '68px' }}>
+                        {ticket.get('subject')}
+                        <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
+                          {ticket.get('type') && (
+                            <div className={'custom-tag type'}>
+                              {ticket.get('type').get('name')}
+                            </div>
+                          )}
+                          {ticket.get('priority') && (
+                            <div className={'custom-tag'} style={{ background: ticket.get('priority').get('htmlColor') }}>
+                              {ticket.get('priority').get('name')}
+                            </div>
+                          )}
+                          {ticket.get('tags').map(tag => (
+                            <div key={tag.get('_id')} className={'custom-tag'}>
+                              {tag.get('name')}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className={'vam nbb'}>

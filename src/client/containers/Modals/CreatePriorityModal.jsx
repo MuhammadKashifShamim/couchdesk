@@ -80,7 +80,7 @@ class CreatePriorityModal extends React.Component {
                     value={this.overdueIn}
                     onChange={e => (this.overdueIn = e.target.value)}
                     data-validation='number'
-                    data-validation-allowing='range[1;525600]'
+                    data-validation-allowing='range[0;525600]'
                     data-validation-error-msg='Invalid SLA Time (1-525600)'
                   />
                 </div>
