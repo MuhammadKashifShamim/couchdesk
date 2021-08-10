@@ -92,7 +92,7 @@ class Sidebar extends React.Component {
           <SidebarItem
             text='Tickets'
             icon='assignment'
-            href='/tickets'
+            href='/tickets/assigned'
             class='navTickets no-ajaxy'
             hasSubmenu={true}
             subMenuTarget='tickets'

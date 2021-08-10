@@ -129,7 +129,12 @@ class CreateTicketModal extends React.Component {
 
     if (!$form.isValid(null, null, false)) return true
 
-    if (allowAgentUserTickets) data.owner = this.ownerSelect.value
+    if (allowAgentUserTickets) {
+      data.owner = this.ownerSelect.value
+      if (this.assigneeSelect.value) {
+        data.assignee = this.assigneeSelect.value
+      }
+    }
 
     data.subject = e.target.subject.value
     data.group = this.groupSelect.value
@@ -160,7 +165,7 @@ class CreateTicketModal extends React.Component {
       viewdata.ticketSettings.allowAgentUserTickets &&
       (shared.sessionUser.role.isAdmin || shared.sessionUser.role.isAgent)
 
-    const mappedAccounts = this.props.accounts
+    const mappedAccountsCreateTicket = this.props.accountsCreateTicket
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
       })
@@ -178,6 +183,13 @@ class CreateTicketModal extends React.Component {
     const mappedTicketTags = this.props.viewdata.ticketTags.map(tag => {
       return { text: tag.name, value: tag._id }
     })
+
+    const mappedAccounts = this.props.accounts
+      .map(a => {
+        return { text: a.get('fullname'), value: a.get('_id') }
+      })
+      .toArray()
+
     return (
       <BaseModal {...this.props} options={{ bgclose: false }}>
         <form className={'uk-form-stacked'} onSubmit={e => this.onFormSubmit(e)}>
@@ -201,7 +213,7 @@ class CreateTicketModal extends React.Component {
                   <label className={'uk-form-label'}>Requestor</label>
                   <SingleSelect
                     showTextbox={true}
-                    items={mappedAccounts}
+                    items={mappedAccountsCreateTicket}
                     defaultValue={[this.props.viewdata.loggedInAccount._id]}
                     width={'100%'}
                     ref={i => (this.ownerSelect = i)}
@@ -248,6 +260,17 @@ class CreateTicketModal extends React.Component {
               </GridItem>
             </Grid>
           </div>
+          {allowAgentUserTickets && (
+            <div className='uk-margin-medium-bottom'>
+              <label className={'uk-form-label'}>Assignee</label>
+              <SingleSelect
+                showTextbox={false}
+                items={mappedAccounts}
+                width={'100%'}
+                ref={i => (this.assigneeSelect = i)}
+              />
+            </div>
+          )}
           <div className='uk-margin-medium-bottom'>
             <label className={'uk-form-label'}>Priority</label>
             <div
@@ -320,6 +343,7 @@ CreateTicketModal.propTypes = {
   shared: PropTypes.object.isRequired,
   viewdata: PropTypes.object.isRequired,
   accounts: PropTypes.object.isRequired,
+  accountsCreateTicket: PropTypes.object.isRequired,
   groups: PropTypes.object.isRequired,
   createTicket: PropTypes.func.isRequired,
   fetchGroups: PropTypes.func.isRequired,
@@ -330,7 +354,8 @@ const mapStateToProps = state => ({
   shared: state.shared,
   viewdata: state.common,
   groups: state.groupsState.groups,
-  accounts: state.accountsState.accountsCreateTicket
+  accounts: state.accountsState.accountsCreateTicket,
+  accountsCreateTicket: state.accountsState.accountsCreateTicket
 })
 
 export default connect(

@@ -49,7 +49,7 @@ mainController.index = function (req, res) {
     }
 
     if (settings.hasCustomLoginBackground.value && settings.customLoginBackgroundFilename.value.length > 0) {
-      content.loginBackground =  '/assets/' + settings.customLoginBackgroundFilename.value
+      content.loginBackground = '/assets/' + settings.customLoginBackgroundFilename.value
     }
 
     content.bottom = 'Trudesk v' + pkg.version
@@ -109,7 +109,7 @@ mainController.loginPost = function (req, res, next) {
     }
     if (!user) return res.redirect('/')
 
-    var redirectUrl = '/tickets/unassigned'
+    var redirectUrl = '/tickets/assigned'
 
     if (req.session.redirectUrl) {
       redirectUrl = req.session.redirectUrl
@@ -117,7 +117,7 @@ mainController.loginPost = function (req, res, next) {
     }
 
     if (req.user.role === 'user') {
-      redirectUrl = '/tickets'
+      redirectUrl = '/tickets/assigned'
     }
 
     req.logIn(user, function (err) {
