@@ -133,8 +133,8 @@ editor.assetsUpload = function (req, res) {
     var includePort = global.TRUDESK_PORT && global.TRUDESK_PORT !== (80 || 443)
 
     var fileUrl =
-      req.protocol +
-      '://' +
+      // req.protocol +
+      'https://' + // FIXME: hardcoded
       req.hostname +
       (includePort ? ':' + global.TRUDESK_PORT.toString() : '') +
       '/uploads/assets/upload/' +
