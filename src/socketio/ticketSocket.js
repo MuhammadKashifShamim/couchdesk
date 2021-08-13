@@ -34,6 +34,7 @@ function register (socket) {
   events.onUpdateAssigneeList(socket)
   events.onSetAssignee(socket)
   events.onClearAssignee(socket)
+  events.onSetTicketOwner(socket)
   events.onSetTicketType(socket)
   events.onSetTicketPriority(socket)
   events.onSetTicketGroup(socket)
@@ -156,6 +157,35 @@ events.onSetAssignee = function (socket) {
           })
         }
       )
+    })
+  })
+}
+
+events.onSetTicketOwner = function (socket) {
+  socket.on('setTicketOwner', function (data) {
+    var ticketId = data.ticketId
+    var nextOwnerId = data.ownerId
+    var ownerId = socket.request.user._id
+
+    if (_.isUndefined(ticketId) || _.isUndefined(nextOwnerId)) return true
+
+    ticketSchema.getTicketById(ticketId, function (err, ticket) {
+      if (err) return true
+
+      ticket.setTicketOwner(ownerId, nextOwnerId, function (err, t) {
+        if (err) return true
+
+        t.save(function (err, tt) {
+          if (err) return true
+
+          ticketSchema.populate(tt, 'owner', function (err) {
+            if (err) return true
+
+            // emitter.emit('ticket:updated', tt)
+            utils.sendToAllConnectedClients(io, 'updateTicketOwner', tt)
+          })
+        })
+      })
     })
   })
 }

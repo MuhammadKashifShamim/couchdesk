@@ -182,8 +182,8 @@ class Sidebar extends React.Component {
         )}
         {sessionUser && Helpers.canUser('groups:view') && (
           <SidebarItem
-            text='Customer Groups'
-            icon='supervisor_account'
+            text='Projects'
+            icon='cases'
             href='/groups'
             class='navGroups'
             active={activeItem === 'groups'}

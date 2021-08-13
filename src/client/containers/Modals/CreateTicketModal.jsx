@@ -22,7 +22,7 @@ import axios from 'axios'
 import Log from '../../logger'
 import { createTicket } from 'actions/tickets'
 import { fetchGroups } from 'actions/groups'
-import { fetchAccountsCreateTicket } from 'actions/accounts'
+import { fetchAccounts, fetchAccountsCreateTicket } from 'actions/accounts'
 
 import $ from 'jquery'
 import helpers from 'lib/helpers'
@@ -49,8 +49,9 @@ class CreateTicketModal extends React.Component {
   }
 
   componentDidMount () {
-    this.props.fetchGroups()
+    this.props.fetchAccounts()
     this.props.fetchAccountsCreateTicket({ type: 'all', limit: 1000 })
+    this.props.fetchGroups()
     helpers.UI.inputs()
     helpers.formvalidator()
     this.defaultTicketTypeWatcher = when(
@@ -104,9 +105,6 @@ class CreateTicketModal extends React.Component {
 
     let data = {}
     if (this.issueText.length < 1) return
-    const allowAgentUserTickets =
-      this.props.viewdata.ticketSettings.allowAgentUserTickets &&
-      (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
 
     const minIssueLength = this.props.viewdata.ticketSettings.minIssue
     let $mdeError
@@ -129,17 +127,15 @@ class CreateTicketModal extends React.Component {
 
     if (!$form.isValid(null, null, false)) return true
 
-    if (allowAgentUserTickets) {
-      data.owner = this.ownerSelect.value
-      if (this.assigneeSelect.value) {
-        data.assignee = this.assigneeSelect.value
-      }
+    if (this.assigneeSelect.value) {
+      data.assignee = this.assigneeSelect.value
     }
 
     data.subject = e.target.subject.value
+    data.owner = this.ownerSelect.value
     data.group = this.groupSelect.value
-    data.type = this.typeSelect.value
-    data.tags = this.tagSelect.value
+    data.type = this.typeSelect ? this.typeSelect.value : this.props.viewdata.defaultTicketType._i
+    data.tags = this.tagSelect ? this.tagSelect.value : []
     data.priority = this.selectedPriority
     data.issue = this.issueMde.easymde.value()
     data.socketid = socket.ui.socket.io.engine.id
@@ -165,6 +161,12 @@ class CreateTicketModal extends React.Component {
       viewdata.ticketSettings.allowAgentUserTickets &&
       (shared.sessionUser.role.isAdmin || shared.sessionUser.role.isAgent)
 
+    const mappedAccounts = this.props.accounts
+      .map(a => {
+        return { text: a.get('fullname'), value: a.get('_id') }
+      })
+      .toArray()
+
     const mappedAccountsCreateTicket = this.props.accountsCreateTicket
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
@@ -184,12 +186,6 @@ class CreateTicketModal extends React.Component {
       return { text: tag.name, value: tag._id }
     })
 
-    const mappedAccounts = this.props.accounts
-      .map(a => {
-        return { text: a.get('fullname'), value: a.get('_id') }
-      })
-      .toArray()
-
     return (
       <BaseModal {...this.props} options={{ bgclose: false }}>
         <form className={'uk-form-stacked'} onSubmit={e => this.onFormSubmit(e)}>
@@ -208,20 +204,19 @@ class CreateTicketModal extends React.Component {
           </div>
           <div className='uk-margin-medium-bottom'>
             <Grid>
-              {allowAgentUserTickets && (
-                <GridItem width={'1-3'}>
-                  <label className={'uk-form-label'}>Requestor</label>
-                  <SingleSelect
-                    showTextbox={true}
-                    items={mappedAccountsCreateTicket}
-                    defaultValue={[this.props.viewdata.loggedInAccount._id]}
-                    width={'100%'}
-                    ref={i => (this.ownerSelect = i)}
-                  />
-                </GridItem>
-              )}
-              <GridItem width={allowAgentUserTickets ? '2-3' : '1-1'}>
-                <label className={'uk-form-label'}>Group</label>
+              <GridItem width={'1-3'}>
+                <label className={'uk-form-label'}>Requestor</label>
+                <SingleSelect
+                  showTextbox={true}
+                  items={mappedAccountsCreateTicket}
+                  defaultValue={[this.props.viewdata.loggedInAccount._id]}
+                  width={'100%'}
+                  disabled={!allowAgentUserTickets}
+                  ref={i => (this.ownerSelect = i)}
+                />
+              </GridItem>
+              <GridItem width={'2-3'}>
+                <label className={'uk-form-label'}>Project</label>
                 <SingleSelect
                   showTextbox={false}
                   items={mappedGroups}
@@ -233,33 +228,35 @@ class CreateTicketModal extends React.Component {
               </GridItem>
             </Grid>
           </div>
-          <div className='uk-margin-medium-bottom'>
-            <Grid>
-              <GridItem width={'1-3'}>
-                <label className={'uk-form-label'}>Type</label>
-                <SingleSelect
-                  showTextbox={false}
-                  items={mappedTicketTypes}
-                  width={'100%'}
-                  defaultValue={this.props.viewdata.defaultTicketType._id}
-                  onSelectChange={e => {
-                    this.onTicketTypeSelectChange(e)
-                  }}
-                  ref={i => (this.typeSelect = i)}
-                />
-              </GridItem>
-              <GridItem width={'2-3'}>
-                <label className={'uk-form-label'}>Tags</label>
-                <SingleSelect
-                  showTextbox={false}
-                  items={mappedTicketTags}
-                  width={'100%'}
-                  multiple={true}
-                  ref={i => (this.tagSelect = i)}
-                />
-              </GridItem>
-            </Grid>
-          </div>
+          {allowAgentUserTickets && (
+            <div className='uk-margin-medium-bottom'>
+              <Grid>
+                <GridItem width={'1-3'}>
+                  <label className={'uk-form-label'}>Type</label>
+                  <SingleSelect
+                    showTextbox={false}
+                    items={mappedTicketTypes}
+                    width={'100%'}
+                    defaultValue={this.props.viewdata.defaultTicketType._id}
+                    onSelectChange={e => {
+                      this.onTicketTypeSelectChange(e)
+                    }}
+                    ref={i => (this.typeSelect = i)}
+                  />
+                </GridItem>
+                <GridItem width={'2-3'}>
+                  <label className={'uk-form-label'}>Tags</label>
+                  <SingleSelect
+                    showTextbox={false}
+                    items={mappedTicketTags}
+                    width={'100%'}
+                    multiple={true}
+                    ref={i => (this.tagSelect = i)}
+                  />
+                </GridItem>
+              </Grid>
+            </div>
+          )}
           {allowAgentUserTickets && (
             <div className='uk-margin-medium-bottom'>
               <label className={'uk-form-label'}>Assignee</label>
@@ -271,47 +268,49 @@ class CreateTicketModal extends React.Component {
               />
             </div>
           )}
-          <div className='uk-margin-medium-bottom'>
-            <label className={'uk-form-label'}>Priority</label>
-            <div
-              ref={i => (this.priorityLoader = i)}
-              style={{ height: '32px', width: '32px', position: 'relative' }}
-              className={'hide'}
-            >
-              <SpinLoader
-                style={{ background: 'transparent' }}
-                spinnerStyle={{ width: '24px', height: '24px' }}
-                active={true}
-              />
+          {helpers.canUser('tickets:priority', true) && (
+            <div className='uk-margin-medium-bottom'>
+              <label className={'uk-form-label'}>Priority</label>
+              <div
+                ref={i => (this.priorityLoader = i)}
+                style={{ height: '32px', width: '32px', position: 'relative' }}
+                className={'hide'}
+              >
+                <SpinLoader
+                  style={{ background: 'transparent' }}
+                  spinnerStyle={{ width: '24px', height: '24px' }}
+                  active={true}
+                />
+              </div>
+              <div ref={i => (this.priorityWrapper = i)} className={'uk-clearfix'}>
+                {this.priorities.map(priority => {
+                  return (
+                    <div key={priority._id} className={'uk-float-left'}>
+                      <span className={'icheck-inline'}>
+                        <input
+                          id={'p___' + priority._id}
+                          name={'priority'}
+                          type='radio'
+                          className={'with-gap'}
+                          value={priority._id}
+                          onChange={e => {
+                            this.onPriorityRadioChange(e)
+                          }}
+                          checked={this.selectedPriority === priority._id}
+                          data-md-icheck
+                        />
+                        <label htmlFor={'p___' + priority._id} className={'mb-10 inline-label'}>
+                          <span className='uk-badge' style={{ backgroundColor: priority.htmlColor }}>
+                            {priority.name}
+                          </span>
+                        </label>
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <div ref={i => (this.priorityWrapper = i)} className={'uk-clearfix'}>
-              {this.priorities.map(priority => {
-                return (
-                  <div key={priority._id} className={'uk-float-left'}>
-                    <span className={'icheck-inline'}>
-                      <input
-                        id={'p___' + priority._id}
-                        name={'priority'}
-                        type='radio'
-                        className={'with-gap'}
-                        value={priority._id}
-                        onChange={e => {
-                          this.onPriorityRadioChange(e)
-                        }}
-                        checked={this.selectedPriority === priority._id}
-                        data-md-icheck
-                      />
-                      <label htmlFor={'p___' + priority._id} className={'mb-10 inline-label'}>
-                        <span className='uk-badge' style={{ backgroundColor: priority.htmlColor }}>
-                          {priority.name}
-                        </span>
-                      </label>
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          )}
           <div className='uk-margin-medium-bottom'>
             <span>Description</span>
             <div className='error-border-wrap uk-clearfix'>
@@ -346,19 +345,20 @@ CreateTicketModal.propTypes = {
   accountsCreateTicket: PropTypes.object.isRequired,
   groups: PropTypes.object.isRequired,
   createTicket: PropTypes.func.isRequired,
-  fetchGroups: PropTypes.func.isRequired,
-  fetchAccountsCreateTicket: PropTypes.func.isRequired
+  fetchAccounts: PropTypes.func.isRequired,
+  fetchAccountsCreateTicket: PropTypes.func.isRequired,
+  fetchGroups: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
   shared: state.shared,
   viewdata: state.common,
-  groups: state.groupsState.groups,
-  accounts: state.accountsState.accountsCreateTicket,
-  accountsCreateTicket: state.accountsState.accountsCreateTicket
+  accounts: state.accountsState.accounts,
+  accountsCreateTicket: state.accountsState.accountsCreateTicket,
+  groups: state.groupsState.groups
 })
 
 export default connect(
   mapStateToProps,
-  { createTicket, fetchGroups, fetchAccountsCreateTicket }
+  { createTicket, fetchAccounts, fetchAccountsCreateTicket, fetchGroups }
 )(CreateTicketModal)

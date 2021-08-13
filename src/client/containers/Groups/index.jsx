@@ -53,7 +53,7 @@ class GroupsContainer extends React.Component {
         <p style="font-size: 12px;">
             Agents may lose access to resources once this group is deleted.
         </p>
-        <span>Groups that are associated with ticket cannot be deleted.</span>
+        <span>Projects that are associated with ticket cannot be deleted.</span>
         `,
       () => {
         this.props.deleteGroup({ _id })
@@ -128,7 +128,7 @@ class GroupsContainer extends React.Component {
     return (
       <div>
         <PageTitle
-          title={'Customer Groups'}
+          title={'Projects'}
           rightComponent={
             helpers.canUser('groups:create', true) ? (
               <div className={'uk-grid uk-grid-collapse'}>
@@ -150,8 +150,8 @@ class GroupsContainer extends React.Component {
           <Table
             headers={[
               <TableHeader key={0} width={'25%'} height={40} text={'Name'} padding={'8px 8px 8px 15px'} />,
-              <TableHeader key={1} width={'50%'} text={'Group Members'} />,
-              <TableHeader key={2} width={130} text={'Group Actions'} />
+              <TableHeader key={1} width={'50%'} text={'Project Members'} />,
+              <TableHeader key={2} width={130} text={'Project Actions'} />
             ]}
           >
             {tableItems}

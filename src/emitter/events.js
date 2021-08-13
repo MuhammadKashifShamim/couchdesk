@@ -475,7 +475,7 @@ var notifications = require('../notifications') // Load Push Events
               ticket.subscribers,
               function (member, cb) {
                 if (_.isUndefined(member) || _.isUndefined(member.email)) return cb()
-                if (member._id.toString() === comment.owner.toString()) return cb()
+                // if (member._id.toString() === comment.owner.toString()) return cb()
                 if (member.deleted) return cb()
 
                 emails.push(member.email)
@@ -504,11 +504,40 @@ var notifications = require('../notifications') // Load Push Events
                   if (err) winston.warn(err)
                   if (err) return c()
 
+                  // TODO: hack
+                  ticket = {
+                    uid: ticket.uid,
+                    subject: ticket.subject,
+                    group: {
+                      name: ticket.group.name
+                    },
+                    owner: {
+                      fullname: ticket.owner.fullname
+                    },
+                    date: ticket.date,
+                    type: {
+                      name: ticket.type.name
+                    },
+                    priority: {
+                      name: ticket.priority.name
+                    },
+                    tags: ticket.tags.map(tag => ({
+                      name: tag.name
+                    })),
+                    issue: ticket.issue,
+                    comments: ticket.comments.map(comment => ({
+                      owner: {
+                        fullname: comment.owner.fullname
+                      },
+                      date: comment.date,
+                      comment: comment.comment
+                    }))
+                  }
+
+                  var context = { ticket: ticket, comment: comment }
+
                   email
-                    .render('ticket-comment-added', {
-                      ticket: ticket,
-                      comment: comment
-                    })
+                    .render('ticket-comment-added', context)
                     .then(function (html) {
                       var mailOptions = {
                         to: emails.join(),

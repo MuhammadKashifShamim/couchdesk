@@ -182,7 +182,7 @@ class AccountsContainer extends React.Component {
                   <li>
                     {customer && user.get('groups') && (
                       <div className='tru-list-content'>
-                        <span className='tru-list-heading'>Groups</span>
+                        <span className='tru-list-heading'>Projects</span>
                         <span className='uk-text-small uk-text-muted uk-text-truncate'>
                           {user.get('groups').map(group => {
                             return group.get('name') + (user.get('groups').toArray().length > 1 ? ', ' : '')

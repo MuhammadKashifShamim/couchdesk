@@ -101,7 +101,7 @@ class DepartmentsContainer extends React.Component {
                 </th>
                 <th style={{ verticalAlign: 'middle', fontSize: 12, textTransform: 'uppercase' }}>Teams</th>
                 <th style={{ width: '25%', verticalAlign: 'middle', fontSize: 12, textTransform: 'uppercase' }}>
-                  Groups
+                  Projects
                 </th>
                 <th
                   style={{
@@ -153,14 +153,14 @@ class DepartmentsContainer extends React.Component {
                         {department.get('allGroups') === true && (
                           <div>
                             <h6 className={'text-success'} style={{ fontWeight: 'bold' }}>
-                              All Groups
+                              All Projects
                             </h6>
                           </div>
                         )}
                         {department.get('publicGroups') === true && (
                           <div>
                             <h6 className={'text-success'} style={{ fontWeight: 'bold' }}>
-                              All Public Groups
+                              All Public Projects
                             </h6>
                           </div>
                         )}

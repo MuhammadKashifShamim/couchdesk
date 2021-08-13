@@ -103,7 +103,7 @@ class PermissionBody extends React.Component {
   }
 
   static mapTicketSpecials () {
-    return [{ title: 'Notes', perm: 'notes' }, { title: 'Manage Public Tickets', perm: 'public' }]
+    return [{ title: 'Notes', perm: 'notes' }, { title: 'Manage Public Tickets', perm: 'public' }, { title: 'Set Priority In New Tickets', perm: 'priority' }]
   }
 
   static mapAccountSpecials () {

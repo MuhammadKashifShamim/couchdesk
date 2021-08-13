@@ -310,6 +310,24 @@ ticketSchema.methods.clearAssignee = function (ownerId, callback) {
   callback(null, self)
 }
 
+ticketSchema.methods.setTicketOwner = function (ownerId, nextOwnerId, callback) {
+  var self = this
+  self.owner = nextOwnerId
+
+  self.populate('owner', function (err, ticket) {
+    if (err) return callback(err)
+
+    var historyItem = {
+      action: 'ticket:set:owner',
+      description: 'Ticket Requestor set to: ' + ticket.owner.fullname,
+      owner: ownerId
+    }
+    self.history.push(historyItem)
+
+    return callback(null, ticket)
+  })
+}
+
 /**
  * Sets the ticket type for the instanced Ticket
  * @instance
@@ -392,7 +410,7 @@ ticketSchema.methods.setTicketGroup = function (ownerId, groupId, callback) {
 
     var historyItem = {
       action: 'ticket:set:group',
-      description: 'Ticket Group set to: ' + ticket.group.name,
+      description: 'Ticket Project set to: ' + ticket.group.name,
       owner: ownerId
     }
     self.history.push(historyItem)

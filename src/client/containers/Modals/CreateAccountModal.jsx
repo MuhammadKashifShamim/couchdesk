@@ -245,7 +245,7 @@ class CreateAccountModal extends React.Component {
             {!this.isAgentRole && (
               <div>
                 <div className='uk-margin-medium-bottom'>
-                  <label className='uk-form-label'>Groups</label>
+                  <label className='uk-form-label'>Projects</label>
                   <MultiSelect
                     items={groups}
                     onChange={e => this.onGroupSelectChange(e)}

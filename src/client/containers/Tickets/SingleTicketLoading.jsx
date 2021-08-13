@@ -77,7 +77,7 @@ class SingleTicketLoading extends React.Component {
                     </div>
                     {/*  Group */}
                     <div className='uk-width-1-1 nopadding uk-clearfix'>
-                      <span>Group</span>
+                      <span>Project</span>
                       <div className='input-box'>---</div>
                     </div>
                     {/*  Due Date */}

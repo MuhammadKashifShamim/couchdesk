@@ -85,11 +85,11 @@ class EditGroupModal extends React.Component {
       <BaseModal>
         <SpinLoader active={this.props.accountsLoading} />
         <div className={'mb-25'}>
-          <h2>Edit Group</h2>
+          <h2>Edit Project</h2>
         </div>
         <form className={'uk-form-stacked'} onSubmit={e => this.onFormSubmit(e)}>
           <div className={'uk-margin-medium-bottom'}>
-            <label>Group Name</label>
+            <label>Project Name</label>
             <input
               type='text'
               className={'md-input'}
@@ -97,11 +97,11 @@ class EditGroupModal extends React.Component {
               onChange={e => this.onInputChange(e)}
               data-validation='length'
               data-validation-length={'min2'}
-              data-validation-error-msg={'Please enter a valid Group name. (Must contain 2 characters)'}
+              data-validation-error-msg={'Please enter a valid Project name. (Must contain 2 characters)'}
             />
           </div>
           <div className={'uk-margin-medium-bottom'}>
-            <label style={{ marginBottom: 5 }}>Group Members</label>
+            <label style={{ marginBottom: 5 }}>Project Members</label>
             <MultiSelect
               items={mappedAccounts}
               initialSelected={selectedMembers}
@@ -120,7 +120,7 @@ class EditGroupModal extends React.Component {
           </div>
           <div className='uk-modal-footer uk-text-right'>
             <Button text={'Close'} flat={true} waves={true} extraClass={'uk-modal-close'} />
-            <Button text={'Save Group'} flat={true} waves={true} style={'primary'} type={'submit'} />
+            <Button text={'Save Project'} flat={true} waves={true} style={'primary'} type={'submit'} />
           </div>
         </form>
       </BaseModal>

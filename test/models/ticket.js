@@ -170,7 +170,7 @@ describe('ticket.js', function () {
     })
   })
 
-  it('should set ticket group', function (done) {
+  it('should set project', function (done) {
     var grp = groupSchema({
       name: 'Test'
     })

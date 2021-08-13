@@ -63,7 +63,7 @@ class CreateDepartmentModal extends React.Component {
     if (!$form.isValid(null, null, false)) return false
 
     if (!this.allGroups && !this.publicGroups && this.groupSelect.getSelected() == null) {
-      helpers.UI.showSnackbar('Can not create department without a group selected or all groups enabled!', true)
+      helpers.UI.showSnackbar('Can not create department without a project selected or all projects enabled!', true)
       return false
     }
 
@@ -121,7 +121,7 @@ class CreateDepartmentModal extends React.Component {
           <hr />
           <div className={'uk-margin-medium-bottom uk-clearfix'}>
             <div className='uk-float-left'>
-              <h4 style={{ paddingLeft: 2 }}>Access all current and new customer groups?</h4>
+              <h4 style={{ paddingLeft: 2 }}>Access all current and new projects?</h4>
             </div>
             <div className='uk-float-right md-switch md-green' style={{ marginTop: 5 }}>
               <label>
@@ -141,7 +141,7 @@ class CreateDepartmentModal extends React.Component {
           </div>
           <div className={'uk-margin-medium-bottom uk-clearfix'}>
             <div className='uk-float-left'>
-              <h4 style={{ paddingLeft: 2 }}>Access all current and new public groups?</h4>
+              <h4 style={{ paddingLeft: 2 }}>Access all current and new public projects?</h4>
             </div>
             <div className='uk-float-right md-switch md-green' style={{ marginTop: 1 }}>
               <label>
@@ -158,7 +158,7 @@ class CreateDepartmentModal extends React.Component {
             </div>
           </div>
           <div className={'uk-margin-medium-bottom'}>
-            <label style={{ marginBottom: 5 }}>Customer Groups</label>
+            <label style={{ marginBottom: 5 }}>Projects</label>
             <MultiSelect
               items={mappedGroups}
               onChange={() => {}}

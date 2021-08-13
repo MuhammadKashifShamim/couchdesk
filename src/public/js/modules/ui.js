@@ -130,6 +130,14 @@ define('modules/ui', [
     socket.emit('clearAssignee', id)
   }
 
+  socketUi.setTicketOwner = function (ticketId, ownerId) {
+    var payload = {
+      ticketId: ticketId,
+      ownerId: ownerId
+    }
+
+    socket.emit('setTicketOwner', payload)
+  }
   socketUi.setTicketType = function (ticketId, typeId) {
     var payload = {
       ticketId: ticketId,

@@ -20,6 +20,7 @@ import sortBy from 'lodash/sortBy'
 import union from 'lodash/union'
 import uniqBy from 'lodash/uniqBy'
 
+import { fetchAccounts, unloadAccounts } from 'actions/accounts'
 import { transferToThirdParty } from 'actions/tickets'
 import { fetchGroups, unloadGroups } from 'actions/groups'
 import { showModal } from 'actions/common'
@@ -80,6 +81,7 @@ class SingleTicketContainer extends React.Component {
     this.onSocketUpdateComments = this.onSocketUpdateComments.bind(this)
     this.onUpdateTicketNotes = this.onUpdateTicketNotes.bind(this)
     this.onUpdateAssignee = this.onUpdateAssignee.bind(this)
+    this.onUpdateTicketOwner = this.onUpdateTicketOwner.bind(this)
     this.onUpdateTicketType = this.onUpdateTicketType.bind(this)
     this.onUpdateTicketPriority = this.onUpdateTicketPriority.bind(this)
     this.onUpdateTicketGroup = this.onUpdateTicketGroup.bind(this)
@@ -91,6 +93,7 @@ class SingleTicketContainer extends React.Component {
     socket.socket.on('updateComments', this.onSocketUpdateComments)
     socket.socket.on('updateNotes', this.onUpdateTicketNotes)
     socket.socket.on('updateAssignee', this.onUpdateAssignee)
+    socket.socket.on('updateTicketOwner', this.onUpdateTicketOwner)
     socket.socket.on('updateTicketType', this.onUpdateTicketType)
     socket.socket.on('updateTicketPriority', this.onUpdateTicketPriority)
     socket.socket.on('updateTicketGroup', this.onUpdateTicketGroup)
@@ -98,6 +101,7 @@ class SingleTicketContainer extends React.Component {
     socket.socket.on('updateTicketTags', this.onUpdateTicketTags)
 
     fetchTicket(this)
+    this.props.fetchAccounts()
     this.props.fetchGroups()
   }
 
@@ -110,12 +114,14 @@ class SingleTicketContainer extends React.Component {
     socket.socket.off('updateComments', this.onSocketUpdateComments)
     socket.socket.off('updateNotes', this.onUpdateTicketNotes)
     socket.socket.off('updateAssignee', this.onUpdateAssignee)
+    socket.socket.off('updateTicketOwner', this.onUpdateTicketOwner)
     socket.socket.off('updateTicketType', this.onUpdateTicketType)
     socket.socket.off('updateTicketPriority', this.onUpdateTicketPriority)
     socket.socket.off('updateTicketGroup', this.onUpdateTicketGroup)
     socket.socket.off('updateTicketDueDate', this.onUpdateTicketDueDate)
     socket.socket.off('updateTicketTags', this.onUpdateTicketTags)
 
+    this.props.unloadAccounts()
     this.props.unloadGroups()
   }
 
@@ -133,6 +139,10 @@ class SingleTicketContainer extends React.Component {
       if (this.ticket.assignee && this.ticket.assignee._id === this.props.shared.sessionUser._id)
         this.isSubscribed = true
     }
+  }
+
+  onUpdateTicketOwner (data) {
+    if (this.ticket._id === data._id) this.ticket.owner = data.owner
   }
 
   onUpdateTicketType (data) {
@@ -234,6 +244,14 @@ class SingleTicketContainer extends React.Component {
   }
 
   render () {
+    const mappedAccounts = this.props.accountsState
+      ? this.props.accountsState.accounts
+          .map(a => {
+            return { text: a.get('fullname'), value: a.get('_id') }
+          })
+          .toArray()
+      : []
+
     const mappedGroups = this.props.groupsState
       ? uniqBy(
           this.props.groupsState.groups
@@ -257,6 +275,8 @@ class SingleTicketContainer extends React.Component {
       this.ticket.status !== 3 &&
       helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)
 
+    const isAdminOrAgent = this.ticket && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
+
     return (
       <div className={'uk-clearfix uk-position-relative'} style={{ width: '100%', height: '100vh' }}>
         {!this.ticket && <SpinLoader active={true} />}
@@ -279,62 +299,85 @@ class SingleTicketContainer extends React.Component {
                 {/*  Left Side */}
                 <div className='page-content-left full-height scrollable'>
                   <div className='ticket-details-wrap uk-position-relative uk-clearfix'>
-                    <div className='ticket-assignee-wrap uk-clearfix' style={{ paddingRight: 30 }}>
-                      <h4>Assignee</h4>
-                      <div className='ticket-assignee uk-clearfix'>
+                    {isAdminOrAgent ? (
+                      <div className='ticket-assignee-wrap uk-clearfix' style={{ paddingRight: 30 }}>
+                        <h4>Assignee</h4>
+                        <div className='ticket-assignee uk-clearfix'>
+                          {hasTicketUpdate && (
+                            <a
+                              role='button'
+                              title='Set Assignee'
+                              style={{ float: 'left' }}
+                              className='relative no-ajaxy'
+                              onClick={() => socket.socket.emit('updateAssigneeList')}
+                            >
+                              <PDropdownTrigger target={'assigneeDropdown'}>
+                                <Avatar
+                                  image={this.ticket.assignee && this.ticket.assignee.image}
+                                  showOnlineBubble={this.ticket.assignee !== undefined}
+                                  userId={this.ticket.assignee && this.ticket.assignee._id}
+                                />
+                                <span className='drop-icon material-icons'>keyboard_arrow_down</span>
+                              </PDropdownTrigger>
+                            </a>
+                          )}
+                          {!hasTicketUpdate && (
+                            <Avatar
+                              image={this.ticket.assignee && this.ticket.assignee.image}
+                              showOnlineBubble={this.ticket.assignee !== undefined}
+                              userId={this.ticket.assignee && this.ticket.assignee._id}
+                            />
+                          )}
+                          <div className='ticket-assignee-details'>
+                            {!this.ticket.assignee && <h3>No User Assigned</h3>}
+                            {this.ticket.assignee && (
+                              <Fragment>
+                                <h3>{this.ticket.assignee.fullname}</h3>
+                                <a
+                                  className='comment-email-link uk-text-truncate uk-display-inline-block'
+                                  href={`mailto:${this.ticket.assignee.email}`}
+                                >
+                                  {this.ticket.assignee.email}
+                                </a>
+                                <span className={'uk-display-block'}>{this.ticket.assignee.title}</span>
+                              </Fragment>
+                            )}
+                          </div>
+                        </div>
+
                         {hasTicketUpdate && (
-                          <a
-                            role='button'
-                            title='Set Assignee'
-                            style={{ float: 'left' }}
-                            className='relative no-ajaxy'
-                            onClick={() => socket.socket.emit('updateAssigneeList')}
-                          >
-                            <PDropdownTrigger target={'assigneeDropdown'}>
-                              <Avatar
-                                image={this.ticket.assignee && this.ticket.assignee.image}
-                                showOnlineBubble={this.ticket.assignee !== undefined}
-                                userId={this.ticket.assignee && this.ticket.assignee._id}
-                              />
-                              <span className='drop-icon material-icons'>keyboard_arrow_down</span>
-                            </PDropdownTrigger>
-                          </a>
-                        )}
-                        {!hasTicketUpdate && (
-                          <Avatar
-                            image={this.ticket.assignee && this.ticket.assignee.image}
-                            showOnlineBubble={this.ticket.assignee !== undefined}
-                            userId={this.ticket.assignee && this.ticket.assignee._id}
+                          <AssigneeDropdownPartial
+                            ticketId={this.ticket._id}
+                            onClearClick={() => (this.ticket.assignee = undefined)}
+                            onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
                           />
                         )}
-                        <div className='ticket-assignee-details'>
-                          {!this.ticket.assignee && <h3>No User Assigned</h3>}
-                          {this.ticket.assignee && (
-                            <Fragment>
-                              <h3>{this.ticket.assignee.fullname}</h3>
-                              <a
-                                className='comment-email-link uk-text-truncate uk-display-inline-block'
-                                href={`mailto:${this.ticket.assignee.email}`}
-                              >
-                                {this.ticket.assignee.email}
-                              </a>
-                              <span className={'uk-display-block'}>{this.ticket.assignee.title}</span>
-                            </Fragment>
-                          )}
-                        </div>
                       </div>
-
-                      {hasTicketUpdate && (
-                        <AssigneeDropdownPartial
-                          ticketId={this.ticket._id}
-                          onClearClick={() => (this.ticket.assignee = undefined)}
-                          onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
-                        />
-                      )}
-                    </div>
+                    ) : <div style={{ marginBottom: 30, paddingRight: 30 }} />}
 
                     <div className='uk-width-1-1 padding-left-right-15'>
                       <div className='tru-card ticket-details uk-clearfix'>
+                        {/*  Owner */}
+                        {(this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent) && (
+                          <div className='uk-width-1-1 nopadding uk-clearfix'>
+                            <span>Requestor</span>
+                            {hasTicketUpdate && (
+                              <select
+                                value={this.ticket.owner._id}
+                                onChange={e => {
+                                  socket.ui.setTicketOwner(this.ticket._id, e.target.value)
+                                }}
+                              >
+                                {mappedAccounts &&
+                                  mappedAccounts.map(account => (
+                                    <option key={account.value} value={account.value}>
+                                      {account.text}
+                                    </option>
+                                  ))}
+                              </select>
+                            )}
+                          </div>
+                        )}
                         {/* Type */}
                         <div className='uk-width-1-2 uk-float-left nopadding'>
                           <div className='marginright5'>
@@ -394,7 +437,7 @@ class SingleTicketContainer extends React.Component {
                         </div>
                         {/*  Group */}
                         <div className='uk-width-1-1 nopadding uk-clearfix'>
-                          <span>Group</span>
+                          <span>Project</span>
                           {hasTicketUpdate && (
                             <select
                               value={this.ticket.group._id}
@@ -790,6 +833,9 @@ SingleTicketContainer.propTypes = {
   ticketUid: PropTypes.string.isRequired,
   shared: PropTypes.object.isRequired,
   common: PropTypes.object.isRequired,
+  accountsState: PropTypes.object.isRequired,
+  fetchAccounts: PropTypes.func.isRequired,
+  unloadAccounts: PropTypes.func.isRequired,
   groupsState: PropTypes.object.isRequired,
   fetchGroups: PropTypes.func.isRequired,
   unloadGroups: PropTypes.func.isRequired,
@@ -800,9 +846,10 @@ SingleTicketContainer.propTypes = {
 const mapStateToProps = state => ({
   common: state.common,
   shared: state.shared,
+  accountsState: state.accountsState,
   groupsState: state.groupsState
 })
 
-export default connect(mapStateToProps, { fetchGroups, unloadGroups, showModal, transferToThirdParty })(
+export default connect(mapStateToProps, { fetchAccounts, unloadAccounts, fetchGroups, unloadGroups, showModal, transferToThirdParty })(
   SingleTicketContainer
 )

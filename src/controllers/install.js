@@ -371,7 +371,7 @@ installController.install = function (req, res) {
         var DepartmentSchema = require('../models/department')
         DepartmentSchema.create(
           {
-            name: 'Support - All Groups (Default)',
+            name: 'Support - All Projects (Default)',
             teams: [defaultTeam._id],
             allGroups: true,
             groups: []

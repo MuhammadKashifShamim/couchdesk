@@ -75,11 +75,11 @@ class CreateGroupModal extends React.Component {
     return (
       <BaseModal>
         <div className={'mb-25'}>
-          <h2>Create Group</h2>
+          <h2>Create Project</h2>
         </div>
         <form className={'uk-form-stacked'} onSubmit={e => this.onFormSubmit(e)}>
           <div className={'uk-margin-medium-bottom'}>
-            <label>Group Name</label>
+            <label>Project Name</label>
             <input
               type='text'
               className={'md-input'}
@@ -87,16 +87,16 @@ class CreateGroupModal extends React.Component {
               onChange={e => this.onInputChange(e)}
               data-validation='length'
               data-validation-length={'min2'}
-              data-validation-error-msg={'Please enter a valid Group name. (Must contain 2 characters)'}
+              data-validation-error-msg={'Please enter a valid Project name. (Must contain 2 characters)'}
             />
           </div>
           <div className={'uk-margin-medium-bottom'}>
-            <label style={{ marginBottom: 5 }}>Group Members</label>
+            <label style={{ marginBottom: 5 }}>Project Members</label>
             <MultiSelect items={mappedAccounts} onChange={() => {}} ref={r => (this.membersSelect = r)} />
           </div>
           <div className='uk-modal-footer uk-text-right'>
             <Button text={'Close'} flat={true} waves={true} extraClass={'uk-modal-close'} />
-            <Button text={'Create Group'} flat={true} waves={true} style={'primary'} type={'submit'} />
+            <Button text={'Create Project'} flat={true} waves={true} style={'primary'} type={'submit'} />
           </div>
         </form>
       </BaseModal>

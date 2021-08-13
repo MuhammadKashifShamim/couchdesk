@@ -81,7 +81,7 @@ reportsController.breakdownGroup = function (req, res) {
   }
 
   var content = {}
-  content.title = 'Group Breakdown'
+  content.title = 'Project Breakdown'
   content.nav = 'reports'
   content.subnav = 'reports-breakdown-group'
 

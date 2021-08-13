@@ -125,7 +125,7 @@ class EditDepartmentModal extends React.Component {
           <hr />
           <div className={'uk-margin-medium-bottom uk-clearfix'}>
             <div className='uk-float-left'>
-              <h4 style={{ paddingLeft: 2 }}>Access all current and new customer groups?</h4>
+              <h4 style={{ paddingLeft: 2 }}>Access all current and new projects?</h4>
             </div>
             <div className='uk-float-right md-switch md-green' style={{ marginTop: 5 }}>
               <label>
@@ -163,7 +163,7 @@ class EditDepartmentModal extends React.Component {
             </div>
           </div>
           <div className={'uk-margin-medium-bottom'}>
-            <label style={{ marginBottom: 5 }}>Customer Groups</label>
+            <label style={{ marginBottom: 5 }}>Projects</label>
             <MultiSelect
               items={mappedGroups}
               onChange={() => {}}

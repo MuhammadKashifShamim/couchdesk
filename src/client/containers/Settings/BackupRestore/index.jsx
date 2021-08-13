@@ -396,7 +396,7 @@ class BackupRestoreSettingsContainer extends React.Component {
                   <tr>
                     <th>UID</th>
                     <th>Subject</th>
-                    <th>Group</th>
+                    <th>Project</th>
                     <th>Date</th>
                     <th />
                   </tr>

@@ -284,7 +284,7 @@ class EditAccountModal extends React.Component {
             )}
             {this.props.groups && customer && (
               <div className='uk-margin-medium-bottom'>
-                <label className='uk-form-label'>Groups</label>
+                <label className='uk-form-label'>Projects</label>
                 <MultiSelect
                   items={groups}
                   initialSelected={user.groups.map(i => i._id)}
