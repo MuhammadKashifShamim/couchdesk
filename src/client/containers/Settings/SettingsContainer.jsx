@@ -123,13 +123,13 @@ class SettingsContainer extends React.Component {
                   this.onMenuItemClick(e, 'elasticsearch')
                 }}
               />
-              <MenuItem
+              {/* <MenuItem
                 title='Push Service'
                 active={this.state.activeCategory === 'settings-tps'}
                 onClick={e => {
                   this.onMenuItemClick(e, 'tps')
                 }}
-              />
+              /> */}
               <MenuItem
                 title='Backup/Restore'
                 active={this.state.activeCategory === 'settings-backup'}

@@ -396,7 +396,7 @@ class TicketsContainer extends React.Component {
               <TableHeader key={3} width={'23%'} text={'Subject'} />,
               <TableHeader key={4} width={110} text={'Created'} />,
               <TableHeader key={5} width={125} text={'Requester'} />,
-              <TableHeader key={6} width={175} text={'Project'} />,
+              <TableHeader key={6} width={225} text={'Project'} />,
               ...(isAdminOrAgent ? [<TableHeader key={7} text={'Assignee'} />] : []),
               <TableHeader key={8} width={110} text={'Due Date'} />,
               ...(isAdminOrAgent ? [<TableHeader key={9} text={'Updated'} />] : [])
@@ -517,7 +517,13 @@ class TicketsContainer extends React.Component {
                       {helpers.formatDate(ticket.get('date'), helpers.getShortDateFormat())}
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.getIn(['owner', 'fullname'])}</TableCell>
-                    <TableCell className={'vam nbb'}>{ticket.getIn(['group', 'name'])}</TableCell>
+                    <TableCell className={'vam nbb'}>
+                      <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
+                        <div className={'custom-tag group'}>
+                          {ticket.getIn(['group', 'name'])}
+                        </div>
+                      </div>
+                    </TableCell>
                     {isAdminOrAgent && <TableCell className={'vam nbb'}>{assignee()}</TableCell>}
                     <TableCell className={'vam nbb'}>{dueDate}</TableCell>
                     {isAdminOrAgent && <TableCell className={'vam nbb'}>{updated}</TableCell>}
