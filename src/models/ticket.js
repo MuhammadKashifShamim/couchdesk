@@ -269,6 +269,10 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
   var permissions = require('../permissions')
   var self = this
 
+  if (!self.assignee && self.status === 0) {
+    self.status = 2
+  }
+
   self.assignee = userId
   userSchema.getUser(userId, function (err, user) {
     if (err) return callback(err, null)

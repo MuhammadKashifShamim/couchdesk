@@ -127,14 +127,14 @@ class CreateTicketModal extends React.Component {
 
     if (!$form.isValid(null, null, false)) return true
 
-    if (this.assigneeSelect.value) {
+    if (this.assigneeSelect && this.assigneeSelect.value) {
       data.assignee = this.assigneeSelect.value
     }
 
     data.subject = e.target.subject.value
     data.owner = this.ownerSelect.value
     data.group = this.groupSelect.value
-    data.type = this.typeSelect ? this.typeSelect.value : this.props.viewdata.defaultTicketType._i
+    data.type = this.typeSelect ? this.typeSelect.value : this.props.viewdata.defaultTicketType._id
     data.tags = this.tagSelect ? this.tagSelect.value : []
     data.priority = this.selectedPriority
     data.issue = this.issueMde.easymde.value()

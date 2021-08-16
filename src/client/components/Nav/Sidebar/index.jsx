@@ -111,12 +111,14 @@ class Sidebar extends React.Component {
                 href='/tickets/assigned'
                 active={activeSubItem === 'tickets-assigned'}
               />
-              <SubmenuItem
-                text='Unassigned'
-                icon='person_add_disabled'
-                href='/tickets/unassigned'
-                active={activeSubItem === 'tickets-unassigned'}
-              />
+              {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
+                <SubmenuItem
+                  text='Unassigned'
+                  icon='person_add_disabled'
+                  href='/tickets/unassigned'
+                  active={activeSubItem === 'tickets-unassigned'}
+                />
+              )}
               <NavSeparator />
               <SubmenuItem text='New' icon='&#xE24D;' href='/tickets/new' active={activeSubItem === 'tickets-new'} />
               <SubmenuItem

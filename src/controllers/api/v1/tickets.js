@@ -455,6 +455,14 @@ apiTickets.create = function (req, res) {
         ticket.history = [HistoryItem]
         ticket.subscribers = [user._id]
 
+        if (ticket.owner !== user._id) {
+          ticket.subscribers.push(ticket.owner)
+        }
+
+        if (ticket.assignee && !ticket.subscribers.includes(ticket.assignee)) {
+          ticket.subscribers.push(ticket.assignee)
+        }
+
         ticket.save(function (err, t) {
           if (err) return done({ status: 400, error: err })
 
@@ -937,6 +945,7 @@ apiTickets.postComment = function (req, res) {
       owner: owner
     }
     t.history.push(HistoryItem)
+    t.skipUpdatedMail = true // FIXME: hack
 
     t.save(function (err, tt) {
       if (err) return res.status(400).json({ success: false, error: err.message })
@@ -1009,6 +1018,7 @@ apiTickets.postInternalNote = function (req, res) {
       owner: payload.owner || req.user._id
     }
     ticket.history.push(HistoryItem)
+    ticket.skipUpdatedMail = true // FIXME: hack
 
     ticket.save(function (err, savedTicket) {
       if (err) return res.status(400).json({ success: false, error: err.message })
@@ -1016,7 +1026,7 @@ apiTickets.postInternalNote = function (req, res) {
       ticketModel.populate(savedTicket, 'subscribers notes.owner history.owner', function (err, savedTicket) {
         if (err) return res.json({ success: true, ticket: savedTicket })
 
-        emitter.emit('ticket:note:added', savedTicket, Note)
+        emitter.emit('ticket:note:added', savedTicket, Note, req.headers.host)
 
         return res.json({ success: true, ticket: savedTicket })
       })

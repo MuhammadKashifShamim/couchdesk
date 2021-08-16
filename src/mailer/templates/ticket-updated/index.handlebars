@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Ticket #{{ticket.uid}}</title>
+    <title>Updated: Ticket #{{ticket.uid}}</title>
     <style>
         h1,h2,h3,h4,h5,h6 {
             margin-bottom: 2px;
@@ -20,7 +20,8 @@
 </head>
 <body>
     <div>
-        <h2>{{{ticket.subject}}}</h2>
+        <h2>Updated: {{{ticket.subject}}}</h2>
+        <h5>Ticket Status: {{ticket.status}}</h5>
         <h5>Ticket Project: {{ticket.group.name}}</h5>
         <h5>Ticket Submitted by: {{ticket.owner.fullname}}</h5>
         <h5>Submitted Date: {{ticket.date}}</h5>

@@ -558,3 +558,19 @@ tr.overdue td
 
 .custom-tag.type
   background: #7a7f80
+
+.ticket-assignee .ticket-assignee-details a.grab-ticket
+  background: darken($page_content_title_bg, 8%)
+  display: block
+  color: automatic-text-color(darken($page_content_title_bg, 8%))
+  font-family: $fontFamily
+  font-weight: 400
+  font-size: 12px
+  padding: 6px 14px
+  +borderRadius(3px)
+  height: 28px
+  line-height: 14px
+  width: 112px;
+
+  &:hover
+    background: darken($page_content_title_bg, 12%)

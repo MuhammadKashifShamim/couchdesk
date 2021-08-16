@@ -33,6 +33,29 @@ var sharedVars = require('../socketio/index').shared
 
 var notifications = require('../notifications') // Load Push Events
 
+function statusToString (status) {
+  var str
+  switch (status) {
+    case 0:
+      str = 'New'
+      break
+    case 1:
+      str = 'Open'
+      break
+    case 2:
+      str = 'Pending'
+      break
+    case 3:
+      str = 'Closed'
+      break
+    default:
+      str = status
+      break
+  }
+
+  return str
+}
+
 ;(function () {
   notifications.init(emitter)
 
@@ -89,9 +112,9 @@ var notifications = require('../notifications') // Load Push Events
                   var emailTo = _.concat(teamMembers, ticket.group.sendMailTo)
 
                   emailTo = _.chain(emailTo)
-                    .filter(function (i) {
+                    /* .filter(function (i) {
                       return i.email !== ticket.owner.email
-                    })
+                    }) */
                     .map(function (i) {
                       return i.email
                     })
@@ -153,6 +176,30 @@ var notifications = require('../notifications') // Load Push Events
                       templateSchema.findOne({ name: 'new-ticket' }, function (err, template) {
                         if (err) return c(err)
                         if (!template) return c()
+
+                        // TODO: hack
+                        ticket = {
+                          uid: ticket.uid,
+                          status: statusToString(ticket.status),
+                          subject: ticket.subject,
+                          group: {
+                            name: ticket.group.name
+                          },
+                          owner: {
+                            fullname: ticket.owner.fullname
+                          },
+                          date: ticket.date,
+                          type: {
+                            name: ticket.type.name
+                          },
+                          priority: {
+                            name: ticket.priority.name
+                          },
+                          tags: ticket.tags.map(tag => ({
+                            name: tag.name
+                          })),
+                          issue: ticket.issue
+                        }
 
                         var context = { base_url: baseUrl, ticket: ticket }
 
@@ -380,6 +427,122 @@ var notifications = require('../notifications') // Load Push Events
 
   emitter.on('ticket:updated', function (ticket) {
     io.sockets.emit('$trudesk:client:ticket:updated', { ticket: ticket })
+
+    if (!ticket.skipUpdatedMail) {
+      settingsSchema.getSettingsByName(['tps:enable', 'tps:username', 'tps:apikey', 'mailer:enable'], function (
+        err,
+        tpsSettings
+      ) {
+        if (err) return false
+
+        var tpsEnabled = _.head(_.filter(tpsSettings, ['name', 'tps:enable']))
+        var tpsUsername = _.head(_.filter(tpsSettings, ['name', 'tps:username']))
+        var tpsApiKey = _.head(_.filter(tpsSettings), ['name', 'tps:apikey'])
+        var mailerEnabled = _.head(_.filter(tpsSettings), ['name', 'mailer:enable'])
+        mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
+
+        if (!tpsEnabled || !tpsUsername || !tpsApiKey) {
+          tpsEnabled = false
+        } else {
+          tpsEnabled = tpsEnabled.value
+          tpsUsername = tpsUsername.value
+          tpsApiKey = tpsApiKey.value
+        }
+
+        async.parallel(
+          [
+            // Send email to subscribed users
+            function (c) {
+              if (!mailerEnabled) return c()
+
+              var mailer = require('../mailer')
+              var emails = []
+              async.each(
+                ticket.subscribers,
+                function (member, cb) {
+                  if (_.isUndefined(member) || _.isUndefined(member.email)) return cb()
+                  if (member.deleted) return cb()
+
+                  emails.push(member.email)
+
+                  cb()
+                },
+                function (err) {
+                  if (err) return c(err)
+
+                  emails = _.uniq(emails)
+
+                  if (_.size(emails) < 1) {
+                    return c()
+                  }
+
+                  var email = new Email({
+                    views: {
+                      root: templateDir,
+                      options: {
+                        extension: 'handlebars'
+                      }
+                    }
+                  })
+
+                  // TODO: hack
+                  ticket = {
+                    uid: ticket.uid,
+                    status: statusToString(ticket.status),
+                    subject: ticket.subject,
+                    group: {
+                      name: ticket.group.name
+                    },
+                    owner: {
+                      fullname: ticket.owner.fullname
+                    },
+                    date: ticket.date,
+                    type: {
+                      name: ticket.type.name
+                    },
+                    priority: {
+                      name: ticket.priority.name
+                    },
+                    tags: ticket.tags.map(tag => ({
+                      name: tag.name
+                    })),
+                    issue: ticket.issue
+                  }
+
+                  var context = { ticket: ticket }
+
+                  email
+                    .render('ticket-updated', context)
+                    .then(function (html) {
+                      var mailOptions = {
+                        to: emails.join(),
+                        subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                        html: html,
+                        generateTextFromHTML: true
+                      }
+
+                      mailer.sendMail(mailOptions, function (err) {
+                        if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+
+                        winston.debug('Sent [' + emails.length + '] emails.')
+                      })
+
+                      return c()
+                    })
+                    .catch(function (err) {
+                      winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                      return c(err)
+                    })
+                }
+              )
+            }
+          ],
+          function () {
+            // Blank
+          }
+        )
+      })
+    }
   })
 
   emitter.on('ticket:deleted', function (oId) {
@@ -475,7 +638,7 @@ var notifications = require('../notifications') // Load Push Events
               ticket.subscribers,
               function (member, cb) {
                 if (_.isUndefined(member) || _.isUndefined(member.email)) return cb()
-                // if (member._id.toString() === comment.owner.toString()) return cb()
+                if (member._id.toString() === comment.owner.toString()) return cb()
                 if (member.deleted) return cb()
 
                 emails.push(member.email)
@@ -507,6 +670,7 @@ var notifications = require('../notifications') // Load Push Events
                   // TODO: hack
                   ticket = {
                     uid: ticket.uid,
+                    status: statusToString(ticket.status),
                     subject: ticket.subject,
                     group: {
                       name: ticket.group.name
@@ -605,9 +769,185 @@ var notifications = require('../notifications') // Load Push Events
     })
   })
 
-  emitter.on('ticket:note:added', function (ticket) {
+  emitter.on('ticket:note:added', function (ticket, note, hostname) {
     // Goes to client
     io.sockets.emit('updateNotes', ticket)
+
+    settingsSchema.getSettingsByName(['tps:enable', 'tps:username', 'tps:apikey', 'mailer:enable'], function (
+      err,
+      tpsSettings
+    ) {
+      if (err) return false
+
+      var tpsEnabled = _.head(_.filter(tpsSettings, ['name', 'tps:enable']))
+      var tpsUsername = _.head(_.filter(tpsSettings, ['name', 'tps:username']))
+      var tpsApiKey = _.head(_.filter(tpsSettings), ['name', 'tps:apikey'])
+      var mailerEnabled = _.head(_.filter(tpsSettings), ['name', 'mailer:enable'])
+      mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
+
+      if (!tpsEnabled || !tpsUsername || !tpsApiKey) {
+        tpsEnabled = false
+      } else {
+        tpsEnabled = tpsEnabled.value
+        tpsUsername = tpsUsername.value
+        tpsApiKey = tpsApiKey.value
+      }
+
+      async.parallel(
+        [
+          function (cb) {
+            if (ticket.owner._id.toString() === note.owner._id.toString()) return cb
+            if (!_.isUndefined(ticket.assignee) && ticket.assignee._id.toString() === note.owner._id.toString())
+              return cb
+
+            var notification = new NotificationSchema({
+              owner: ticket.owner,
+              title: 'Note Added to Ticket#' + ticket.uid,
+              message: ticket.subject,
+              type: 1,
+              data: { ticket: ticket },
+              unread: true
+            })
+
+            notification.save(function (err) {
+              return cb(err)
+            })
+          },
+          function (cb) {
+            if (_.isUndefined(ticket.assignee)) return cb()
+            if (ticket.assignee._id.toString() === ticket.owner._id.toString()) return cb
+            if (ticket.owner._id.toString() === ticket.assignee._id.toString()) return cb()
+
+            var notification = new NotificationSchema({
+              owner: ticket.assignee,
+              title: 'Note Added to Ticket#' + ticket.uid,
+              message: ticket.subject,
+              type: 2,
+              data: { ticket: ticket },
+              unread: true
+            })
+
+            notification.save(function (err) {
+              return cb(err)
+            })
+          },
+          function (cb) {
+            sendPushNotification(
+              {
+                tpsEnabled: tpsEnabled,
+                tpsUsername: tpsUsername,
+                tpsApiKey: tpsApiKey,
+                hostname: hostname
+              },
+              { type: 2, ticket: ticket }
+            )
+            return cb()
+          },
+          // Send email to subscribed users
+          function (c) {
+            if (!mailerEnabled) return c()
+
+            var mailer = require('../mailer')
+            var emails = []
+            async.each(
+              ticket.subscribers,
+              function (member, cb) {
+                if (_.isUndefined(member) || _.isUndefined(member.email)) return cb()
+                if (member._id.toString() === note.owner._id.toString()) return cb()
+                if (!member.role.isAgent) return cb()
+                if (member.deleted) return cb()
+
+                emails.push(member.email)
+
+                cb()
+              },
+              function (err) {
+                if (err) return c(err)
+
+                emails = _.uniq(emails)
+
+                if (_.size(emails) < 1) {
+                  return c()
+                }
+
+                var email = new Email({
+                  views: {
+                    root: templateDir,
+                    options: {
+                      extension: 'handlebars'
+                    }
+                  }
+                })
+
+                ticket.populate('notes.owner', function (err, ticket) {
+                  if (err) winston.warn(err)
+                  if (err) return c()
+
+                  // TODO: hack
+                  ticket = {
+                    uid: ticket.uid,
+                    status: statusToString(ticket.status),
+                    subject: ticket.subject,
+                    group: {
+                      name: ticket.group.name
+                    },
+                    owner: {
+                      fullname: ticket.owner.fullname
+                    },
+                    date: ticket.date,
+                    type: {
+                      name: ticket.type.name
+                    },
+                    priority: {
+                      name: ticket.priority.name
+                    },
+                    tags: ticket.tags.map(tag => ({
+                      name: tag.name
+                    })),
+                    issue: ticket.issue,
+                    notes: ticket.notes.map(note => ({
+                      owner: {
+                        fullname: note.owner.fullname
+                      },
+                      date: note.date,
+                      note: note.note
+                    }))
+                  }
+
+                  var context = { ticket: ticket, note: note }
+
+                  email
+                    .render('ticket-note-added', context)
+                    .then(function (html) {
+                      var mailOptions = {
+                        to: emails.join(),
+                        subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                        html: html,
+                        generateTextFromHTML: true
+                      }
+
+                      mailer.sendMail(mailOptions, function (err) {
+                        if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+
+                        winston.debug('Sent [' + emails.length + '] emails.')
+                      })
+
+                      return c()
+                    })
+                    .catch(function (err) {
+                      winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                      return c(err)
+                    })
+                })
+              }
+            )
+          }
+        ],
+        function () {
+          // Blank
+        }
+      )
+    })
   })
 
   emitter.on('trudesk:profileImageUpdate', function (data) {

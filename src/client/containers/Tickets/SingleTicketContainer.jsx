@@ -65,7 +65,7 @@ const fetchTicket = parent => {
 const showPriorityConfirm = () => {
   UIkit.modal.confirm(
     'Selected Priority does not exist for this ticket type.<br><br><strong>Please select a new priority</strong>',
-    () => {},
+    () => { },
     { cancelButtonClass: 'uk-hidden' }
   )
 }
@@ -75,7 +75,7 @@ class SingleTicketContainer extends React.Component {
   @observable ticket = null
   @observable isSubscribed = false
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.onSocketUpdateComments = this.onSocketUpdateComments.bind(this)
@@ -89,7 +89,7 @@ class SingleTicketContainer extends React.Component {
     this.onUpdateTicketTags = this.onUpdateTicketTags.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     socket.socket.on('updateComments', this.onSocketUpdateComments)
     socket.socket.on('updateNotes', this.onUpdateTicketNotes)
     socket.socket.on('updateAssignee', this.onUpdateAssignee)
@@ -105,12 +105,12 @@ class SingleTicketContainer extends React.Component {
     this.props.fetchGroups()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     helpers.resizeFullHeight()
     helpers.setupScrollers()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     socket.socket.off('updateComments', this.onSocketUpdateComments)
     socket.socket.off('updateNotes', this.onUpdateTicketNotes)
     socket.socket.off('updateAssignee', this.onUpdateAssignee)
@@ -125,47 +125,48 @@ class SingleTicketContainer extends React.Component {
     this.props.unloadGroups()
   }
 
-  onSocketUpdateComments (data) {
+  onSocketUpdateComments(data) {
     if (this.ticket._id === data._id) this.ticket.comments = data.comments
   }
 
-  onUpdateTicketNotes (data) {
+  onUpdateTicketNotes(data) {
     if (this.ticket._id === data._id) this.ticket.notes = data.notes
   }
 
-  onUpdateAssignee (data) {
+  onUpdateAssignee(data) {
     if (this.ticket._id === data._id) {
       this.ticket.assignee = data.assignee
       if (this.ticket.assignee && this.ticket.assignee._id === this.props.shared.sessionUser._id)
         this.isSubscribed = true
+      this.ticket.status = data.status
     }
   }
 
-  onUpdateTicketOwner (data) {
+  onUpdateTicketOwner(data) {
     if (this.ticket._id === data._id) this.ticket.owner = data.owner
   }
 
-  onUpdateTicketType (data) {
+  onUpdateTicketType(data) {
     if (this.ticket._id === data._id) this.ticket.type = data.type
   }
 
-  onUpdateTicketPriority (data) {
+  onUpdateTicketPriority(data) {
     if (this.ticket._id === data._id) this.ticket.priority = data.priority
   }
 
-  onUpdateTicketGroup (data) {
+  onUpdateTicketGroup(data) {
     if (this.ticket._id === data._id) this.ticket.group = data.group
   }
 
-  onUpdateTicketDueDate (data) {
+  onUpdateTicketDueDate(data) {
     if (this.ticket._id === data._id) this.ticket.dueDate = data.dueDate
   }
 
-  onUpdateTicketTags (data) {
+  onUpdateTicketTags(data) {
     if (this.ticket._id === data._id) this.ticket.tags = data.tags
   }
 
-  onCommentNoteSubmit (e, type) {
+  onCommentNoteSubmit(e, type) {
     e.preventDefault()
     const isNote = type === 'note'
     axios
@@ -197,7 +198,7 @@ class SingleTicketContainer extends React.Component {
       })
   }
 
-  onSubscriberChanged (e) {
+  onSubscriberChanged(e) {
     axios
       .put(`/api/v1/tickets/${this.ticket._id}/subscribe`, {
         user: this.props.shared.sessionUser._id,
@@ -214,19 +215,19 @@ class SingleTicketContainer extends React.Component {
       })
   }
 
-  transferToThirdParty (e) {
+  transferToThirdParty(e) {
     socket.ui.sendUpdateTicketStatus(this.ticket._id, 3)
     this.props.transferToThirdParty({ uid: this.ticket.uid })
   }
 
   @computed
-  get notesTagged () {
+  get notesTagged() {
     this.ticket.notes.forEach(i => (i.isNote = true))
 
     return this.ticket.notes
   }
 
-  @computed get commentsAndNotes () {
+  @computed get commentsAndNotes() {
     if (!this.ticket) return []
     if (!helpers.canUser('tickets:notes', true)) {
       return sortBy(this.ticket.comments, 'date')
@@ -238,35 +239,35 @@ class SingleTicketContainer extends React.Component {
     return commentsAndNotes
   }
 
-  @computed get hasCommentsOrNotes () {
+  @computed get hasCommentsOrNotes() {
     if (!this.ticket) return false
     return this.ticket.comments.length > 0 || this.ticket.notes.length > 0
   }
 
-  render () {
+  render() {
     const mappedAccounts = this.props.accountsState
       ? this.props.accountsState.accounts
-          .map(a => {
-            return { text: a.get('fullname'), value: a.get('_id') }
-          })
-          .toArray()
+        .map(a => {
+          return { text: a.get('fullname'), value: a.get('_id') }
+        })
+        .toArray()
       : []
 
     const mappedGroups = this.props.groupsState
       ? uniqBy(
-          this.props.groupsState.groups
-            .map((group) => {
-              return { text: group.get('name'), value: group.get('_id') };
-            })
-            .toArray(),
-          'value',
-        )
+        this.props.groupsState.groups
+          .map((group) => {
+            return { text: group.get('name'), value: group.get('_id') };
+          })
+          .toArray(),
+        'value',
+      )
       : []
 
     const mappedTypes = this.props.common.ticketTypes
       ? this.props.common.ticketTypes.map(type => {
-          return { text: type.name, value: type._id, raw: type }
-        })
+        return { text: type.name, value: type._id, raw: type }
+      })
       : []
 
     // Perms
@@ -275,7 +276,7 @@ class SingleTicketContainer extends React.Component {
       this.ticket.status !== 3 &&
       helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)
 
-    const isAdminOrAgent = this.ticket && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
+    const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
 
     return (
       <div className={'uk-clearfix uk-position-relative'} style={{ width: '100%', height: '100vh' }}>
@@ -329,7 +330,24 @@ class SingleTicketContainer extends React.Component {
                             />
                           )}
                           <div className='ticket-assignee-details'>
-                            {!this.ticket.assignee && <h3>No User Assigned</h3>}
+                            {!this.ticket.assignee && (
+                              <>
+                                <h3>No User Assigned</h3>
+                                {isAdminOrAgent && (
+                                  <a
+                                    role='button'
+                                    className='btn no-ajaxy grab-ticket'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      socket.socket.emit('setAssignee', { _id: this.props.shared.sessionUser._id, ticketId: this.ticket._id })
+                                      this.ticket.assignee = this.props.shared.sessionUser
+                                    }}
+                                  >
+                                    Grab The Ticket
+                                  </a>
+                                )}
+                              </>
+                            )}
                             {this.ticket.assignee && (
                               <Fragment>
                                 <h3>{this.ticket.assignee.fullname}</h3>
@@ -456,37 +474,39 @@ class SingleTicketContainer extends React.Component {
                           {!hasTicketUpdate && <div className={'input-box'}>{this.ticket.group.name}</div>}
                         </div>
                         {/*  Due Date */}
-                        <div className='uk-width-1-1 p-0'>
-                          <span>Due Date</span> {hasTicketUpdate && <span>-&nbsp;</span>}
-                          {hasTicketUpdate && (
-                            <div className={'uk-display-inline'}>
-                              <a
-                                role={'button'}
-                                onClick={e => {
-                                  e.preventDefault()
-                                  socket.ui.setTicketDueDate(this.ticket._id, undefined)
-                                }}
-                              >
-                                Clear
-                              </a>
-                              <DatePicker
-                                format={helpers.getShortDateFormat()}
-                                value={this.ticket.dueDate}
-                                onChange={e => {
-                                  const dueDate = moment(e.target.value, helpers.getShortDateFormat())
-                                    .utc()
-                                    .toISOString()
-                                  socket.ui.setTicketDueDate(this.ticket._id, dueDate)
-                                }}
-                              />
-                            </div>
-                          )}
-                          {!hasTicketUpdate && (
-                            <div className='input-box'>
-                              {helpers.formatDate(this.ticket.dueDate, this.props.common.shortDateFormat)}
-                            </div>
-                          )}
-                        </div>
+                        {(this.ticket.dueDate || hasTicketUpdate) && (
+                          <div className='uk-width-1-1 p-0'>
+                            <span>Due Date</span> {hasTicketUpdate && <span>-&nbsp;</span>}
+                            {hasTicketUpdate && (
+                              <div className={'uk-display-inline'}>
+                                <a
+                                  role={'button'}
+                                  onClick={e => {
+                                    e.preventDefault()
+                                    socket.ui.setTicketDueDate(this.ticket._id, undefined)
+                                  }}
+                                >
+                                  Clear
+                                </a>
+                                <DatePicker
+                                  format={helpers.getShortDateFormat()}
+                                  value={this.ticket.dueDate}
+                                  onChange={e => {
+                                    const dueDate = moment(e.target.value, helpers.getShortDateFormat())
+                                      .utc()
+                                      .toISOString()
+                                    socket.ui.setTicketDueDate(this.ticket._id, dueDate)
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {!hasTicketUpdate && (
+                              <div className='input-box'>
+                                {helpers.formatDate(this.ticket.dueDate, this.props.common.shortDateFormat)}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         {/* Tags */}
                         <div className='uk-width-1-1 nopadding'>
@@ -587,6 +607,7 @@ class SingleTicketContainer extends React.Component {
                       name='subscribeSwitch'
                       className='onoffswitch-checkbox'
                       checked={this.isSubscribed}
+                      disabled={this.isSubscribed && this.ticket.assignee && this.ticket.assignee._id === this.props.shared.sessionUser._id}
                       onChange={e => this.onSubscriberChanged(e)}
                     />
                     <label className='onoffswitch-label' htmlFor='subscribeSwitch'>

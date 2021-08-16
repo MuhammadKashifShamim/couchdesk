@@ -257,6 +257,8 @@ class TicketsContainer extends React.Component {
       })
       .toArray()
 
+    const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
+
     return (
       <div>
         <PageTitle
@@ -389,15 +391,15 @@ class TicketsContainer extends React.Component {
             striped={true}
             headers={[
               <TableHeader key={0} width={45} height={50} component={selectAllCheckbox} />,
-              <TableHeader key={1} width={60} text={'Status'} />,
+              ...(isAdminOrAgent ? [<TableHeader key={1} width={60} text={'Status'} />] : []),
               <TableHeader key={2} width={65} text={'#'} />,
               <TableHeader key={3} width={'23%'} text={'Subject'} />,
               <TableHeader key={4} width={110} text={'Created'} />,
               <TableHeader key={5} width={125} text={'Requester'} />,
-              <TableHeader key={6} width={175} text={'Group'} />,
-              <TableHeader key={7} text={'Assignee'} />,
+              <TableHeader key={6} width={175} text={'Project'} />,
+              ...(isAdminOrAgent ? [<TableHeader key={7} text={'Assignee'} />] : []),
               <TableHeader key={8} width={110} text={'Due Date'} />,
-              <TableHeader key={9} text={'Updated'} />
+              ...(isAdminOrAgent ? [<TableHeader key={9} text={'Updated'} />] : [])
             ]}
           >
             {!this.props.loading && this.props.tickets.size < 1 && (
@@ -482,9 +484,11 @@ class TicketsContainer extends React.Component {
                         </svg>
                       </label>
                     </TableCell>
-                    <TableCell className={`ticket-status ticket-${status()} vam nbb uk-text-center`}>
-                      <span className={'uk-display-inline-block'}>{status()[0].toUpperCase()}</span>
-                    </TableCell>
+                    {isAdminOrAgent && (
+                      <TableCell className={`ticket-status ticket-${status()} vam nbb uk-text-center`}>
+                        <span className={'uk-display-inline-block'}>{status()[0].toUpperCase()}</span>
+                      </TableCell>
+                    )}
                     <TableCell className={'vam nbb'}>{ticket.get('uid')}</TableCell>
                     <TableCell className={'vam nbb'}>
                       <Avatar image={ticket.getIn(['owner', 'image'])} userId={ticket.getIn(['owner', '_id'])} size={40} />
@@ -514,9 +518,9 @@ class TicketsContainer extends React.Component {
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.getIn(['owner', 'fullname'])}</TableCell>
                     <TableCell className={'vam nbb'}>{ticket.getIn(['group', 'name'])}</TableCell>
-                    <TableCell className={'vam nbb'}>{assignee()}</TableCell>
+                    {isAdminOrAgent && <TableCell className={'vam nbb'}>{assignee()}</TableCell>}
                     <TableCell className={'vam nbb'}>{dueDate}</TableCell>
-                    <TableCell className={'vam nbb'}>{updated}</TableCell>
+                    {isAdminOrAgent && <TableCell className={'vam nbb'}>{updated}</TableCell>}
                   </TableRow>
                 )
               })}
@@ -545,6 +549,7 @@ TicketsContainer.propTypes = {
   showModal: PropTypes.func.isRequired,
   fetchSearchResults: PropTypes.func.isRequired,
   common: PropTypes.object.isRequired,
+  shared: PropTypes.object.isRequired,
   filter: PropTypes.object.isRequired,
   groupsState: PropTypes.object.isRequired,
   fetchGroups: PropTypes.func.isRequired,
@@ -565,6 +570,7 @@ const mapStateToProps = state => ({
   nextPage: state.ticketsState.nextPage,
   loading: state.ticketsState.loading,
   common: state.common,
+  shared: state.shared,
   groupsState: state.groupsState,
   settings: state.settings.settings
 })

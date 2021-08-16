@@ -42,13 +42,13 @@
         <p class="issue">{{{ticket.issue}}}</p>
 
         <br/><br/>
-        <h4>Comments</h4>
+        <h4>Notes</h4>
         <hr/>
-        {{#each ticket.comments}}
+        {{#each ticket.notes}}
             <h5>{{owner.fullname}}</h5>
             <h5>{{date}}</h5>
             <br/>
-            <p class="issue">{{{comment}}}</p>
+            <p class="issue">{{{note}}}</p>
             <br/>
             <hr/>
         {{/each}}

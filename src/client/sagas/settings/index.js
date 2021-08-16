@@ -188,6 +188,9 @@ function * updatePermissions ({ payload }) {
     const response = yield call(api.settings.updatePermissions, payload)
     yield put({ type: UPDATE_PERMISSIONS.SUCCESS, response })
     helpers.UI.showSnackbar('Updated Role. Flushing Permissions...')
+    setTimeout(function () {
+      window.location.reload()
+    }, 1000)
   } catch (error) {
     const errorText = error.response.data.error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)

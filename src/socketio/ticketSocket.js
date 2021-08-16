@@ -118,6 +118,8 @@ events.onSetAssignee = function (socket) {
     ticketSchema.getTicketById(ticketId, function (err, ticket) {
       if (err) return true
 
+      var prevStatus = ticket.status
+
       async.parallel(
         {
           setAssignee: function (callback) {
@@ -135,6 +137,11 @@ events.onSetAssignee = function (socket) {
           if (err) return true
 
           ticket = results.subscriber
+
+          if (ticket.status === prevStatus) {
+            ticket.skipUpdatedMail = true
+          }
+
           ticket.save(function (err, ticket) {
             if (err) return true
             ticket.populate('assignee', function (err, ticket) {
@@ -256,6 +263,7 @@ events.onClearAssignee = function (socket) {
       ticket.clearAssignee(ownerId, function (err, t) {
         if (err) return true
 
+        t.skipUpdatedMail = true
         t.save(function (err, tt) {
           if (err) return true
 
