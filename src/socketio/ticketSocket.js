@@ -65,8 +65,14 @@ events.onUpdateTicketStatus = function (socket) {
     ticketSchema.getTicketById(ticketId, function (err, ticket) {
       if (err) return true
 
+      var prevStatus = ticket.status
+
       ticket.setStatus(ownerId, status, function (err, t) {
         if (err) return true
+
+        if ([1, 2, 4].includes(prevStatus) && [1, 2, 4].includes(t.status)) {
+          t.skipUpdatedMail = true
+        }
 
         t.save(function (err, t) {
           if (err) return true

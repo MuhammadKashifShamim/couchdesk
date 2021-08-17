@@ -76,15 +76,37 @@ ticketsV2.get = function (req, res) {
 
         switch (type.toLowerCase()) {
           case 'active':
-            queryObject.status = [0, 1, 2]
+            queryObject.status = [0, 1, 2, 4]
             break
           case 'assigned':
-            queryObject.filter = Object.assign({}, queryObject.filter, {
-              assignee: [req.user._id]
+            Object.assign(queryObject, {
+              status: [0, 1, 2, 4],
+              filter: Object.assign({}, queryObject.filter, {
+                assignee: [req.user._id]
+              })
             })
             break
           case 'unassigned':
-            queryObject.unassigned = true
+            Object.assign(queryObject, {
+              status: [0, 1, 2, 4],
+              unassigned: true
+            })
+            break
+          case 'live':
+            Object.assign(queryObject, {
+              status: [2, 4],
+              filter: Object.assign({}, queryObject.filter, {
+                assignee: [req.user._id]
+              })
+            })
+            break
+          case 'upcoming':
+            Object.assign(queryObject, {
+              status: [1],
+              filter: Object.assign({}, queryObject.filter, {
+                assignee: [req.user._id]
+              })
+            })
             break
           case 'new':
             queryObject.status = [0]
@@ -97,6 +119,9 @@ ticketsV2.get = function (req, res) {
             break
           case 'closed':
             queryObject.status = [3]
+            break
+          case 'working':
+            queryObject.status = [4]
             break
           case 'filter':
             queryObject.status = queryObject.filter.status

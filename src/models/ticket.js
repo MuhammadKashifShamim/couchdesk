@@ -195,6 +195,9 @@ ticketSchema.virtual('statusFormatted').get(function () {
     case 3:
       formatted = 'Closed'
       break
+    case 4:
+      formatted = 'Working'
+      break
     default:
       formatted = 'New'
   }
@@ -231,6 +234,7 @@ ticketSchema.virtual('commentsAndNotes').get(function () {
  *      1 - Open
  *      2 - Pending
  *      3 - Closed
+ *      4 - Working
  */
 ticketSchema.methods.setStatus = function (ownerId, status, callback) {
   if (_.isUndefined(status)) return callback('Invalid Status', null)
@@ -1676,6 +1680,9 @@ function statusToString (status) {
       break
     case 3:
       str = 'Closed'
+      break
+    case 4:
+      str = 'Working'
       break
     default:
       str = status

@@ -23,7 +23,7 @@ class PageTitle extends React.Component {
         <div className={'uk-width-1-1 page-title dt-borderBottom pl-25 uk-clearfix' + (!shadow ? ' noshadow' : '')}>
           <p className={'uk-float-left'}>{title}</p>
           <div className={'uk-float-left uk-clearfix uk-width-1-3'}>{leftComponent}</div>
-          <div className={'uk-float-right uk-clearfix uk-width-1-2'}>{rightComponent}</div>
+          <div className={'uk-float-right uk-clearfix uk-width-1-2'} style={{ width: '40%' }}>{rightComponent}</div>
         </div>
       </div>
     )

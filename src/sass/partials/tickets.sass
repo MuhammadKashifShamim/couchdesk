@@ -54,6 +54,10 @@ div#accountsTable_wrapper
 .ticket-status-closed
   background: $ticket_status_closed !important
   color: white !important
+.ticket-status.ticket-working span,
+.ticket-status-working
+  background: $ticket_status_working !important
+  color: white !important
 
 .floating-ticket-status
   .ticket-status,
@@ -71,6 +75,9 @@ div#accountsTable_wrapper
       color: white !important
     &.ticket-closed span
       background: $ticket_status_closed !important
+      color: white !important
+    &.ticket-working span
+      background: $ticket_status_working !important
       color: white !important
 
 .ticket-priority
@@ -97,7 +104,7 @@ div#accountsTable_wrapper
       padding: 0 !important
       margin: 0 !important
     &.shown
-      height: 124px !important
+      height: 150px !important
       opacity: 1 !important
 
 #statusSelect

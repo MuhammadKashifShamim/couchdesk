@@ -102,6 +102,9 @@ ticketsController.getByStatus = function (req, res, next) {
     case 'closed':
       s = 3
       break
+    case 'working':
+      s = 4
+      break
   }
 
   var filter = {
@@ -109,7 +112,7 @@ ticketsController.getByStatus = function (req, res, next) {
   }
 
   var processor = {}
-  processor.title = 'Tickets'
+  processor.title = `${tType[0].toUpperCase() + tType.slice(1)} Tickets`
   processor.nav = 'tickets'
   processor.subnav = 'tickets-'
   processor.renderpage = 'tickets'
@@ -118,7 +121,7 @@ ticketsController.getByStatus = function (req, res, next) {
   processor.object = {
     limit: 50,
     page: page,
-    status: [s],
+    status: filter.status,
     filter: filter
   }
   processor.subnav += tType
@@ -139,8 +142,12 @@ ticketsController.getActive = function (req, res, next) {
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
+  var filter = {
+    status: [0, 1, 2, 4]
+  }
+
   var processor = {}
-  processor.title = 'Tickets'
+  processor.title = 'Active Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-active'
   processor.renderpage = 'tickets'
@@ -148,7 +155,8 @@ ticketsController.getActive = function (req, res, next) {
   processor.object = {
     limit: 50,
     page: page,
-    status: [0, 1, 2]
+    status: filter.status,
+    filter: filter
   }
 
   req.processor = processor
@@ -169,24 +177,25 @@ ticketsController.getAssigned = function (req, res, next) {
   if (_.isUndefined(page)) page = 0
 
   var filter = {
+    status: [0, 1, 2, 4],
     assignee: [req.user._id]
   }
 
   var processor = {}
-  processor.title = 'Tickets'
+  processor.title = 'My Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-assigned'
   processor.renderpage = 'tickets'
   processor.pagetype = 'assigned'
-  processor.filter =
-    processor.object = {
-      limit: 50,
-      page: page,
-      status: [0, 1, 2],
-      assignedSelf: true,
-      user: req.user._id,
-      filter: filter
-    }
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: filter.status,
+    assignedSelf: true,
+    user: req.user._id,
+    filter: filter
+  }
 
   req.processor = processor
 
@@ -206,11 +215,12 @@ ticketsController.getUnassigned = function (req, res, next) {
   if (_.isUndefined(page)) page = 0
 
   var filter = {
+    status: [0, 1, 2, 4],
     unassigned: true
   }
 
   var processor = {}
-  processor.title = 'Tickets'
+  processor.title = 'Unassigned Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-unassigned'
   processor.renderpage = 'tickets'
@@ -219,8 +229,66 @@ ticketsController.getUnassigned = function (req, res, next) {
   processor.object = {
     limit: 50,
     page: page,
-    status: [0, 1, 2],
+    status: filter.status,
     unassigned: true,
+    user: req.user._id,
+    filter: filter
+  }
+
+  req.processor = processor
+
+  return next()
+}
+
+ticketsController.getLive = function (req, res, next) {
+  var page = req.params.page
+  if (_.isUndefined(page)) page = 0
+
+  var filter = {
+    status: [2, 4],
+    assignee: [req.user._id]
+  }
+
+  var processor = {}
+  processor.title = 'Live Tickets'
+  processor.nav = 'tickets-live'
+  processor.renderpage = 'tickets'
+  processor.pagetype = 'live'
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: filter.status,
+    assignedSelf: true,
+    user: req.user._id,
+    filter: filter
+  }
+
+  req.processor = processor
+
+  return next()
+}
+
+ticketsController.getUpcoming = function (req, res, next) {
+  var page = req.params.page
+  if (_.isUndefined(page)) page = 0
+
+  var filter = {
+    status: [1],
+    assignee: [req.user._id]
+  }
+
+  var processor = {}
+  processor.title = 'Upcoming Tickets'
+  processor.nav = 'tickets-upcoming'
+  processor.renderpage = 'tickets'
+  processor.pagetype = 'upcoming'
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: filter.status,
+    assignedSelf: true,
     user: req.user._id,
     filter: filter
   }

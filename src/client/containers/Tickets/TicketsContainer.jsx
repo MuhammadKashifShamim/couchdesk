@@ -135,6 +135,9 @@ class TicketsContainer extends React.Component {
         break
       case 3:
         statusText = 'Closed'
+        break
+      case 4:
+        statusText = 'Working'
     }
 
     const batch = this.selectedTickets.map(id => {
@@ -259,10 +262,19 @@ class TicketsContainer extends React.Component {
 
     const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
 
+    let title
+    if (this.props.view === 'assigned') {
+      title = 'My Tickets'
+    } else if (this.props.view === 'filter') {
+      title = 'Tickets'
+    } else {
+      title = `${this.props.view[0].toUpperCase() + this.props.view.slice(1)} Tickets`
+    }
+
     return (
       <div>
         <PageTitle
-          title={'Tickets'}
+          title={title}
           shadow={false}
           leftComponent={
             <div style={{ 'margin': '8px 0 0 15px' }}>
@@ -351,6 +363,7 @@ class TicketsContainer extends React.Component {
                     <DropdownItem text={'Create'} onClick={() => this.props.showModal('CREATE_TICKET')} />
                     <DropdownSeparator />
                     <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
+                    <DropdownItem text={'Set Working'} onClick={() => this.onSetStatus(4)} />
                     <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
                     <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
                     {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
@@ -422,6 +435,8 @@ class TicketsContainer extends React.Component {
                       return 'pending'
                     case 3:
                       return 'closed'
+                    case 4:
+                      return 'working'
                   }
                 }
 

@@ -162,6 +162,9 @@ angular
         case 3:
           status = 'Closed'
           break
+        case 4:
+          status = 'Working'
+          break
       }
 
       return status
@@ -2376,7 +2379,7 @@ angular
     $scope.showStatusActionSheet = function () {
       $scope.popover.hide()
       $ionicActionSheet.show({
-        buttons: [{ text: 'Open' }, { text: 'Pending' }, { text: 'Closed' }],
+        buttons: [{ text: 'Open' }, { text: 'Working' }, { text: 'Pending' }, { text: 'Closed' }],
         titleText: 'Set Ticket Status',
         cancelText: 'Cancel',
         cancel: function () {
@@ -2398,6 +2401,19 @@ angular
               )
               return true
             case 1:
+                var reqTicket = { _id: $scope.ticket._id }
+                reqTicket.status = 4
+                Tickets.update(reqTicket).then(
+                  function successCallback (response) {
+                    $scope.ticket.status = 4
+                    $scope.showSnackbar('Ticket status set to Working')
+                  },
+                  function errorCallback (response) {
+                    console.log(response)
+                  }
+                )
+                return true
+            case 2:
               var reqTicket = { _id: $scope.ticket._id }
               reqTicket.status = 2
               Tickets.update(reqTicket).then(
@@ -2410,7 +2426,7 @@ angular
                 }
               )
               return true
-            case 2:
+            case 3:
               var reqTicket = { _id: $scope.ticket._id }
               reqTicket.status = 3
               $scope.ticket.status = 3
@@ -2717,6 +2733,7 @@ angular
 
       if ($scope.isAgent) {
         buttons.push({ text: 'Open' })
+        buttons.push({ text: 'Working' })
         buttons.push({ text: 'Pending' })
         buttons.push({ text: 'Closed' })
       }
@@ -2756,6 +2773,22 @@ angular
                 return obj._id == $ticket._id
               })
               var reqTicket = { _id: t._id }
+              reqTicket.status = 4
+              Tickets.update(reqTicket).then(
+                function successCallback (response) {
+                  t.status = 4
+                  $scope.showSnackbar('Ticket status set to Working')
+                },
+                function errorCallback (response) {
+                  console.log(response)
+                }
+              )
+              return true
+            case 3:
+              var t = _.find($scope.tickets, function (obj) {
+                return obj._id == $ticket._id
+              })
+              var reqTicket = { _id: t._id }
               reqTicket.status = 2
               Tickets.update(reqTicket).then(
                 function successCallback (response) {
@@ -2767,7 +2800,7 @@ angular
                 }
               )
               return true
-            case 3:
+            case 4:
               var t = _.find($scope.tickets, function (obj) {
                 return obj._id == $ticket._id
               })

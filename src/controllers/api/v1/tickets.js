@@ -945,7 +945,7 @@ apiTickets.postComment = function (req, res) {
       owner: owner
     }
     t.history.push(HistoryItem)
-    t.skipUpdatedMail = true // FIXME: hack
+    t.skipUpdatedMail = true
 
     t.save(function (err, tt) {
       if (err) return res.status(400).json({ success: false, error: err.message })
@@ -1018,7 +1018,7 @@ apiTickets.postInternalNote = function (req, res) {
       owner: payload.owner || req.user._id
     }
     ticket.history.push(HistoryItem)
-    ticket.skipUpdatedMail = true // FIXME: hack
+    ticket.skipUpdatedMail = true
 
     ticket.save(function (err, savedTicket) {
       if (err) return res.status(400).json({ success: false, error: err.message })
