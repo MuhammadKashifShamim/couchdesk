@@ -908,6 +908,10 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, callback) {
       q.where({ assignee: { $in: object.filter.assignee } })
     }
 
+    if (!_.isUndefined(object.filter.assigned)) {
+      q.where({ assignee: { $exists: true } })
+    }
+
     if (!_.isUndefined(object.filter.unassigned)) {
       q.where({ assignee: { $exists: false } })
     }

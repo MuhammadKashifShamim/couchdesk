@@ -147,7 +147,7 @@ ticketsController.getActive = function (req, res, next) {
   }
 
   var processor = {}
-  processor.title = 'Active Tickets'
+  processor.title = 'All Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-active'
   processor.renderpage = 'tickets'
@@ -241,16 +241,23 @@ ticketsController.getUnassigned = function (req, res, next) {
 }
 
 ticketsController.getLive = function (req, res, next) {
+  var user = req.user
+
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
   var filter = {
-    status: [2, 4],
-    assignee: [req.user._id]
+    status: [2, 4]
+  }
+
+  if (user.role.isAdmin || user.role.isAgent) {
+    filter.assignee = [req.user._id]
+  } else {
+    filter.assigned = true
   }
 
   var processor = {}
-  processor.title = 'Live Tickets'
+  processor.title = user.role.isAdmin || user.role.isAgent ? 'My Live Tickets' : 'Live Tickets'
   processor.nav = 'tickets-live'
   processor.renderpage = 'tickets'
   processor.pagetype = 'live'
@@ -852,7 +859,7 @@ ticketsController.uploadAttachment = function (req, res) {
   req.pipe(busboy)
 }
 
-function handleError(res, err) {
+function handleError (res, err) {
   if (err) {
     winston.warn(err)
     if (!err.status) res.status = 500

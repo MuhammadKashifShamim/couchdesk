@@ -109,7 +109,7 @@ mainController.loginPost = function (req, res, next) {
     }
     if (!user) return res.redirect('/')
 
-    var redirectUrl = '/tickets/assigned'
+    var redirectUrl = '/tickets/new'
 
     if (req.session.redirectUrl) {
       redirectUrl = req.session.redirectUrl
@@ -117,7 +117,7 @@ mainController.loginPost = function (req, res, next) {
     }
 
     if (req.user.role === 'user') {
-      redirectUrl = '/tickets/assigned'
+      redirectUrl = '/tickets/new'
     }
 
     req.logIn(user, function (err) {

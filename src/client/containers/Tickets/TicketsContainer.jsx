@@ -263,8 +263,12 @@ class TicketsContainer extends React.Component {
     const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
 
     let title
-    if (this.props.view === 'assigned') {
+    if (this.props.view === 'live' && isAdminOrAgent) {
+      title = 'My Live Tickets'
+    } else if (this.props.view === 'assigned') {
       title = 'My Tickets'
+    } else if (this.props.view === 'active') {
+      title = 'All Tickets'
     } else if (this.props.view === 'filter') {
       title = 'Tickets'
     } else {

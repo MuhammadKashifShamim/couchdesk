@@ -97,17 +97,19 @@ class Sidebar extends React.Component {
               class='navHome'
               active={activeItem === 'tickets-live'}
             />
-            <SidebarItem
-              text='Upcoming Tickets'
-              icon='wb_twilight'
-              href='/tickets/upcoming'
-              class='navHome'
-              active={activeItem === 'tickets-upcoming'}
-            />
+            {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
+              <SidebarItem
+                text='Upcoming Tickets'
+                icon='wb_twilight'
+                href='/tickets/upcoming'
+                class='navHome'
+                active={activeItem === 'tickets-upcoming'}
+              />
+            )}
             <SidebarItem
               text='Tickets'
               icon='assignment'
-              href='/tickets/assigned'
+              href='/tickets/new'
               class='navTickets no-ajaxy'
               hasSubmenu={true}
               subMenuTarget='tickets'
@@ -131,17 +133,19 @@ class Sidebar extends React.Component {
                 <NavSeparator />
                 <SubmenuItem text='New' icon='&#xE24D;' href='/tickets/new' active={activeSubItem === 'tickets-new'} />
                 <SubmenuItem
-                  text='Active'
+                  text='All'
                   icon='timer'
                   href='/tickets/active'
                   active={activeSubItem === 'tickets-active'}
                 />
-                <SubmenuItem
-                  text='Pending'
-                  icon='&#xE629;'
-                  href='/tickets/pending'
-                  active={activeSubItem === 'tickets-pending'}
-                />
+                {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
+                  <SubmenuItem
+                    text='Pending'
+                    icon='&#xE629;'
+                    href='/tickets/pending'
+                    active={activeSubItem === 'tickets-pending'}
+                  />
+                )}
                 <SubmenuItem text='Open' icon='&#xE2C8;' href='/tickets/open' active={activeSubItem === 'tickets-open'} />
                 <SubmenuItem
                   text='Closed'
