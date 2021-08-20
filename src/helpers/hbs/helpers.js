@@ -815,7 +815,7 @@ var helpers = {
         str = 'Closed'
         break
       case 4:
-        str = 'Working'
+        str = 'Live'
         break
       default:
         str = 'New'

@@ -49,7 +49,7 @@ function statusToString (status) {
       str = 'Closed'
       break
     case 4:
-      str = 'Working'
+      str = 'Live'
       break
     default:
       str = status

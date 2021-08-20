@@ -263,6 +263,7 @@ function mainRoutes (router, middleware, controllers) {
   router.post('/accounts/import/csv/upload', middleware.redirectToLogin, controllers.accounts.uploadCSV)
   router.post('/accounts/import/json/upload', middleware.redirectToLogin, controllers.accounts.uploadJSON)
   router.post('/accounts/import/ldap/bind', middleware.redirectToLogin, controllers.accounts.bindLdap)
+  router.post('/accounts/login', middleware.redirectToLogin, controllers.accounts.login)
 
   // Groups
   router.get('/groups', middleware.redirectToLogin, middleware.loadCommonData, controllers.groups.get)

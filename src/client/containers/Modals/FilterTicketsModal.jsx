@@ -94,7 +94,7 @@ class FilterTicketsModal extends React.Component {
     const statuses = [
       { text: 'New', value: '0' },
       { text: 'Open', value: '1' },
-      { text: 'Working', value: '4' },
+      { text: 'Live', value: '4' },
       { text: 'Pending', value: '2' },
       { text: 'Closed', value: '3' }
     ]

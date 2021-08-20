@@ -196,7 +196,7 @@ ticketSchema.virtual('statusFormatted').get(function () {
       formatted = 'Closed'
       break
     case 4:
-      formatted = 'Working'
+      formatted = 'Live'
       break
     default:
       formatted = 'New'
@@ -234,7 +234,7 @@ ticketSchema.virtual('commentsAndNotes').get(function () {
  *      1 - Open
  *      2 - Pending
  *      3 - Closed
- *      4 - Working
+ *      4 - Live
  */
 ticketSchema.methods.setStatus = function (ownerId, status, callback) {
   if (_.isUndefined(status)) return callback('Invalid Status', null)
@@ -327,7 +327,7 @@ ticketSchema.methods.setTicketOwner = function (ownerId, nextOwnerId, callback) 
 
     var historyItem = {
       action: 'ticket:set:owner',
-      description: 'Ticket Requestor set to: ' + ticket.owner.fullname,
+      description: 'Ticket Author set to: ' + ticket.owner.fullname,
       owner: ownerId
     }
     self.history.push(historyItem)
@@ -1686,7 +1686,7 @@ function statusToString (status) {
       str = 'Closed'
       break
     case 4:
-      str = 'Working'
+      str = 'Live'
       break
     default:
       str = status

@@ -137,7 +137,7 @@ class TicketsContainer extends React.Component {
         statusText = 'Closed'
         break
       case 4:
-        statusText = 'Working'
+        statusText = 'Live'
     }
 
     const batch = this.selectedTickets.map(id => {
@@ -367,7 +367,7 @@ class TicketsContainer extends React.Component {
                     <DropdownItem text={'Create'} onClick={() => this.props.showModal('CREATE_TICKET')} />
                     <DropdownSeparator />
                     <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
-                    <DropdownItem text={'Set Working'} onClick={() => this.onSetStatus(4)} />
+                    <DropdownItem text={'Set Live'} onClick={() => this.onSetStatus(4)} />
                     <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
                     <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
                     {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
@@ -412,7 +412,7 @@ class TicketsContainer extends React.Component {
               <TableHeader key={2} width={65} text={'#'} />,
               <TableHeader key={3} width={'23%'} text={'Subject'} />,
               <TableHeader key={4} width={110} text={'Created'} />,
-              <TableHeader key={5} width={125} text={'Requester'} />,
+              <TableHeader key={5} width={125} text={'Author'} />,
               <TableHeader key={6} width={225} text={'Project'} />,
               ...(isAdminOrAgent ? [<TableHeader key={7} text={'Assignee'} />] : []),
               <TableHeader key={8} width={110} text={'Due Date'} />,
@@ -440,7 +440,7 @@ class TicketsContainer extends React.Component {
                     case 3:
                       return 'closed'
                     case 4:
-                      return 'working'
+                      return 'live'
                   }
                 }
 
@@ -514,14 +514,14 @@ class TicketsContainer extends React.Component {
                       <div style={{ marginLeft: '58px' }}>
                         {ticket.get('subject')}
                         <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
-                          {ticket.get('type') && (
-                            <div className={'custom-tag type'}>
-                              {ticket.get('type').get('name')}
-                            </div>
-                          )}
                           {ticket.get('priority') && (
                             <div className={'custom-tag'} style={{ background: ticket.get('priority').get('htmlColor') }}>
                               {ticket.get('priority').get('name')}
+                            </div>
+                          )}
+                          {ticket.get('type') && (
+                            <div className={'custom-tag type'}>
+                              {ticket.get('type').get('name')}
                             </div>
                           )}
                           {ticket.get('tags').map(tag => (

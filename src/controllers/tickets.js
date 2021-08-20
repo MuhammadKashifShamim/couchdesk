@@ -102,7 +102,7 @@ ticketsController.getByStatus = function (req, res, next) {
     case 'closed':
       s = 3
       break
-    case 'working':
+    case 'live':
       s = 4
       break
   }

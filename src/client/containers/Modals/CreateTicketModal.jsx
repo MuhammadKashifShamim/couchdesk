@@ -219,7 +219,7 @@ class CreateTicketModal extends React.Component {
           <div className='uk-margin-medium-bottom'>
             <Grid>
               <GridItem width={'1-2'}>
-                <label className={'uk-form-label'}>Requestor</label>
+                <label className={'uk-form-label'}>Author</label>
                 <SingleSelect
                   showTextbox={true}
                   items={mappedAccountsCreateTicket}

@@ -547,4 +547,23 @@ accountsController.uploadImage = function (req, res) {
   req.pipe(busboy)
 }
 
+accountsController.login = function (req, res, next) {
+  if (!req.user.role.isAdmin) {
+    return res.redirect('/')
+  }
+
+  userSchema.getUser(req.body.userId, function (err, user) {
+    if (err) return handleError(res, err)
+
+    req.logIn(user, function (err) {
+      if (err) {
+        winston.debug(err)
+        return next(err)
+      }
+
+      return res.redirect('/tickets/new')
+    })
+  })
+}
+
 module.exports = accountsController

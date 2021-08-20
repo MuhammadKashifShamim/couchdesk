@@ -125,7 +125,7 @@ ticketsV2.get = function (req, res) {
           case 'closed':
             queryObject.status = [3]
             break
-          case 'working':
+          case 'live':
             queryObject.status = [4]
             break
           case 'filter':

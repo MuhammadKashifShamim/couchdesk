@@ -36,6 +36,26 @@ import InfiniteScroll from 'react-infinite-scroller'
 
 import helpers from 'lib/helpers'
 
+function post(path, params, method='post') {
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+
+  for (const key in params) {
+    if (params.hasOwnProperty(key)) {
+      const hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.name = key;
+      hiddenField.value = params[key];
+
+      form.appendChild(hiddenField);
+    }
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
 @observer
 class AccountsContainer extends React.Component {
   @observable initialLoad = true
@@ -58,6 +78,11 @@ class AccountsContainer extends React.Component {
 
   componentWillUnmount () {
     this.props.unloadAccounts()
+  }
+
+  onLoginAsUserClicked (e, user) {
+    e.preventDefault(e)
+    post('/accounts/login', { userId: user.get('_id') })
   }
 
   onEditAccountClicked (e, user) {
@@ -115,8 +140,11 @@ class AccountsContainer extends React.Component {
       this.props.accountsState.accounts.map(user => {
         const userImage = user.get('image') || 'defaultProfile.jpg'
         let actionMenu;
-        if (helpers.canUser('accounts:update', true) || helpers.canUser('accounts:delete', true)) {
+        if ((this.props.shared.sessionUser && this.props.shared.sessionUser.role.isAdmin) || helpers.canUser('accounts:update', true) || helpers.canUser('accounts:delete', true)) {
           actionMenu = []
+          if (this.props.shared.sessionUser && this.props.shared.sessionUser.role.isAdmin) {
+            actionMenu.push(<DropdownItem key={0} text={'Login As User'} onClick={e => this.onLoginAsUserClicked(e, user)} />)
+          }
           if (helpers.canUser('accounts:update', true)) {
             actionMenu.push(<DropdownItem key={0} text={'Edit'} onClick={e => this.onEditAccountClicked(e, user)} />)
             if (user.get('deleted'))

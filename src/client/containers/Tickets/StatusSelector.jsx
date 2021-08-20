@@ -30,7 +30,7 @@ const statusToName = status => {
     case 3:
       return 'Closed'
     case 4:
-      return 'Working'
+      return 'Live'
   }
 }
 
@@ -123,8 +123,8 @@ class StatusSelector extends React.Component {
             <li className='ticket-status ticket-open' onClick={() => this.changeStatus(1)}>
               <span>Open</span>
             </li>
-            <li className='ticket-status ticket-working' onClick={() => this.changeStatus(4)}>
-              <span>Working</span>
+            <li className='ticket-status ticket-live' onClick={() => this.changeStatus(4)}>
+              <span>Live</span>
             </li>
             <li className='ticket-status ticket-pending' onClick={() => this.changeStatus(2)}>
               <span>Pending</span>

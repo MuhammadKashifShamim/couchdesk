@@ -136,7 +136,7 @@ define('pages/reportsBreakdown', [
                   status = 'closed'
                   break
                 case 4:
-                  status = 'working'
+                  status = 'live'
                   break
               }
               html += '<tr class="uk-table-middle">'

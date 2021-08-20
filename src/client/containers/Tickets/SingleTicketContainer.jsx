@@ -378,7 +378,7 @@ class SingleTicketContainer extends React.Component {
                         {/*  Owner */}
                         {(this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent) && (
                           <div className='uk-width-1-1 nopadding uk-clearfix'>
-                            <span>Requestor</span>
+                            <span>Author</span>
                             {hasTicketUpdate && (
                               <select
                                 value={this.ticket.owner._id}
@@ -657,16 +657,19 @@ class SingleTicketContainer extends React.Component {
                         {this.hasCommentsOrNotes && (
                           <TruTabWrapper>
                             <TruTabSelectors style={{ marginLeft: 110, width: 'calc(100% - 110px)' }}>
+                            {helpers.canUser('tickets:notes', true) && (
                               <TruTabSelector
-                                selectorId={0}
-                                label='All'
-                                active={true}
-                                showBadge={true}
-                                badgeText={this.commentsAndNotes.length}
-                              />
+                                  selectorId={0}
+                                  label='All'
+                                  active={true}
+                                  showBadge={true}
+                                  badgeText={this.commentsAndNotes.length}
+                                />
+                              )}
                               <TruTabSelector
                                 selectorId={1}
                                 label='Comments'
+                                active={!helpers.canUser('tickets:notes', true)}
                                 showBadge={true}
                                 badgeText={this.ticket ? this.ticket.comments && this.ticket.comments.length : 0}
                               />
@@ -681,7 +684,7 @@ class SingleTicketContainer extends React.Component {
                             </TruTabSelectors>
 
                             {/* Tab Sections */}
-                            <TruTabSection sectionId={0} active={true}>
+                            <TruTabSection sectionId={0} active={helpers.canUser('tickets:notes', true)}>
                               <div className='all-comments'>
                                 {this.commentsAndNotes.map(item => (
                                   <CommentNotePartial
@@ -709,7 +712,7 @@ class SingleTicketContainer extends React.Component {
                                 ))}
                               </div>
                             </TruTabSection>
-                            <TruTabSection sectionId={1}>
+                            <TruTabSection sectionId={1} active={!helpers.canUser('tickets:notes', true)}>
                               <div className='comments'>
                                 {this.ticket &&
                                   this.ticket.comments.map(comment => (

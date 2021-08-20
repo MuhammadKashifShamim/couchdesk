@@ -491,7 +491,7 @@ define([
         })
       }
 
-      $scope.setWorkingTickets = function () {
+      $scope.setLiveTickets = function () {
         var $ids = getChecked()
 
         _.each($ids, function (id) {
@@ -500,10 +500,10 @@ define([
               status: 4
             })
             .success(function () {
-              helpers.UI.showSnackbar('Ticket status set to working', false)
+              helpers.UI.showSnackbar('Ticket status set to live', false)
             })
             .error(function (e) {
-              $log.error('[trudes:tickets:setWorkingTickets] - Error ', e)
+              $log.error('[trudes:tickets:setLiveTickets] - Error ', e)
               helpers.UI.showSnackbar('An Error occurred. Please check console.', true)
             })
         })
