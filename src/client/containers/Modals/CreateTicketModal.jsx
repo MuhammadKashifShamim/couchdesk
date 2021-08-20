@@ -43,9 +43,14 @@ class CreateTicketModal extends React.Component {
   @observable groupAccounts = []
   @observable selectedPriority = ''
   issueText = ''
+  isGrabbed = false
 
   constructor (props) {
     super(props)
+
+    // FIXME: hack
+    const filter = document.getElementById('tickets-container').getAttribute('data-filter')
+    this.filter = filter ? JSON.parse(filter) : {}
   }
 
   componentDidMount () {
@@ -127,7 +132,9 @@ class CreateTicketModal extends React.Component {
 
     if (!$form.isValid(null, null, false)) return true
 
-    if (this.assigneeSelect && this.assigneeSelect.value) {
+    if (this.isGrabbed) {
+      data.assignee = this.props.shared.sessionUser._id
+    } else if (this.assigneeSelect && this.assigneeSelect.value) {
       data.assignee = this.assigneeSelect.value
     }
 
@@ -186,6 +193,13 @@ class CreateTicketModal extends React.Component {
       return { text: tag.name, value: tag._id }
     })
 
+    let defaultGroupValue
+    if (this.filter.groups && this.filter.groups.length > 0) {
+      defaultGroupValue = this.filter.groups[0]
+    } else {
+      defaultGroupValue = head(mappedGroups) ? head(mappedGroups).value : ''
+    }
+
     return (
       <BaseModal {...this.props} options={{ bgclose: false }}>
         <form className={'uk-form-stacked'} onSubmit={e => this.onFormSubmit(e)}>
@@ -204,7 +218,7 @@ class CreateTicketModal extends React.Component {
           </div>
           <div className='uk-margin-medium-bottom'>
             <Grid>
-              <GridItem width={'1-3'}>
+              <GridItem width={'1-2'}>
                 <label className={'uk-form-label'}>Requestor</label>
                 <SingleSelect
                   showTextbox={true}
@@ -215,12 +229,12 @@ class CreateTicketModal extends React.Component {
                   ref={i => (this.ownerSelect = i)}
                 />
               </GridItem>
-              <GridItem width={'2-3'}>
+              <GridItem width={'1-2'}>
                 <label className={'uk-form-label'}>Project</label>
                 <SingleSelect
                   showTextbox={false}
                   items={mappedGroups}
-                  defaultValue={head(mappedGroups) ? head(mappedGroups).value : ''}
+                  defaultValue={defaultGroupValue}
                   onSelectChange={e => this.onGroupSelectChange(e)}
                   width={'100%'}
                   ref={i => (this.groupSelect = i)}
@@ -264,6 +278,9 @@ class CreateTicketModal extends React.Component {
                 showTextbox={false}
                 items={mappedAccounts}
                 width={'100%'}
+                onSelectChange={() => {
+                  this.forceUpdate()
+                }}
                 ref={i => (this.assigneeSelect = i)}
               />
             </div>
@@ -330,7 +347,10 @@ class CreateTicketModal extends React.Component {
           </div>
           <div className='uk-modal-footer uk-text-right'>
             <Button text={'Cancel'} flat={true} waves={true} extraClass={'uk-modal-close'} />
-            <Button text={'Create'} style={'primary'} flat={true} type={'submit'} />
+            <Button text={'Create'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = false} />
+            {allowAgentUserTickets && this.assigneeSelect && !this.assigneeSelect.value && (
+              <Button text={'Create And Grab'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = true} />
+            )}
           </div>
         </form>
       </BaseModal>
