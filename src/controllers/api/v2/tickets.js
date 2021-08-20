@@ -93,11 +93,16 @@ ticketsV2.get = function (req, res) {
             })
             break
           case 'live':
+            var filter = {}
+            if (req.user.role.isAdmin || req.user.role.isAgent) {
+              filter.assignee = [req.user._id]
+            } else {
+              filter.assigned = true
+            }
+
             Object.assign(queryObject, {
               status: [2, 4],
-              filter: Object.assign({}, queryObject.filter, {
-                assignee: [req.user._id]
-              })
+              filter: Object.assign({}, queryObject.filter, filter)
             })
             break
           case 'upcoming':
