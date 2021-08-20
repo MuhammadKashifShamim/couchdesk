@@ -49,8 +49,8 @@ class CreateTicketModal extends React.Component {
     super(props)
 
     // FIXME: hack
-    const filter = document.getElementById('tickets-container').getAttribute('data-filter')
-    this.filter = filter ? JSON.parse(filter) : {}
+    const filter = document.getElementById('tickets-container')
+    this.filter = filter ? JSON.parse(filter.getAttribute('data-filter')) : {}
   }
 
   componentDidMount () {

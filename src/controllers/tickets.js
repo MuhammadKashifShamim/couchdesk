@@ -113,8 +113,14 @@ ticketsController.getByStatus = function (req, res, next) {
 
   var processor = {}
   processor.title = `${tType[0].toUpperCase() + tType.slice(1)} Tickets`
-  processor.nav = 'tickets'
-  processor.subnav = 'tickets-'
+
+  if (tType === 'new') {
+    processor.nav = 'tickets-new'
+  } else {
+    processor.nav = 'tickets'
+    processor.subnav = 'tickets-new'
+  }
+
   processor.renderpage = 'tickets'
   processor.pagetype = 'active'
   processor.filter = filter
@@ -221,8 +227,7 @@ ticketsController.getUnassigned = function (req, res, next) {
 
   var processor = {}
   processor.title = 'Unassigned Tickets'
-  processor.nav = 'tickets'
-  processor.subnav = 'tickets-unassigned'
+  processor.nav = 'tickets-unassigned'
   processor.renderpage = 'tickets'
   processor.pagetype = 'unassigned'
   processor.filter = filter
@@ -286,7 +291,7 @@ ticketsController.getUpcoming = function (req, res, next) {
   }
 
   var processor = {}
-  processor.title = 'Upcoming Tickets'
+  processor.title = 'Next Tickets'
   processor.nav = 'tickets-upcoming'
   processor.renderpage = 'tickets'
   processor.pagetype = 'upcoming'

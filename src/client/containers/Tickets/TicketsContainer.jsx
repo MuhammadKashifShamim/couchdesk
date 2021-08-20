@@ -265,6 +265,8 @@ class TicketsContainer extends React.Component {
     let title
     if (this.props.view === 'live' && isAdminOrAgent) {
       title = 'My Live Tickets'
+    } else if (this.props.view === 'upcoming') {
+      title = 'Next Tickets'
     } else if (this.props.view === 'assigned') {
       title = 'My Tickets'
     } else if (this.props.view === 'active') {

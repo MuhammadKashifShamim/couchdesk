@@ -98,14 +98,23 @@ class Sidebar extends React.Component {
               active={activeItem === 'tickets-live'}
             />
             {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
-              <SidebarItem
-                text='Upcoming Tickets'
-                icon='wb_twilight'
-                href='/tickets/upcoming'
-                class='navHome'
-                active={activeItem === 'tickets-upcoming'}
-              />
+              <>
+                <SidebarItem
+                  text='Next Tickets'
+                  icon='wb_twilight'
+                  href='/tickets/upcoming'
+                  class='navHome'
+                  active={activeItem === 'tickets-upcoming'}
+                />
+                <SubmenuItem
+                  text='Unassigned Tickets'
+                  icon='person_add_disabled'
+                  href='/tickets/unassigned'
+                  active={activeItem === 'tickets-unassigned'}
+                />
+              </>
             )}
+            <SubmenuItem text='New Tickets' icon='&#xE24D;' href='/tickets/new' active={activeItem === 'tickets-new'} />
             <SidebarItem
               text='Tickets'
               icon='assignment'
@@ -117,21 +126,12 @@ class Sidebar extends React.Component {
             >
               <Submenu id='tickets'>
                 <SubmenuItem
-                  text='My Tickets'
+                  text='My'
                   icon='assignment_ind'
                   href='/tickets/assigned'
                   active={activeSubItem === 'tickets-assigned'}
                 />
-                {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
-                  <SubmenuItem
-                    text='Unassigned'
-                    icon='person_add_disabled'
-                    href='/tickets/unassigned'
-                    active={activeSubItem === 'tickets-unassigned'}
-                  />
-                )}
                 <NavSeparator />
-                <SubmenuItem text='New' icon='&#xE24D;' href='/tickets/new' active={activeSubItem === 'tickets-new'} />
                 <SubmenuItem
                   text='All'
                   icon='timer'
