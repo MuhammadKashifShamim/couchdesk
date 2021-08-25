@@ -124,7 +124,7 @@ ticketsController.getByStatus = function (req, res, next) {
     processor.nav = 'tickets-new'
   } else {
     processor.nav = 'tickets'
-    processor.subnav = 'tickets-new'
+    processor.subnav = 'tickets-' + tType
   }
 
   processor.renderpage = 'tickets'
@@ -136,7 +136,6 @@ ticketsController.getByStatus = function (req, res, next) {
     status: filter.status,
     filter: filter
   }
-  processor.subnav += tType
   processor.pagetype = tType
 
   req.processor = processor
