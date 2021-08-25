@@ -175,7 +175,7 @@ class TopbarContainer extends React.Component {
                           className={'anchor'}
                           onClick={() => this.props.showModal('CREATE_TICKET')}
                         >
-                          <i className='material-icons'>&#xE145;</i>
+                          <i className='material-icons'>add_box</i>
                         </button>
                       </li>
                     )}

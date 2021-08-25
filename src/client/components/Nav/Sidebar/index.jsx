@@ -101,20 +101,25 @@ class Sidebar extends React.Component {
               <>
                 <SidebarItem
                   text='Next Tickets'
-                  icon='wb_twilight'
+                  icon='upcoming'
                   href='/tickets/upcoming'
                   class='navHome'
                   active={activeItem === 'tickets-upcoming'}
                 />
                 <SubmenuItem
                   text='Unassigned Tickets'
-                  icon='person_add_disabled'
+                  icon='person_off'
                   href='/tickets/unassigned'
                   active={activeItem === 'tickets-unassigned'}
                 />
               </>
             )}
-            <SubmenuItem text='New Tickets' icon='&#xE24D;' href='/tickets/new' active={activeItem === 'tickets-new'} />
+            <SubmenuItem
+              text='New Tickets'
+              icon='move_to_inbox'
+              href='/tickets/new'
+              active={activeItem === 'tickets-new'}
+            />
             <SidebarItem
               text='Tickets'
               icon='assignment'
@@ -134,24 +139,34 @@ class Sidebar extends React.Component {
                 <NavSeparator />
                 <SubmenuItem
                   text='All'
-                  icon='timer'
+                  icon='source'
                   href='/tickets/active'
                   active={activeSubItem === 'tickets-active'}
                 />
                 {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
                   <SubmenuItem
                     text='Pending'
-                    icon='&#xE629;'
+                    icon='pending'
                     href='/tickets/pending'
                     active={activeSubItem === 'tickets-pending'}
                   />
                 )}
-                <SubmenuItem text='Open' icon='&#xE2C8;' href='/tickets/open' active={activeSubItem === 'tickets-open'} />
-                <SubmenuItem text='Done' icon='&#xE2C8;' href='/tickets/done' active={activeSubItem === 'tickets-done'} />
+                <SubmenuItem
+                  text='Open'
+                  icon='&#xE2C8;'
+                  href='/tickets/open'
+                  active={activeSubItem === 'tickets-open'}
+                />
+                <SubmenuItem
+                  text='Done'
+                  icon='assignment_turned_in'
+                  href='/tickets/done'
+                  active={activeSubItem === 'tickets-done'}
+                />
                 {Helpers.canUser('tickets:closing', true) && (
                   <SubmenuItem
                     text='Hold'
-                    icon='&#xE2C7;'
+                    icon='hourglass_top'
                     href='/tickets/hold'
                     active={activeSubItem === 'tickets-hold'}
                   />
@@ -190,14 +205,14 @@ class Sidebar extends React.Component {
                 <SubmenuItem
                   href={'/accounts/customers'}
                   text={'Customers'}
-                  icon={'account_box'}
+                  icon={'portrait'}
                   active={activeSubItem === 'accounts-customers'}
                 />
                 {sessionUser && Helpers.canUser('agent:*', true) && (
                   <SubmenuItem
                     href={'/accounts/agents'}
                     text={'Agents'}
-                    icon={'account_circle'}
+                    icon={'support_agent'}
                     active={activeSubItem === 'accounts-agents'}
                   />
                 )}
@@ -205,7 +220,7 @@ class Sidebar extends React.Component {
                   <SubmenuItem
                     href={'/accounts/admins'}
                     text={'Admins'}
-                    icon={'how_to_reg'}
+                    icon={'manage_accounts'}
                     active={activeSubItem === 'accounts-admins'}
                   />
                 )}

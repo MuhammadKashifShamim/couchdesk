@@ -505,7 +505,7 @@ class TicketsContainer extends React.Component {
                   >
                     <TableCell
                       className={'ticket-priority nbb vam'}
-                      style={{ borderColor: ticket.getIn(['priority', 'htmlColor']), padding: '18px 15px' }}
+                      style={{ /* borderColor: ticket.getIn(['priority', 'htmlColor']), */ padding: '18px 15px' }}
                     >
                       <input
                         type='checkbox'
