@@ -509,6 +509,42 @@ define([
         })
       }
 
+      $scope.setDoneTickets = function () {
+        var $ids = getChecked()
+
+        _.each($ids, function (id) {
+          $http
+            .put('/api/v1/tickets/' + id, {
+              status: 5
+            })
+            .success(function () {
+              helpers.UI.showSnackbar('Ticket status set to done', false)
+            })
+            .error(function (e) {
+              $log.error('[trudes:tickets:setDoneTickets] - Error ', e)
+              helpers.UI.showSnackbar('An Error occurred. Please check console.', true)
+            })
+        })
+      }
+
+      $scope.setHoldTickets = function () {
+        var $ids = getChecked()
+
+        _.each($ids, function (id) {
+          $http
+            .put('/api/v1/tickets/' + id, {
+              status: 6
+            })
+            .success(function () {
+              helpers.UI.showSnackbar('Ticket status set to hold', false)
+            })
+            .error(function (e) {
+              $log.error('[trudes:tickets:setHoldTickets] - Error ', e)
+              helpers.UI.showSnackbar('An Error occurred. Please check console.', true)
+            })
+        })
+      }
+
       $scope.GridRefreshChanged = function () {
         $http
           .put('/api/v1/users/' + $scope.username + '/updatepreferences', {

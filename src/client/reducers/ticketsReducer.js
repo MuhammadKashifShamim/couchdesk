@@ -68,6 +68,12 @@ function hasInView (view, status, assignee, userId, userGroupIds, groupId) {
     case 'live':
       hasView = status === 4
       break
+    case 'done':
+      hasView = status === 5
+      break
+    case 'hold':
+      hasView = status === 6
+      break
     default:
       hasView = false
   }

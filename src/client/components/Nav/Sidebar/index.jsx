@@ -126,7 +126,7 @@ class Sidebar extends React.Component {
             >
               <Submenu id='tickets'>
                 <SubmenuItem
-                  text='My'
+                  text='Mine'
                   icon='assignment_ind'
                   href='/tickets/assigned'
                   active={activeSubItem === 'tickets-assigned'}
@@ -147,12 +147,23 @@ class Sidebar extends React.Component {
                   />
                 )}
                 <SubmenuItem text='Open' icon='&#xE2C8;' href='/tickets/open' active={activeSubItem === 'tickets-open'} />
-                <SubmenuItem
-                  text='Closed'
-                  icon='&#xE2C7;'
-                  href='/tickets/closed'
-                  active={activeSubItem === 'tickets-closed'}
-                />
+                <SubmenuItem text='Done' icon='&#xE2C8;' href='/tickets/done' active={activeSubItem === 'tickets-done'} />
+                {Helpers.canUser('tickets:closing', true) && (
+                  <SubmenuItem
+                    text='Hold'
+                    icon='&#xE2C7;'
+                    href='/tickets/hold'
+                    active={activeSubItem === 'tickets-hold'}
+                  />
+                )}
+                {Helpers.canUser('tickets:closing', true) && (
+                  <SubmenuItem
+                    text='Closed'
+                    icon='&#xE2C7;'
+                    href='/tickets/closed'
+                    active={activeSubItem === 'tickets-closed'}
+                  />
+                )}
               </Submenu>
             </SidebarItem>
           </>

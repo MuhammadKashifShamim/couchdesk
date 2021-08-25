@@ -19,6 +19,7 @@ var apiUtils = require('../apiUtils')
 var Ticket = require('../../../models/ticket')
 var Group = require('../../../models/group')
 var Department = require('../../../models/department')
+var permissions = require('../../../permissions')
 
 var ticketsV2 = {}
 
@@ -43,6 +44,8 @@ ticketsV2.get = function (req, res) {
     limit: limit,
     page: page
   }
+
+  var ownerIdForNewTickets = permissions.canThis(req.user.role, 'tickets:handling') ? null : req.user._id
 
   async.waterfall(
     [
@@ -125,21 +128,27 @@ ticketsV2.get = function (req, res) {
           case 'closed':
             queryObject.status = [3]
             break
-          case 'live':
+          /* case 'live':
             queryObject.status = [4]
+            break */
+          case 'done':
+            queryObject.status = [5]
+            break
+          case 'hold':
+            queryObject.status = [6]
             break
           case 'filter':
             queryObject.status = queryObject.filter.status
             break
         }
 
-        Ticket.getTicketsWithObject(mappedGroups, queryObject, function (err, tickets) {
+        Ticket.getTicketsWithObject(mappedGroups, queryObject, ownerIdForNewTickets, function (err, tickets) {
           if (err) return next(err)
           return next(null, mappedGroups, tickets)
         })
       },
       function (mappedGroups, tickets, done) {
-        Ticket.getCountWithObject(mappedGroups, queryObject, function (err, count) {
+        Ticket.getCountWithObject(mappedGroups, queryObject, ownerIdForNewTickets, function (err, count) {
           if (err) return done(err)
 
           return done(null, {

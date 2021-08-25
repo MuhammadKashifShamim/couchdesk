@@ -22,6 +22,12 @@
                         {{#is data.ticket.status 4}}
                                 <div class="ticket-status ticket-live"><span>Live</span></div>
                         {{/is}}
+                        {{#is data.ticket.status 5}}
+                                <div class="ticket-status ticket-done"><span>Done</span></div>
+                        {{/is}}
+                        {{#is data.ticket.status 6}}
+                                <div class="ticket-status ticket-hold"><span>Hold</span></div>
+                        {{/is}}
                     </div>
                 </div>
             </div>

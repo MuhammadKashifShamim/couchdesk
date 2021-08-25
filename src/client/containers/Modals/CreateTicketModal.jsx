@@ -109,7 +109,7 @@ class CreateTicketModal extends React.Component {
     const $form = $(e.target)
 
     let data = {}
-    if (this.issueText.length < 1) return
+    // if (this.issueText.length < 1) return
 
     const minIssueLength = this.props.viewdata.ticketSettings.minIssue
     let $mdeError
@@ -134,6 +134,7 @@ class CreateTicketModal extends React.Component {
 
     if (this.isGrabbed) {
       data.assignee = this.props.shared.sessionUser._id
+      data.status = 2
     } else if (this.assigneeSelect && this.assigneeSelect.value) {
       data.assignee = this.assigneeSelect.value
     }
@@ -209,11 +210,11 @@ class CreateTicketModal extends React.Component {
               type='text'
               name={'subject'}
               className={'md-input'}
-              data-validation='length'
-              data-validation-length={`min${viewdata.ticketSettings.minSubject}`}
-              data-validation-error-msg={`Please enter a valid Subject. Subject must contain at least ${
+              data-validation={viewdata.ticketSettings.minSubject > 0 ? 'length' : undefined}
+              data-validation-length={viewdata.ticketSettings.minSubject > 0 ? `min${viewdata.ticketSettings.minSubject}` : undefined}
+              data-validation-error-msg={viewdata.ticketSettings.minSubject > 0 ? `Please enter a valid Subject. Subject must contain at least ${
                 viewdata.ticketSettings.minSubject
-              } characters.`}
+              } characters.` : undefined}
             />
           </div>
           <div className='uk-margin-medium-bottom'>

@@ -167,6 +167,34 @@ function mainRoutes (router, middleware, controllers) {
     controllers.tickets.processor
   )
   router.get(
+    '/tickets/done',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getByStatus,
+    controllers.tickets.processor
+  )
+  router.get(
+    '/tickets/done/page/:page',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getByStatus,
+    controllers.tickets.processor
+  )
+  router.get(
+    '/tickets/hold',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getByStatus,
+    controllers.tickets.processor
+  )
+  router.get(
+    '/tickets/hold/page/:page',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getByStatus,
+    controllers.tickets.processor
+  )
+  router.get(
     '/tickets/assigned',
     middleware.redirectToLogin,
     middleware.loadCommonData,

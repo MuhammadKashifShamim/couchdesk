@@ -98,8 +98,8 @@ var ticketSchema = mongoose.Schema({
     required: true
   },
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'tags', autopopulate: true }],
-  subject: { type: String, required: true },
-  issue: { type: String, required: true },
+  subject: { type: String },
+  issue: { type: String },
   closedDate: { type: Date },
   dueDate: { type: Date },
   comments: [commentSchema],
@@ -198,6 +198,12 @@ ticketSchema.virtual('statusFormatted').get(function () {
     case 4:
       formatted = 'Live'
       break
+    case 5:
+      formatted = 'Done'
+      break
+    case 6:
+      formatted = 'Hold'
+      break
     default:
       formatted = 'New'
   }
@@ -235,6 +241,8 @@ ticketSchema.virtual('commentsAndNotes').get(function () {
  *      2 - Pending
  *      3 - Closed
  *      4 - Live
+ *      5 - Done
+ *      6 - Hold
  */
 ticketSchema.methods.setStatus = function (ownerId, status, callback) {
   if (_.isUndefined(status)) return callback('Invalid Status', null)
@@ -841,7 +849,8 @@ ticketSchema.statics.getTicketsByDepartments = function (departments, object, ca
   }
 }
 
-ticketSchema.statics.getTicketsWithObject = function (grpId, object, callback) {
+// eslint-disable-next-line complexity
+ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForNewTickets, callback) {
   if (_.isUndefined(grpId)) {
     return callback('Invalid GroupId - TicketSchema.GetTickets()', null)
   }
@@ -945,10 +954,19 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, callback) {
   if (!_.isUndefined(object.assignedSelf) && !_.isNull(object.assignedSelf)) q.where('assignee', object.user)
   if (!_.isUndefined(object.unassigned) && !_.isNull(object.unassigned)) q.where({ assignee: { $exists: false } })
 
-  return q.exec(callback)
+  return new Promise((resolve) => {
+    q.exec(function (err, tickets) {
+      if (ownerIdForNewTickets && !err) {
+        tickets = tickets.filter((ticket) => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
+      }
+
+      resolve(err, tickets)
+      return callback(err, tickets)
+    })
+  })
 }
 
-ticketSchema.statics.getCountWithObject = function (grpId, object, callback) {
+ticketSchema.statics.getCountWithObject = function (grpId, object, ownerIdForNewTickets, callback) {
   if (_.isUndefined(grpId)) {
     return callback('Invalid GroupId - TicketSchema.GetCountWithObject()', null)
   }
@@ -968,7 +986,7 @@ ticketSchema.statics.getCountWithObject = function (grpId, object, callback) {
     grpId = _.intersection(object.filter.groups, g)
   }
 
-  var q = self.model(COLLECTION).countDocuments({ group: { $in: grpId }, deleted: false })
+  var q = self.model(COLLECTION).find({ group: { $in: grpId }, deleted: false })
   if (!_.isUndefined(object.status) && _.isArray(object.status)) {
     var status = object.status.map(Number)
     q.where({ status: { $in: status } })
@@ -998,7 +1016,16 @@ ticketSchema.statics.getCountWithObject = function (grpId, object, callback) {
     q.where({ assignee: { $exists: false } })
   }
 
-  return q.lean().exec(callback)
+  return new Promise((resolve) => {
+    q.exec(function (err, tickets) {
+      if (ownerIdForNewTickets && !err) {
+        tickets = tickets.filter((ticket) => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
+      }
+
+      resolve(err, tickets.length)
+      return callback(err, tickets.length)
+    })
+  })
 }
 
 /**
@@ -1687,6 +1714,12 @@ function statusToString (status) {
       break
     case 4:
       str = 'Live'
+      break
+    case 5:
+      str = 'Done'
+      break
+    case 6:
+      str = 'Hold'
       break
     default:
       str = status

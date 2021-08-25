@@ -27,7 +27,8 @@
     <!--<div aria-busy="false" aria-label="Loading, please wait." role="progressbar"></div>-->
 <!--</header>-->
 <div id="loader-wrapper" class="loader-wrapper">
-    <div class="shadow-wrapper">
+    <div id="loader"></div>
+    <!--<div class="shadow-wrapper">
         <svg class="shadow">
             <defs>
                 <radialGradient r="0.5" cy="0.5" cx="0.5" id="bigdotshadow">
@@ -44,7 +45,7 @@
                 <circle class="s1" cx="35.9" cy="82" r="10" />
             </g>
         </svg>
-    </div>
+    </div>-->
 </div>
 <div id="serverRestarting" class="loader-wrapper hide" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #ddd; z-index: 999998;">
     <div class="shadow-wrapper">
@@ -84,7 +85,8 @@
 </div>
 
 <div class="disconnected loader-wrapper" style="display: none; opacity: 0; z-index: 999997;">
-    <div class="shadow-wrapper">
+    <div id="loader"></div>
+    <!--<div class="shadow-wrapper">
         <svg class="shadow">
             <defs>
                 <radialGradient r="0.5" cy="0.5" cx="0.5" id="shadow">
@@ -102,7 +104,7 @@
                 <circle class="s1" cx="35.9" cy="82" r="4" />
             </g>
         </svg>
-    </div>
+    </div>-->
     <div style="position:absolute;width: 400px;top:50%; left: 50%;transform: translate(-50%, -50%);">
         <p style="padding-top: 75px;">Disconnected... Trying to reconnect</p>
     </div>

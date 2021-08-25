@@ -58,6 +58,14 @@ div#accountsTable_wrapper
 .ticket-status-live
   background: $ticket_status_live !important
   color: white !important
+.ticket-status.ticket-done span,
+.ticket-status-done
+  background: $ticket_status_done !important
+  color: white !important
+.ticket-status.ticket-hold span,
+.ticket-status-hold
+  background: $ticket_status_hold !important
+  color: white !important
 
 .floating-ticket-status
   .ticket-status,
@@ -79,6 +87,12 @@ div#accountsTable_wrapper
     &.ticket-live span
       background: $ticket_status_live !important
       color: white !important
+    &.ticket-done span
+      background: $ticket_status_done !important
+      color: white !important
+    &.ticket-hold span
+      background: $ticket_status_hold !important
+      color: white !important
 
 .ticket-priority
   border-left: 10px solid transparent
@@ -86,7 +100,7 @@ div#accountsTable_wrapper
 
 .floating-ticket-status
   position: absolute
-  top: 22px
+  top: 20px
   right: 18px
 
   .ticket-status span
@@ -104,7 +118,6 @@ div#accountsTable_wrapper
       padding: 0 !important
       margin: 0 !important
     &.shown
-      height: 150px !important
       opacity: 1 !important
 
 #statusSelect
@@ -357,7 +370,7 @@ div#accountsTable_wrapper
     .issue-text
       padding-left: 85px
     h3
-      margin: 0 0 5px
+      margin: 0 0 2px
       font-family: $fontFamily
       font-size: 18px
       font-weight: 600
@@ -588,3 +601,7 @@ tr.overdue td
 
   &:hover
     background: darken($page_content_title_bg, 12%)
+
+.comments-wrapper .ticket-comment
+    h3
+      color: rgba(0, 0, 0, 0.5)

@@ -219,3 +219,72 @@ header [role="progressbar"][aria-busy="true"]
     width: 50%
     background-color: colour(green)
 
+#loader
+  display: block
+  position: relative
+  left: 50%
+  top: 50%
+  width: 150px
+  height: 150px
+  margin: -75px 0 0 -75px
+  border-radius: 50%
+  border: 6px solid transparent
+  border-top-color: rgb(31,167,224)
+
+  -webkit-animation: spin 2s linear infinite /* Chrome, Opera 15+, Safari 5+ */
+          animation: spin 2s linear infinite /* Chrome, Firefox 16+, IE 10+, Opera */
+
+  z-index: 1001
+
+#loader:before
+  content: ""
+  position: absolute
+  top: 5px
+  left: 5px
+  right: 5px
+  bottom: 5px
+  border-radius: 50%
+  border: 6px solid transparent
+  border-top-color: rgb(254,207,36)
+
+  -webkit-animation: spin 3s linear infinite /* Chrome, Opera 15+, Safari 5+ */
+          animation: spin 3s linear infinite /* Chrome, Firefox 16+, IE 10+, Opera */
+
+#loader:after
+  content: ""
+  position: absolute
+  top: 16px
+  left: 16px
+  right: 16px
+  bottom: 16px
+  border-radius: 50%
+  border: 6px solid transparent
+  border-top-color: rgb(171,202,41)
+
+  -webkit-animation: spin 2s linear infinite /* Chrome, Opera 15+, Safari 5+ */
+          animation: spin 2s linear infinite /* Chrome, Firefox 16+, IE 10+, Opera */
+
+@-webkit-keyframes spin
+  0%
+    -webkit-transform: rotate(0deg)  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(0deg)  /* IE 9 */
+            transform: rotate(0deg)  /* Firefox 16+, IE 10+, Opera */
+
+  100%
+    -webkit-transform: rotate(360deg)  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(360deg)  /* IE 9 */
+            transform: rotate(360deg)  /* Firefox 16+, IE 10+, Opera */
+
+@keyframes spin
+  0%
+    -webkit-transform: rotate(0deg)  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(0deg)  /* IE 9 */
+            transform: rotate(0deg)  /* Firefox 16+, IE 10+, Opera */
+
+  100%
+    -webkit-transform: rotate(360deg)  /* Chrome, Opera 15+, Safari 3.1+ */
+        -ms-transform: rotate(360deg)  /* IE 9 */
+            transform: rotate(360deg)  /* Firefox 16+, IE 10+, Opera */
+
+.loader-wrapper.disconnected #loader
+  margin: -140px 0 0 -110px

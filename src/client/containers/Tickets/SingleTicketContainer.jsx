@@ -270,13 +270,15 @@ class SingleTicketContainer extends React.Component {
       })
       : []
 
+    const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
+
     // Perms
     const hasTicketUpdate =
       this.ticket &&
-      this.ticket.status !== 3 &&
-      helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)
-
-    const isAdminOrAgent = this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent)
+      (
+        (this.ticket.status !== 3 && helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)) ||
+        (this.ticket.owner._id === this.props.shared.sessionUser._id && !isAdminOrAgent)
+      )
 
     return (
       <div className={'uk-clearfix uk-position-relative'} style={{ width: '100%', height: '100vh' }}>
@@ -571,6 +573,36 @@ class SingleTicketContainer extends React.Component {
               {/* Right Side */}
               <div className='page-message nopadding' style={{ marginLeft: 360 }}>
                 <div className='page-title-right noshadow'>
+                  {this.ticket.status !== 4 && (
+                    <div className='page-top-comments uk-float-left'>
+                      <a
+                        role='button'
+                        className='btn no-ajaxy ticket-status-live'
+                        onClick={e => {
+                          e.preventDefault()
+                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 4)
+                          this.ticket.status = 4
+                        }}
+                      >
+                        Activate
+                      </a>
+                    </div>
+                  )}
+                  {this.ticket.status !== 6 && helpers.canUser('tickets:closing', true) && (
+                    <div className='page-top-comments uk-float-left'>
+                      <a
+                        role='button'
+                        className='btn no-ajaxy ticket-status-hold'
+                        onClick={e => {
+                          e.preventDefault()
+                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 6)
+                          this.ticket.status = 6
+                        }}
+                      >
+                        Put On Hold
+                      </a>
+                    </div>
+                  )}
                   {this.props.common.hasThirdParty && (
                     <div className='page-top-comments uk-float-right'>
                       <a

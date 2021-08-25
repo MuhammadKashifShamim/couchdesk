@@ -105,6 +105,12 @@ ticketsController.getByStatus = function (req, res, next) {
     case 'live':
       s = 4
       break
+    case 'done':
+      s = 5
+      break
+    case 'hold':
+      s = 6
+      break
   }
 
   var filter = {

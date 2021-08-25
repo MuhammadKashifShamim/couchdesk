@@ -134,13 +134,9 @@ class IssuePartial extends React.Component {
           }}>
             {this.subject}
           </h3>
-          <a href={`mailto:${this.owner.email}`}>
-            {this.owner.fullname} &lt;{this.owner.email}&gt;
+          <a href={() => false}>
+            {this.owner.fullname} - {helpers.getHumanFriendlyDelta(this.props.date)}
           </a>
-          <br />
-          <time dateTime={helpers.formatDate(this.props.date, 'YYYY-MM-DD HH:mm')}>
-            {helpers.formatDate(this.props.date, this.props.dateFormat)}
-          </time>
           <br />
           {/* Attachments */}
           <ul className='attachments'>

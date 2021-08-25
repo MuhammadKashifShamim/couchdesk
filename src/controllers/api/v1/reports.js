@@ -72,6 +72,7 @@ apiReports.generate.ticketsByGroup = function (req, res) {
         }
       }
     },
+    null,
     function (err, tickets) {
       if (err) return res.status(400).json({ success: false, error: err })
 
@@ -183,6 +184,7 @@ apiReports.generate.ticketsByPriority = function (req, res) {
               priority: postData.priorities
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 
@@ -272,6 +274,7 @@ apiReports.generate.ticketsByStatus = function (req, res) {
               }
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 
@@ -361,6 +364,7 @@ apiReports.generate.ticketsByTags = function (req, res) {
               tags: postData.tags
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 
@@ -449,6 +453,7 @@ apiReports.generate.ticketsByType = function (req, res) {
               types: postData.types
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 
@@ -537,6 +542,7 @@ apiReports.generate.ticketsByUser = function (req, res) {
               owner: postData.users
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 
@@ -594,6 +600,7 @@ apiReports.generate.ticketsByAssignee = function (req, res) {
               assignee: postData.assignees
             }
           },
+          null,
           function (err, tickets) {
             if (err) return done(err)
 

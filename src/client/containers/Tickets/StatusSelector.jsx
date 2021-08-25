@@ -19,6 +19,8 @@ import socket from 'lib/socket'
 import { observer } from 'mobx-react'
 import { observable } from 'mobx'
 
+import helpers from 'lib/helpers'
+
 const statusToName = status => {
   switch (status) {
     case 0:
@@ -31,6 +33,10 @@ const statusToName = status => {
       return 'Closed'
     case 4:
       return 'Live'
+    case 5:
+      return 'Done'
+    case 6:
+      return 'Hold'
   }
 }
 
@@ -50,6 +56,8 @@ class StatusSelector extends React.Component {
     document.addEventListener('click', this.onDocumentClick)
 
     socket.socket.on('updateTicketStatus', this.onUpdateTicketStatus)
+
+    this.dropMenu.style.height = this.dropMenuChild.clientHeight + 'px';
   }
 
   componentDidUpdate (prevProps) {
@@ -116,10 +124,12 @@ class StatusSelector extends React.Component {
         )}
 
         <div id={'statusSelect'} ref={r => (this.dropMenu = r)} className='hide'>
-          <ul>
-            <li className='ticket-status ticket-new' onClick={() => this.changeStatus(0)}>
-              <span>New</span>
-            </li>
+          <ul ref={r => (this.dropMenuChild = r)}>
+            {helpers.canUser('tickets:handling', true) && (
+              <li className='ticket-status ticket-new' onClick={() => this.changeStatus(0)}>
+                <span>New</span>
+              </li>
+            )}
             <li className='ticket-status ticket-open' onClick={() => this.changeStatus(1)}>
               <span>Open</span>
             </li>
@@ -129,9 +139,19 @@ class StatusSelector extends React.Component {
             <li className='ticket-status ticket-pending' onClick={() => this.changeStatus(2)}>
               <span>Pending</span>
             </li>
-            <li className='ticket-status ticket-closed' onClick={() => this.changeStatus(3)}>
-              <span>Closed</span>
+            <li className='ticket-status ticket-done' onClick={() => this.changeStatus(5)}>
+              <span>Done</span>
             </li>
+            {helpers.canUser('tickets:closing', true) && (
+              <>
+                <li className='ticket-status ticket-hold' onClick={() => this.changeStatus(6)}>
+                  <span>Hold</span>
+                </li>
+                <li className='ticket-status ticket-closed' onClick={() => this.changeStatus(3)}>
+                  <span>Closed</span>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

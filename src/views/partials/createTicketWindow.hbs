@@ -5,9 +5,11 @@
             <div class="uk-margin-medium-bottom">
                 <label for="subject">Subject</label>
                 <input type="text" class="md-input" id="subject" name="subject"
-                       data-validation="length"
-                       data-validation-length="min{{data.common.ticketSettings.minSubject}}"
-                       data-validation-error-msg="Please enter a valid Subject. Subject must contain at least {{data.common.ticketSettings.minSubject}} characters."
+                        {{#if data.common.ticketSettings.minSubject > 0 }}
+                            data-validation="length"
+                            data-validation-length="min{{data.common.ticketSettings.minSubject}}"
+                            data-validation-error-msg="Please enter a valid Subject. Subject must contain at least {{data.common.ticketSettings.minSubject}} characters."
+                        {{/if}}
                 />
             </div>
             <div class="uk-margin-medium-bottom">

@@ -51,6 +51,12 @@ function statusToString (status) {
     case 4:
       str = 'Live'
       break
+    case 5:
+      str = 'Done'
+      break
+    case 6:
+      str = 'Hold'
+      break
     default:
       str = status
       break

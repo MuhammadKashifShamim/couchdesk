@@ -96,6 +96,8 @@ class FilterTicketsModal extends React.Component {
       { text: 'Open', value: '1' },
       { text: 'Live', value: '4' },
       { text: 'Pending', value: '2' },
+      { text: 'Done', value: '5' },
+      { text: 'Hold', value: '6' },
       { text: 'Closed', value: '3' }
     ]
 

@@ -1975,6 +1975,51 @@ define([
     return isEqual(value, other)
   }
 
+  helpers.getHumanFriendlyDelta = function (date) {
+    var timezone = this.getTimezone()
+    if (!timezone) {
+      timezone = 'America/New_York'
+    }
+
+    date = moment
+      .utc(date)
+      .tz(timezone)
+      .toDate();
+
+    const now = new Date()
+
+    const deltaMilliseconds = now - date;
+    const deltaSeconds = Math.floor(deltaMilliseconds / 1000);
+    const deltaMinutes = Math.floor(deltaSeconds / 60);
+    const deltaHours = Math.floor(deltaMinutes / 60);
+    const deltaDays = Math.floor(deltaHours / 24);
+    const deltaWeeks = Math.floor(deltaDays / 7);
+    const deltaMonths = Math.floor(deltaWeeks / 4.2);
+
+    var result;
+    if (deltaMinutes < 5) {
+      result = 'just now';
+    } else if ((deltaMinutes > 45) && (deltaMinutes < 90)) {
+      result = 'an hour ago';
+    } else if (deltaHours < 24) {
+      result = 'today';
+    } else if (deltaDays === 1) {
+      result = 'yesterday';
+    } else if (deltaDays < 7) {
+      result = deltaDays + ' days ago';
+    } else if (deltaWeeks === 1) {
+      result = 'a week ago';
+    } else if (deltaWeeks < 4) {
+      result = deltaWeeks + ' weeks ago';
+    } else if (deltaMonths === 1) {
+      result = deltaWeeks + 'a month ago';
+    } else {
+      result = deltaMonths + ' montha ago';
+    }
+
+    return result
+  }
+
   helpers.UI.hierarchicalShow = function (element) {
     var $hierarchicalShow = $('.hierarchical_show')
 

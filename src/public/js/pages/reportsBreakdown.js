@@ -138,6 +138,12 @@ define('pages/reportsBreakdown', [
                 case 4:
                   status = 'live'
                   break
+                case 5:
+                  status = 'done'
+                  break
+                case 6:
+                  status = 'hold'
+                  break
               }
               html += '<tr class="uk-table-middle">'
               html +=

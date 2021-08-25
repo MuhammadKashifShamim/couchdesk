@@ -37,19 +37,15 @@ class CommentNotePartial extends React.Component {
 
   render () {
     const { ticketSubject, comment, isNote, dateFormat, onEditClick, onRemoveClick } = this.props
-    const dateFormatted = helpers.formatDate(comment.date, dateFormat)
+    // const dateFormatted = helpers.formatDate(comment.date, dateFormat)
     return (
       <div className='ticket-comment'>
         <Avatar image={comment.owner.image} userId={comment.owner._id} />
         <div className='issue-text'>
           <h3>Re: {ticketSubject}</h3>
-          <a className='comment-email-link' href={`mailto:${comment.owner.email}`}>
-            {comment.owner.fullname} &lt;{comment.owner.email}&gt;
+          <a className='comment-email-link' href={() => false}>
+            {comment.owner.fullname} - {helpers.getHumanFriendlyDelta(comment.date)}
           </a>
-          <br />
-          <time dateTime={dateFormatted} title={dateFormatted} data-uk-tooltip='{delay: 200}'>
-            {helpers.calendarDate(comment.date)}
-          </time>
 
           <br />
           {isNote && <span className='uk-badge uk-badge-small nomargin-left-right text-white'>NOTE</span>}

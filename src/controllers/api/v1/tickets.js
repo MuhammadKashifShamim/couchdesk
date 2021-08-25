@@ -184,7 +184,7 @@ apiTickets.get = function (req, res) {
         }
       },
       function (grps, callback) {
-        ticketModel.getTicketsWithObject(grps, object, function (err, results) {
+        ticketModel.getTicketsWithObject(grps, object, null, function (err, results) {
           if (!permissions.canThis(user.role, 'comments:view')) {
             _.each(results, function (ticket) {
               ticket.comments = []
@@ -243,7 +243,7 @@ apiTickets.getByGroup = function (req, res) {
   }
 
   var ticketSchema = require('../../../models/ticket')
-  ticketSchema.getTicketsWithObject([groupId], obj, function (err, tickets) {
+  ticketSchema.getTicketsWithObject([groupId], obj, null, function (err, tickets) {
     if (err) return res.status(500).json({ success: false, error: err.message })
 
     return res.json({ success: true, tickets: tickets, count: tickets.length })
@@ -271,7 +271,7 @@ apiTickets.getCountByGroup = function (req, res) {
   switch (type.toLowerCase()) {
     case 'status':
       obj.status = [Number(value)]
-      ticketSchema.getCountWithObject([groupId], obj, function (err, count) {
+      ticketSchema.getCountWithObject([groupId], obj, null, function (err, count) {
         if (err) return res.status(500).json({ success: false, error: err.message })
 
         return res.json({ success: true, count: count })
@@ -281,7 +281,7 @@ apiTickets.getCountByGroup = function (req, res) {
       obj.filter = {
         types: [value]
       }
-      ticketSchema.getCountWithObject([groupId], obj, function (err, count) {
+      ticketSchema.getCountWithObject([groupId], obj, null, function (err, count) {
         if (err) return res.status(500).json({ success: false, error: err.message })
 
         return res.json({ success: true, count: count })
@@ -411,7 +411,7 @@ apiTickets.create = function (req, res) {
   response.success = true
 
   var postData = req.body
-  if (!_.isObject(postData) || !postData.subject || !postData.issue)
+  if (!_.isObject(postData) /* || !postData.subject || !postData.issue */)
     return res.status(400).json({ success: false, error: 'Invalid Post Data' })
 
   var socketId = _.isUndefined(postData.socketId) ? '' : postData.socketId
@@ -1547,7 +1547,7 @@ apiTickets.getTicketStatsForGroup = function (req, res) {
     [
       function (callback) {
         var obj = { limit: 10000, page: 0 }
-        ticketModel.getTicketsWithObject([groupId], obj, function (err, tickets) {
+        ticketModel.getTicketsWithObject([groupId], obj, null, function (err, tickets) {
           if (err) return callback(err)
           parseTicketStats(req.user.role, tickets, function (data) {
             tags = data.tags

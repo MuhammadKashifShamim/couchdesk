@@ -138,6 +138,12 @@ class TicketsContainer extends React.Component {
         break
       case 4:
         statusText = 'Live'
+        break
+      case 5:
+        statusText = 'Done'
+        break
+      case 6:
+        statusText = 'Hold'
     }
 
     const batch = this.selectedTickets.map(id => {
@@ -371,7 +377,13 @@ class TicketsContainer extends React.Component {
                     <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
                     <DropdownItem text={'Set Live'} onClick={() => this.onSetStatus(4)} />
                     <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
-                    <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
+                    <DropdownItem text={'Set Done'} onClick={() => this.onSetStatus(5)} />
+                    {helpers.canUser('tickets:closing', true) && (
+                      <>
+                        <DropdownItem text={'Set Hold'} onClick={() => this.onSetStatus(6)} />
+                        <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
+                      </>
+                    )}
                     {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
                     {helpers.canUser('tickets:delete', true) && (
                       <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteClicked()} />
@@ -443,6 +455,10 @@ class TicketsContainer extends React.Component {
                       return 'closed'
                     case 4:
                       return 'live'
+                    case 5:
+                      return 'done'
+                    case 6:
+                      return 'hold'
                   }
                 }
 
@@ -452,9 +468,10 @@ class TicketsContainer extends React.Component {
                 }
 
                 const updated = ticket.get('updated')
-                  ? helpers.formatDate(ticket.get('updated'), helpers.getShortDateFormat()) +
+                  ? helpers.getHumanFriendlyDelta(ticket.get('updated'))
+                  /* helpers.formatDate(ticket.get('updated'), helpers.getShortDateFormat()) +
                   ', ' +
-                  helpers.formatDate(ticket.get('updated'), helpers.getTimeFormat())
+                  helpers.formatDate(ticket.get('updated'), helpers.getTimeFormat()) */
                   : '--'
 
                 const dueDate = ticket.get('dueDate')
@@ -535,7 +552,7 @@ class TicketsContainer extends React.Component {
                       </div>
                     </TableCell>
                     <TableCell className={'vam nbb'}>
-                      {helpers.formatDate(ticket.get('date'), helpers.getShortDateFormat())}
+                      {helpers.getHumanFriendlyDelta(ticket.get('date')) /* helpers.formatDate(ticket.get('date'), helpers.getShortDateFormat()) */}
                     </TableCell>
                     <TableCell className={'vam nbb'}>{ticket.getIn(['owner', 'fullname'])}</TableCell>
                     <TableCell className={'vam nbb'}>
