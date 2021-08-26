@@ -22,7 +22,7 @@ import axios from 'axios'
 import Log from '../../logger'
 import { createTicket } from 'actions/tickets'
 import { fetchGroups } from 'actions/groups'
-import { fetchAccounts, fetchAccountsCreateTicket } from 'actions/accounts'
+import { fetchAccountsCreateTicket } from 'actions/accounts'
 
 import $ from 'jquery'
 import helpers from 'lib/helpers'
@@ -39,8 +39,9 @@ import EasyMDE from 'components/EasyMDE'
 @observer
 class CreateTicketModal extends React.Component {
   @observable priorities = []
-  @observable allAccounts = this.props.accounts || []
-  @observable groupAccounts = []
+  // @observable allAccounts = this.props.accounts || []
+  // @observable groupAccounts = []
+  @observable selectedGroup = null
   @observable selectedPriority = ''
   issueText = ''
   isGrabbed = false
@@ -54,8 +55,23 @@ class CreateTicketModal extends React.Component {
   }
 
   componentDidMount () {
-    this.props.fetchAccounts()
-    this.props.fetchAccountsCreateTicket({ type: 'all', limit: 1000 })
+    this.groupsWatcher = when(
+      () => this.props.groups.size,
+      () => {
+        let groupId
+        if (this.filter.groups && this.filter.groups.length > 0) {
+          groupId = this.filter.groups[0]
+        } else if (this.props.groups.size > 0) {
+          groupId = this.props.groups.first().get('_id')
+        }
+
+        if (groupId) {
+          this.selectedGroup = this.props.groups.find((group) => group.get('_id') === groupId) || null
+        }
+      }
+    )
+
+    this.props.fetchAccounts({ type: 'all:available', limit: -1 })
     this.props.fetchGroups()
     helpers.UI.inputs()
     helpers.formvalidator()
@@ -72,6 +88,7 @@ class CreateTicketModal extends React.Component {
 
   componentWillUnmount () {
     if (this.defaultTicketTypeWatcher) this.defaultTicketTypeWatcher()
+    if (this.groupsWatcher) this.groupsWatcher()
   }
 
   onTicketTypeSelectChange (e) {
@@ -160,6 +177,8 @@ class CreateTicketModal extends React.Component {
     //     return { text: a.get('fullname'), value: a.get('_id') }
     //   })
     //   .toArray()
+
+    this.selectedGroup = this.props.groups.find((group) => group.get('_id') === e.target.value) || null
   }
 
   render () {
@@ -169,13 +188,18 @@ class CreateTicketModal extends React.Component {
       viewdata.ticketSettings.allowAgentUserTickets &&
       (shared.sessionUser.role.isAdmin || shared.sessionUser.role.isAgent)
 
-    const mappedAccounts = this.props.accounts
+    const availableAccounts = this.selectedGroup ? this.props.accounts.filter((account) => this.selectedGroup.get('availableAccountIds').includes(account.get('_id'))) : this.props.accounts
+
+    const mappedAccounts = availableAccounts
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
       })
       .toArray()
 
-    const mappedAccountsCreateTicket = this.props.accountsCreateTicket
+    const mappedAgentAccounts = availableAccounts
+      .filter(a => {
+        return a.getIn(['role', 'isAgent'])
+      })
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
       })
@@ -190,6 +214,7 @@ class CreateTicketModal extends React.Component {
     const mappedTicketTypes = this.props.viewdata.ticketTypes.map(type => {
       return { text: type.name, value: type._id }
     })
+
     const mappedTicketTags = this.props.viewdata.ticketTags.map(tag => {
       return { text: tag.name, value: tag._id }
     })
@@ -223,7 +248,7 @@ class CreateTicketModal extends React.Component {
                 <label className={'uk-form-label'}>Author</label>
                 <SingleSelect
                   showTextbox={true}
-                  items={mappedAccountsCreateTicket}
+                  items={mappedAccounts}
                   defaultValue={[this.props.viewdata.loggedInAccount._id]}
                   width={'100%'}
                   disabled={!allowAgentUserTickets}
@@ -277,7 +302,7 @@ class CreateTicketModal extends React.Component {
               <label className={'uk-form-label'}>Assignee</label>
               <SingleSelect
                 showTextbox={false}
-                items={mappedAccounts}
+                items={mappedAgentAccounts}
                 width={'100%'}
                 onSelectChange={() => {
                   this.forceUpdate()
@@ -363,23 +388,20 @@ CreateTicketModal.propTypes = {
   shared: PropTypes.object.isRequired,
   viewdata: PropTypes.object.isRequired,
   accounts: PropTypes.object.isRequired,
-  accountsCreateTicket: PropTypes.object.isRequired,
   groups: PropTypes.object.isRequired,
   createTicket: PropTypes.func.isRequired,
   fetchAccounts: PropTypes.func.isRequired,
-  fetchAccountsCreateTicket: PropTypes.func.isRequired,
   fetchGroups: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
   shared: state.shared,
   viewdata: state.common,
-  accounts: state.accountsState.accounts,
-  accountsCreateTicket: state.accountsState.accountsCreateTicket,
+  accounts: state.accountsState.accountsCreateTicket,
   groups: state.groupsState.groups
 })
 
 export default connect(
   mapStateToProps,
-  { createTicket, fetchAccounts, fetchAccountsCreateTicket, fetchGroups }
+  { createTicket, fetchAccounts: fetchAccountsCreateTicket, fetchGroups }
 )(CreateTicketModal)

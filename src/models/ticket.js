@@ -281,8 +281,12 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
   var permissions = require('../permissions')
   var self = this
 
-  if (!self.assignee && self.status === 0) {
-    self.status = 2
+  if (self.status === 0) {
+    if (!self.assignee) {
+      self.status = 2
+    }
+  } else if (![3, 5, 6].includes(self.status)) {
+    self.status = 0
   }
 
   self.assignee = userId
@@ -316,6 +320,11 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
  */
 ticketSchema.methods.clearAssignee = function (ownerId, callback) {
   var self = this
+
+  if (![0, 3, 5, 6].includes(self.status)) {
+    self.status = 0
+  }
+
   self.assignee = undefined
   var historyItem = {
     action: 'ticket:set:assignee',
@@ -419,8 +428,12 @@ ticketSchema.methods.setTicketPriority = function (ownerId, priority, callback) 
  */
 ticketSchema.methods.setTicketGroup = function (ownerId, groupId, callback) {
   var self = this
-  self.group = groupId
 
+  if (![0, 3, 5, 6].includes(self.status)) {
+    self.status = 0
+  }
+
+  self.group = groupId
   self.populate('group', function (err, ticket) {
     if (err) return callback(err)
 
@@ -437,6 +450,11 @@ ticketSchema.methods.setTicketGroup = function (ownerId, groupId, callback) {
 
 ticketSchema.methods.setTicketDueDate = function (ownerId, dueDate, callback) {
   var self = this
+
+  if (![0, 3, 5, 6].includes(self.status)) {
+    self.status = 0
+  }
+
   self.dueDate = dueDate
 
   var historyItem = {
@@ -954,10 +972,10 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForN
   if (!_.isUndefined(object.assignedSelf) && !_.isNull(object.assignedSelf)) q.where('assignee', object.user)
   if (!_.isUndefined(object.unassigned) && !_.isNull(object.unassigned)) q.where({ assignee: { $exists: false } })
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     q.exec(function (err, tickets) {
       if (ownerIdForNewTickets && !err) {
-        tickets = tickets.filter((ticket) => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
+        tickets = tickets.filter(ticket => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
       }
 
       resolve(err, tickets)
@@ -1016,10 +1034,10 @@ ticketSchema.statics.getCountWithObject = function (grpId, object, ownerIdForNew
     q.where({ assignee: { $exists: false } })
   }
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     q.exec(function (err, tickets) {
       if (ownerIdForNewTickets && !err) {
-        tickets = tickets.filter((ticket) => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
+        tickets = tickets.filter(ticket => ticket.status !== 0 || ticket.owner._id.equals(ownerIdForNewTickets))
       }
 
       resolve(err, tickets.length)

@@ -144,7 +144,7 @@ events.onSetAssignee = function (socket) {
 
           ticket = results.subscriber
 
-          if (ticket.status === prevStatus) {
+          if (ticket.status === prevStatus || ticket.status === 0) {
             ticket.skipUpdatedMail = true
           }
 
@@ -188,6 +188,7 @@ events.onSetTicketOwner = function (socket) {
       ticket.setTicketOwner(ownerId, nextOwnerId, function (err, t) {
         if (err) return true
 
+        t.skipUpdatedMail = true
         t.save(function (err, tt) {
           if (err) return true
 
@@ -215,6 +216,7 @@ events.onSetTicketType = function (socket) {
       ticket.setTicketType(ownerId, typeId, function (err, t) {
         if (err) return true
 
+        t.skipUpdatedMail = true
         t.save(function (err, tt) {
           if (err) return true
 
@@ -247,6 +249,8 @@ events.onSetTicketPriority = function (socket) {
 
         ticket.setTicketPriority(ownerId, p, function (err, t) {
           if (err) return true
+
+          t.skipUpdatedMail = true
           t.save(function (err, tt) {
             if (err) return true
 
@@ -295,6 +299,7 @@ events.onSetTicketGroup = function (socket) {
       ticket.setTicketGroup(ownerId, groupId, function (err, t) {
         if (err) return true
 
+        t.skipUpdatedMail = true
         t.save(function (err, tt) {
           if (err) return true
 
@@ -324,6 +329,7 @@ events.onSetTicketDueDate = function (socket) {
       ticket.setTicketDueDate(ownerId, dueDate, function (err, t) {
         if (err) return true
 
+        t.skipUpdatedMail = true
         t.save(function (err, tt) {
           if (err) return true
 

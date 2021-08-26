@@ -12,6 +12,7 @@
  *  Copyright (c) 2014-2019. All rights reserved.
  */
 
+var async = require('async')
 var apiUtils = require('../apiUtils')
 var Ticket = require('../../../models/ticket')
 var Group = require('../../../models/group')
@@ -39,27 +40,66 @@ apiGroups.get = function (req, res) {
   var page = Number(req.query.page) || 0
   var type = req.query.type || 'user'
 
-  if (type === 'all') {
-    Group.getWithObject({ limit: limit, page: page }, function (err, groups) {
+  async.waterfall(
+    [
+      function (next) {
+        if (type === 'all') {
+          Group.getWithObject({ limit: limit, page: page }, function (err, groups) {
+            if (err) return next(err)
+
+            next(null, groups)
+          })
+        } else {
+          if (req.user.role.isAdmin || req.user.role.isAgent) {
+            Department.getDepartmentGroupsOfUser(req.user._id, function (err, groups) {
+              if (err) return next(err)
+
+              next(null, groups)
+            })
+          } else {
+            Group.getAllGroupsOfUser(req.user._id, function (err, groups) {
+              if (err) return next(err)
+
+              next(null, groups)
+            })
+          }
+        }
+      },
+      function (groups, next) {
+        Department.getDepartmentsByGroup(groups.map(group => group._id), function (err, departments) {
+          if (err) return next(err)
+
+          next(null, departments, groups)
+        })
+      }
+    ],
+    function (err, departments, groups) {
       if (err) return apiUtils.sendApiError(res, 500, err.message)
 
+      groups = groups.map(group => {
+        var groupDepartments = departments.filter(department =>
+          department.groups.some(departmentGroup => departmentGroup._id.equals(group._id))
+        )
+
+        var departmentAccountIds = []
+        groupDepartments.forEach(groupDepartment => {
+          var memberIds = groupDepartment.teams.flatMap(team => team.members.flatMap(member => member.id))
+
+          memberIds.forEach(memberId => {
+            if (!departmentAccountIds.includes(memberId)) {
+              departmentAccountIds.push(memberId)
+            }
+          })
+        })
+
+        return Object.assign({}, group.toObject(), {
+          availableAccountIds: departmentAccountIds.concat(group.members.map(member => member.id))
+        })
+      })
+
       return apiUtils.sendApiSuccess(res, { groups: groups, count: groups.length })
-    })
-  } else {
-    if (req.user.role.isAdmin || req.user.role.isAgent) {
-      Department.getDepartmentGroupsOfUser(req.user._id, function (err, groups) {
-        if (err) return apiUtils.sendApiError(res, 500, err.message)
-
-        return apiUtils.sendApiSuccess(res, { groups: groups, count: groups.length })
-      })
-    } else {
-      Group.getAllGroupsOfUser(req.user._id, function (err, groups) {
-        if (err) return apiUtils.sendApiError(res, 500, err.message)
-
-        return apiUtils.sendApiSuccess(res, { groups: groups, count: groups.length })
-      })
     }
-  }
+  )
 }
 
 apiGroups.update = function (req, res) {

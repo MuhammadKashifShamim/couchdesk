@@ -37,7 +37,7 @@ class FilterTicketsModal extends React.Component {
   componentDidMount () {
     helpers.UI.inputs()
     this.props.fetchGroups()
-    this.props.fetchAccounts({ page: 0, limit: -1, type: 'agents', showDeleted: false })
+    this.props.fetchAccounts({ type: 'agents:available', limit: -1 })
   }
 
   componentDidUpdate () {

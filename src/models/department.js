@@ -99,18 +99,18 @@ departmentSchema.statics.getDepartmentGroupsOfUser = function (userId, callback)
             })
           )
 
-          return callback(null, groups)
+          return callback(null, groups, departments)
         }
       })
   })
 }
 
-departmentSchema.statics.getDepartmentsByGroup = function (groupId, callback) {
+departmentSchema.statics.getDepartmentsByGroup = function (groupIds, callback) {
   var self = this
 
   return self
     .model(COLLECTION)
-    .find({ $or: [{ groups: groupId }, { allGroups: true }] })
+    .find({ $or: [{ groups: { $in: groupIds } }, { allGroups: true }] })
     .exec(callback)
 }
 

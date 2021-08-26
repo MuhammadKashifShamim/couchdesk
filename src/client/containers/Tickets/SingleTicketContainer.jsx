@@ -75,7 +75,7 @@ class SingleTicketContainer extends React.Component {
   @observable ticket = null
   @observable isSubscribed = false
 
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.onSocketUpdateComments = this.onSocketUpdateComments.bind(this)
@@ -89,7 +89,7 @@ class SingleTicketContainer extends React.Component {
     this.onUpdateTicketTags = this.onUpdateTicketTags.bind(this)
   }
 
-  componentDidMount() {
+  componentDidMount () {
     socket.socket.on('updateComments', this.onSocketUpdateComments)
     socket.socket.on('updateNotes', this.onUpdateTicketNotes)
     socket.socket.on('updateAssignee', this.onUpdateAssignee)
@@ -101,16 +101,16 @@ class SingleTicketContainer extends React.Component {
     socket.socket.on('updateTicketTags', this.onUpdateTicketTags)
 
     fetchTicket(this)
-    this.props.fetchAccounts()
+    this.props.fetchAccounts({ type: 'all:available', limit: -1 })
     this.props.fetchGroups()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate () {
     helpers.resizeFullHeight()
     helpers.setupScrollers()
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     socket.socket.off('updateComments', this.onSocketUpdateComments)
     socket.socket.off('updateNotes', this.onUpdateTicketNotes)
     socket.socket.off('updateAssignee', this.onUpdateAssignee)
@@ -125,15 +125,15 @@ class SingleTicketContainer extends React.Component {
     this.props.unloadGroups()
   }
 
-  onSocketUpdateComments(data) {
+  onSocketUpdateComments (data) {
     if (this.ticket._id === data._id) this.ticket.comments = data.comments
   }
 
-  onUpdateTicketNotes(data) {
+  onUpdateTicketNotes (data) {
     if (this.ticket._id === data._id) this.ticket.notes = data.notes
   }
 
-  onUpdateAssignee(data) {
+  onUpdateAssignee (data) {
     if (this.ticket._id === data._id) {
       this.ticket.assignee = data.assignee
       if (this.ticket.assignee && this.ticket.assignee._id === this.props.shared.sessionUser._id)
@@ -142,31 +142,37 @@ class SingleTicketContainer extends React.Component {
     }
   }
 
-  onUpdateTicketOwner(data) {
+  onUpdateTicketOwner (data) {
     if (this.ticket._id === data._id) this.ticket.owner = data.owner
   }
 
-  onUpdateTicketType(data) {
+  onUpdateTicketType (data) {
     if (this.ticket._id === data._id) this.ticket.type = data.type
   }
 
-  onUpdateTicketPriority(data) {
+  onUpdateTicketPriority (data) {
     if (this.ticket._id === data._id) this.ticket.priority = data.priority
   }
 
-  onUpdateTicketGroup(data) {
-    if (this.ticket._id === data._id) this.ticket.group = data.group
+  onUpdateTicketGroup (data) {
+    if (this.ticket._id === data._id) {
+      this.ticket.group = data.group
+      this.ticket.status = data.status
+    }
   }
 
-  onUpdateTicketDueDate(data) {
-    if (this.ticket._id === data._id) this.ticket.dueDate = data.dueDate
+  onUpdateTicketDueDate (data) {
+    if (this.ticket._id === data._id) {
+      this.ticket.dueDate = data.dueDate
+      this.ticket.status = data.status
+    }
   }
 
-  onUpdateTicketTags(data) {
+  onUpdateTicketTags (data) {
     if (this.ticket._id === data._id) this.ticket.tags = data.tags
   }
 
-  onCommentNoteSubmit(e, type) {
+  onCommentNoteSubmit (e, type) {
     e.preventDefault()
     const isNote = type === 'note'
     axios
@@ -198,7 +204,7 @@ class SingleTicketContainer extends React.Component {
       })
   }
 
-  onSubscriberChanged(e) {
+  onSubscriberChanged (e) {
     axios
       .put(`/api/v1/tickets/${this.ticket._id}/subscribe`, {
         user: this.props.shared.sessionUser._id,
@@ -215,19 +221,19 @@ class SingleTicketContainer extends React.Component {
       })
   }
 
-  transferToThirdParty(e) {
+  transferToThirdParty (e) {
     socket.ui.sendUpdateTicketStatus(this.ticket._id, 3)
     this.props.transferToThirdParty({ uid: this.ticket.uid })
   }
 
   @computed
-  get notesTagged() {
+  get notesTagged () {
     this.ticket.notes.forEach(i => (i.isNote = true))
 
     return this.ticket.notes
   }
 
-  @computed get commentsAndNotes() {
+  @computed get commentsAndNotes () {
     if (!this.ticket) return []
     if (!helpers.canUser('tickets:notes', true)) {
       return sortBy(this.ticket.comments, 'date')
@@ -239,19 +245,30 @@ class SingleTicketContainer extends React.Component {
     return commentsAndNotes
   }
 
-  @computed get hasCommentsOrNotes() {
+  @computed get hasCommentsOrNotes () {
     if (!this.ticket) return false
     return this.ticket.comments.length > 0 || this.ticket.notes.length > 0
   }
 
-  render() {
-    const mappedAccounts = this.props.accountsState
-      ? this.props.accountsState.accounts
-        .map(a => {
-          return { text: a.get('fullname'), value: a.get('_id') }
-        })
-        .toArray()
-      : []
+  render () {
+    const selectedGroup = this.ticket
+      && this.props.groupsState
+      && (this.props.groupsState.groups.find((group) => group.get('_id') === this.ticket.group._id) || null)
+
+    let availableAccounts
+    if (selectedGroup) {
+      availableAccounts = this.props.accountsState
+        ? this.props.accountsState.accounts
+          .filter((account) => selectedGroup.get('availableAccountIds').includes(account.get('_id')))
+          .toArray()
+        : []
+    } else {
+      availableAccounts = []
+    }
+
+    const mappedAccounts = availableAccounts.map(a => {
+      return { text: a.get('fullname'), value: a.get('_id') }
+    })
 
     const mappedGroups = this.props.groupsState
       ? uniqBy(
@@ -368,6 +385,7 @@ class SingleTicketContainer extends React.Component {
                         {hasTicketUpdate && (
                           <AssigneeDropdownPartial
                             ticketId={this.ticket._id}
+                            availableAccountIds={availableAccounts.map((account) => account.get('_id'))}
                             onClearClick={() => (this.ticket.assignee = undefined)}
                             onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
                           />
@@ -378,7 +396,7 @@ class SingleTicketContainer extends React.Component {
                     <div className='uk-width-1-1 padding-left-right-15'>
                       <div className='tru-card ticket-details uk-clearfix'>
                         {/*  Owner */}
-                        {(this.props.shared.sessionUser.role.isAdmin || this.props.shared.sessionUser.role.isAgent) && (
+                        {this.props.shared.sessionUser.role.isAdmin && (
                           <div className='uk-width-1-1 nopadding uk-clearfix'>
                             <span>Author</span>
                             {hasTicketUpdate && (
@@ -462,6 +480,21 @@ class SingleTicketContainer extends React.Component {
                             <select
                               value={this.ticket.group._id}
                               onChange={e => {
+                                const selectedGroup = this.props.groupsState && (this.props.groupsState.groups.find((group) => group.get('_id') === e.target.value) || null)
+                                if (!selectedGroup) {
+                                  return
+                                }
+
+                                if (!selectedGroup.get('availableAccountIds').includes(this.ticket.owner._id)) {
+                                  this.ticket.owner = this.props.shared.sessionUser
+                                  socket.ui.setTicketOwner(this.ticket._id, this.props.shared.sessionUser._id)
+                                }
+
+                                if (!selectedGroup.get('availableAccountIds').includes(this.ticket.assignee._id)) {
+                                  this.ticket.assignee = undefined
+                                  socket.socket.emit('clearAssignee', this.props.ticketId)
+                                }
+
                                 socket.ui.setTicketGroup(this.ticket._id, e.target.value)
                               }}
                             >
@@ -689,8 +722,8 @@ class SingleTicketContainer extends React.Component {
                         {this.hasCommentsOrNotes && (
                           <TruTabWrapper>
                             <TruTabSelectors style={{ marginLeft: 110, width: 'calc(100% - 110px)' }}>
-                            {helpers.canUser('tickets:notes', true) && (
-                              <TruTabSelector
+                              {helpers.canUser('tickets:notes', true) && (
+                                <TruTabSelector
                                   selectorId={0}
                                   label='All'
                                   active={true}

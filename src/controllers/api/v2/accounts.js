@@ -236,6 +236,51 @@ accountsApi.get = function (req, res) {
         )
       })
       break
+    case 'all:available':
+    case 'customers:available':
+    case 'agents:available':
+    case 'admins:available':
+      async.waterfall(
+        [
+          function (next) {
+            if (req.user.role.isAdmin || req.user.role.isAgent) {
+              Department.getDepartmentGroupsOfUser(req.user._id, function (err, groups, departments) {
+                if (err) return next(err)
+
+                next(null, departments, groups)
+              })
+            } else {
+              Group.getAllGroupsOfUser(req.user._id, function (err, groups) {
+                if (err) return next(err)
+
+                Department.getDepartmentsByGroup(groups.map(group => group._id), function (err, departments) {
+                  if (err) return next(err)
+
+                  next(null, departments, groups)
+                })
+              })
+            }
+          }
+        ],
+        function (err, departments, groups) {
+          if (err) return apiUtil.sendApiError(res, 500, err.message)
+
+          var departmentAccounts = departments.flatMap(department => department.teams.flatMap(team => team.members))
+          var groupAccounts = groups.flatMap(group => group.members)
+          var accounts = _.uniqBy(departmentAccounts.concat(groupAccounts), 'id')
+
+          if (type === 'customers:available') {
+            accounts = accounts.filter(account => !account.role.isAdmin && !account.role.isAgent)
+          } else if (type === 'agents:available') {
+            accounts = accounts.filter(account => account.role.isAgent)
+          } else if (type === 'admins:available') {
+            accounts = accounts.filter(account => account.role.isAdmin)
+          }
+
+          return apiUtil.sendApiSuccess(res, { accounts: accounts, count: accounts.length })
+        }
+      )
+      break
     default:
       return apiUtil.sendApiError_InvalidPostData(res)
   }

@@ -45,6 +45,8 @@ class AssigneeDropdownPartial extends React.Component {
   }
 
   render () {
+    const agents = this.agents.filter((agent) => this.props.availableAccountIds.includes(agent._id))
+
     return (
       <PDropDown
         title={'Select Assignee'}
@@ -67,7 +69,7 @@ class AssigneeDropdownPartial extends React.Component {
           </a>
         }
       >
-        {this.agents.map(agent => {
+        {agents.map(agent => {
           return (
             <li
               key={agent._id}
@@ -99,6 +101,7 @@ class AssigneeDropdownPartial extends React.Component {
 
 AssigneeDropdownPartial.propTypes = {
   ticketId: PropTypes.string.isRequired,
+  availableAccountIds: PropTypes.array.isRequired,
   onClearClick: PropTypes.func,
   onAssigneeClick: PropTypes.func
 }
