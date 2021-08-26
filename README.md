@@ -41,13 +41,13 @@ Couchdesk is now a powerful self-hosted solution to fast track, manage and coord
 The following list of additions and changes should give you an idea how we got from a rather unfinished draft to a complete and powerful, yet simple to use corporate version:
 
 - Workflow oriented permission and user system overhaul
-- Heavy improvements of the internal messaging to provide appealing out of box mails
-- Optimization of menu structures and views
+- Lots of improvements of the internal messaging to provide visually appealing out of the box mails
+- Optimization of menu structures, views and functionalities
 - Many visual improvements and simplifications to provide an easier yet more powerful experience
-- A more project based approach
-- Powerful optimization of daily work options
-- Possibilites for true client access rules and restrictions
-- Lots of important Bug fixes and functionality completion
+- A more project based approach 
+- Powerful optimization of typical daily work setups
+- Better possibilites for client access rules and restrictions
+- Lots of important bug fixes and functionality completion
 
 ### Current ongoing efforts
 We are still working hard to brush off some dust and polish the edges. These are the remaining issues we are currently working on:
