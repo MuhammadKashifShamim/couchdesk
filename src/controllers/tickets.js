@@ -315,6 +315,36 @@ ticketsController.getUpcoming = function (req, res, next) {
   return next()
 }
 
+ticketsController.getDelegated = function (req, res, next) {
+  var page = req.params.page
+  if (_.isUndefined(page)) page = 0
+
+  var filter = {
+    status: [1, 2, 4, 5],
+    assigneeNin: [req.user._id],
+    assigned: true
+  }
+
+  var processor = {}
+  processor.title = 'Delegated Tickets'
+  processor.nav = 'tickets-delegated'
+  processor.renderpage = 'tickets'
+  processor.pagetype = 'delegated'
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: filter.status,
+    assignedOthers: true,
+    user: req.user._id,
+    filter: filter
+  }
+
+  req.processor = processor
+
+  return next()
+}
+
 ticketsController.filter = function (req, res, next) {
   var page = req.query.page
   if (_.isUndefined(page)) page = 0

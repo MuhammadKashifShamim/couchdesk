@@ -82,7 +82,7 @@ events.onUpdateTicketStatus = function (socket) {
             tid: t._id,
             owner: t.owner,
             status: status,
-            assignee: t.assignee,
+            assignee: t.assignee
           })
         })
       })

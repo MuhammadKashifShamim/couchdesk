@@ -324,7 +324,9 @@ apiTickets.search = function (req, res) {
     [
       function (callback) {
         if (req.user.role.isAdmin || req.user.role.isAgent) {
-          return departmentModel.getDepartmentGroupsOfUser(req.user._id, callback)
+          return departmentModel.getDepartmentGroupsOfUser(req.user._id, function (err, groups) {
+            callback(err, groups)
+          })
         } else {
           return groupModel.getAllGroupsOfUserNoPopulate(req.user._id, callback)
         }

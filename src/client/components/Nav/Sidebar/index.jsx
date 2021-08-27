@@ -101,7 +101,7 @@ class Sidebar extends React.Component {
               <>
                 <SidebarItem
                   text='Next Tickets'
-                  icon='upcoming'
+                  icon='collections_bookmark'
                   href='/tickets/upcoming'
                   class='navHome'
                   active={activeItem === 'tickets-upcoming'}
@@ -111,6 +111,12 @@ class Sidebar extends React.Component {
                   icon='person_off'
                   href='/tickets/unassigned'
                   active={activeItem === 'tickets-unassigned'}
+                />
+                <SubmenuItem
+                  text='Delegated Tickets'
+                  icon='folder_shared'
+                  href='/tickets/delegated'
+                  active={activeItem === 'tickets-delegated'}
                 />
               </>
             )}

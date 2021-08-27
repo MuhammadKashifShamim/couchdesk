@@ -75,7 +75,9 @@ departmentSchema.statics.getDepartmentGroupsOfUser = function (userId, callback)
         var hasAllGroups = _.some(departments, { allGroups: true })
         var hasPublicGroups = _.some(departments, { publicGroups: true })
         if (hasAllGroups) {
-          return Groups.getAllGroups(callback)
+          Groups.getAllGroups(function (err, groups) {
+            return callback(err, groups, departments)
+          })
         } else if (hasPublicGroups) {
           return Groups.getAllPublicGroups(function (err, publicGroups) {
             if (err) return callback(err)
@@ -90,7 +92,7 @@ departmentSchema.statics.getDepartmentGroupsOfUser = function (userId, callback)
               return i._id
             })
 
-            return callback(null, merged)
+            return callback(null, merged, departments)
           })
         } else {
           var groups = _.flattenDeep(

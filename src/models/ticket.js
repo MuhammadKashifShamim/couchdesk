@@ -254,7 +254,8 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
     if (!self.assignee) {
       self.assignee = ownerId
     }
-  } if (status === 3) {
+  }
+  if (status === 3) {
     self.closedDate = new Date()
   } else {
     self.closedDate = null
@@ -940,6 +941,10 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForN
       q.where({ assignee: { $in: object.filter.assignee } })
     }
 
+    if (!_.isUndefined(object.filter.assigneeNin)) {
+      q.where({ assignee: { $nin: object.filter.assigneeNin } })
+    }
+
     if (!_.isUndefined(object.filter.assigned)) {
       q.where({ assignee: { $exists: true } })
     }
@@ -975,6 +980,7 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForN
   }
 
   if (!_.isUndefined(object.assignedSelf) && !_.isNull(object.assignedSelf)) q.where('assignee', object.user)
+  if (!_.isUndefined(object.assignedOthers) && !_.isNull(object.assignedOthers)) q.where({ assignee: { $ne: object.user }})
   if (!_.isUndefined(object.unassigned) && !_.isNull(object.unassigned)) q.where({ assignee: { $exists: false } })
 
   return new Promise(resolve => {

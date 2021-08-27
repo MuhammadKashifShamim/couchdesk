@@ -250,6 +250,20 @@ function mainRoutes (router, middleware, controllers) {
     controllers.tickets.getUpcoming,
     controllers.tickets.processor
   )
+  router.get(
+    '/tickets/delegated',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getDelegated,
+    controllers.tickets.processor
+  )
+  router.get(
+    '/tickets/delegated/page/:page',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getDelegated,
+    controllers.tickets.processor
+  )
   router.get('/tickets/print/:uid', middleware.redirectToLogin, middleware.loadCommonData, controllers.tickets.print)
   router.get('/tickets/:id', middleware.redirectToLogin, middleware.loadCommonData, controllers.tickets.single)
   // router.post('/tickets/postcomment', middleware.redirectToLogin, controllers.tickets.postcomment);

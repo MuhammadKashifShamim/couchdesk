@@ -77,7 +77,9 @@ apiElasticSearch.search = function (req, res) {
           return groupSchema.getAllGroupsOfUserNoPopulate(req.user._id, next)
 
         var Department = require('../../../models/department')
-        return Department.getDepartmentGroupsOfUser(req.user._id, next)
+        return Department.getDepartmentGroupsOfUser(req.user._id, function (err, groups) {
+          next(err, groups)
+        })
       },
       function (groups, next) {
         var g = _.map(groups, function (i) {
