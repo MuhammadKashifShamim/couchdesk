@@ -31,7 +31,8 @@ groupsController.get = function (req, res) {
 
   var content = {}
   content.title = 'Groups'
-  content.nav = 'groups'
+  content.nav = 'company'
+  content.subnav = 'company-groups'
 
   content.data = {}
   content.data.user = req.user

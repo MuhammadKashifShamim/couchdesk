@@ -300,6 +300,7 @@ define([
     var sidebarElements = [
       { element: '#side-nav-sub-tickets', target: 'tickets' },
       { element: '#side-nav-sub-accounts', target: 'accounts' },
+      { element: '#side-nav-sub-company', target: 'company' },
       { element: '#side-nav-sub-reports', target: 'reports' },
       { element: '#side-nav-sub-settings', target: 'settings' }
     ]
@@ -1984,37 +1985,37 @@ define([
     date = moment
       .utc(date)
       .tz(timezone)
-      .toDate();
+      .toDate()
 
     const now = new Date()
 
-    const deltaMilliseconds = now - date;
-    const deltaSeconds = Math.floor(deltaMilliseconds / 1000);
-    const deltaMinutes = Math.floor(deltaSeconds / 60);
-    const deltaHours = Math.floor(deltaMinutes / 60);
-    const deltaDays = Math.floor(deltaHours / 24);
-    const deltaWeeks = Math.floor(deltaDays / 7);
-    const deltaMonths = Math.floor(deltaWeeks / 4.2);
+    const deltaMilliseconds = now - date
+    const deltaSeconds = Math.floor(deltaMilliseconds / 1000)
+    const deltaMinutes = Math.floor(deltaSeconds / 60)
+    const deltaHours = Math.floor(deltaMinutes / 60)
+    const deltaDays = Math.floor(deltaHours / 24)
+    const deltaWeeks = Math.floor(deltaDays / 7)
+    const deltaMonths = Math.floor(deltaWeeks / 4.2)
 
-    var result;
+    var result
     if (deltaMinutes < 5) {
-      result = 'just now';
-    } else if ((deltaMinutes > 45) && (deltaMinutes < 90)) {
-      result = 'an hour ago';
+      result = 'just now'
+    } else if (deltaMinutes > 45 && deltaMinutes < 90) {
+      result = 'an hour ago'
     } else if (deltaHours < 24) {
-      result = 'today';
+      result = 'today'
     } else if (deltaDays === 1) {
-      result = 'yesterday';
+      result = 'yesterday'
     } else if (deltaDays < 7) {
-      result = deltaDays + ' days ago';
+      result = deltaDays + ' days ago'
     } else if (deltaWeeks === 1) {
-      result = 'a week ago';
+      result = 'a week ago'
     } else if (deltaWeeks < 4) {
-      result = deltaWeeks + ' weeks ago';
+      result = deltaWeeks + ' weeks ago'
     } else if (deltaMonths === 1) {
-      result = deltaWeeks + 'a month ago';
+      result = deltaWeeks + 'a month ago'
     } else {
-      result = deltaMonths + ' montha ago';
+      result = deltaMonths + ' montha ago'
     }
 
     return result

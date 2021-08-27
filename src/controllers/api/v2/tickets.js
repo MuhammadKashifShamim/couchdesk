@@ -118,7 +118,7 @@ ticketsV2.get = function (req, res) {
             break
           case 'delegated':
             Object.assign(queryObject, {
-              status: [1, 2, 4, 5],
+              status: [1, 2, 4],
               filter: Object.assign({}, queryObject.filter, {
                 assigneeNin: [req.user._id],
                 assigned: true

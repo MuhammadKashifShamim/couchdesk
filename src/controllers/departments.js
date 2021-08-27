@@ -26,7 +26,8 @@ departmentController.get = function (req, res) {
 
   var content = {}
   content.title = 'Departments'
-  content.nav = 'departments'
+  content.nav = 'company'
+  content.subnav = 'company-departments'
 
   content.data = {}
   content.data.user = req.user

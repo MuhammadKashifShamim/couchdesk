@@ -25,11 +25,11 @@ import { updateNavChange } from '../../../actions/nav'
 import Helpers from 'lib/helpers'
 
 class Sidebar extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     Helpers.UI.getPlugins((err, result) => {
       if (!err && result.plugins) {
         this.setState({ plugins: result.plugins })
@@ -37,12 +37,12 @@ class Sidebar extends React.Component {
     })
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     Helpers.UI.initSidebar()
     Helpers.UI.bindExpand()
   }
 
-  renderPlugins () {
+  renderPlugins() {
     const { plugins, sessionUser, activeItem, activeSubItem } = this.state
     return (
       <SidebarItem
@@ -75,7 +75,7 @@ class Sidebar extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { activeItem, activeSubItem, sessionUser } = this.props
     return (
       <ul className='side-nav'>
@@ -210,7 +210,7 @@ class Sidebar extends React.Component {
               <Submenu id='accounts'>
                 <SubmenuItem
                   href={'/accounts/customers'}
-                  text={'Customers'}
+                  text={'Users'}
                   icon={'portrait'}
                   active={activeSubItem === 'accounts-customers'}
                 />
@@ -234,26 +234,51 @@ class Sidebar extends React.Component {
             )}
           </SidebarItem>
         )}
-        {sessionUser && Helpers.canUser('groups:view') && (
+        {sessionUser && (Helpers.canUser('groups:view') || Helpers.canUser('teams:view') || Helpers.canUser('departments:view') || Helpers.canUser('notices:view')) && (
           <SidebarItem
-            text='Projects'
-            icon='cases'
+            text='Company'
+            icon='maps_home_work'
             href='/groups'
-            class='navGroups'
-            active={activeItem === 'groups'}
-          />
-        )}
-        {sessionUser && Helpers.canUser('teams:view') && (
-          <SidebarItem text='Teams' icon='wc' href='/teams' class='navTeams' active={activeItem === 'teams'} />
-        )}
-        {sessionUser && Helpers.canUser('departments:view') && (
-          <SidebarItem
-            text='Departments'
-            icon='domain'
-            href='/departments'
-            class='navTeams'
-            active={activeItem === 'departments'}
-          />
+            class='navCompany no-ajaxy'
+            hasSubmenu={true}
+            subMenuTarget='company'
+            active={activeItem === 'company'}
+          >
+            <Submenu id='company'>
+              {Helpers.canUser('groups:view') && (
+                <SubmenuItem
+                  text='Projects'
+                  icon='cases'
+                  href='/groups'
+                  active={activeSubItem === 'company-groups'}
+                />
+              )}
+              {Helpers.canUser('teams:view') && (
+                <SubmenuItem
+                  text='Teams'
+                  icon='wc'
+                  href='/teams'
+                  active={activeSubItem === 'company-teams'}
+                />
+              )}
+              {Helpers.canUser('departments:view') && (
+                <SubmenuItem
+                  text='Departments'
+                  icon='domain'
+                  href='/departments'
+                  active={activeSubItem === 'company-departments'}
+                />
+              )}
+              {Helpers.canUser('notices:view') && (
+                <SubmenuItem
+                  text='Notices'
+                  icon='warning'
+                  href='/notices'
+                  active={activeSubItem === 'company-notices'}
+                />
+              )}
+            </Submenu>
+          </SidebarItem>
         )}
         {sessionUser && Helpers.canUser('reports:view') && (
           <SidebarItem
@@ -290,16 +315,6 @@ class Sidebar extends React.Component {
         )}
 
         {/*{this.renderPlugins()}*/}
-
-        {sessionUser && Helpers.canUser('notices:view') && (
-          <SidebarItem
-            text='Notices'
-            icon='warning'
-            href='/notices'
-            class='navNotices'
-            active={activeItem === 'notices'}
-          />
-        )}
 
         {sessionUser && Helpers.canUser('settings:edit') && (
           <SidebarItem

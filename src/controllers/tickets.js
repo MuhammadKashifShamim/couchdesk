@@ -320,7 +320,7 @@ ticketsController.getDelegated = function (req, res, next) {
   if (_.isUndefined(page)) page = 0
 
   var filter = {
-    status: [1, 2, 4, 5],
+    status: [1, 2, 4],
     assigneeNin: [req.user._id],
     assigned: true
   }

@@ -37,7 +37,8 @@ noticesController.get = function (req, res) {
 
   var content = {}
   content.title = 'Notices'
-  content.nav = 'notices'
+  content.nav = 'company'
+  content.subnav = 'company-notices'
 
   content.data = {}
   content.data.user = req.user

@@ -26,7 +26,8 @@ teamController.get = function (req, res) {
 
   var content = {}
   content.title = 'Teams'
-  content.nav = 'teams'
+  content.nav = 'company'
+  content.subnav = 'company-teams'
 
   content.data = {}
   content.data.user = req.user
