@@ -275,8 +275,6 @@ class TicketsContainer extends React.Component {
       title = 'Next Tickets'
     } else if (this.props.view === 'assigned') {
       title = 'My Tickets'
-    } else if (this.props.view === 'active') {
-      title = 'All Tickets'
     } else if (this.props.view === 'filter') {
       title = 'Tickets'
     } else {
@@ -424,7 +422,7 @@ class TicketsContainer extends React.Component {
               <TableHeader key={0} width={45} height={50} component={selectAllCheckbox} />,
               ...(isAdminOrAgent ? [<TableHeader key={1} width={60} text={'Status'} />] : []),
               <TableHeader key={2} width={65} text={'#'} />,
-              <TableHeader key={3} width={'23%'} text={'Subject'} />,
+              <TableHeader key={3} width={'23%'} text={'Subject'} padding={'0 0 0 66px'} />,
               <TableHeader key={4} width={110} text={'Created'} />,
               <TableHeader key={5} width={125} text={'Author'} />,
               <TableHeader key={6} width={225} text={'Project'} />,

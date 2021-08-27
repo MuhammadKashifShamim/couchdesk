@@ -76,7 +76,7 @@ class StatusSelector extends React.Component {
   onUpdateTicketStatus (data) {
     if (this.props.ticketId === data.tid) {
       this.status = data.status
-      if (this.props.onStatusChange) this.props.onStatusChange(this.status)
+      if (this.props.onStatusChange) this.props.onStatusChange(this.status, data.assignee)
     }
   }
 

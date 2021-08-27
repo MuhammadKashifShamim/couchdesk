@@ -158,7 +158,7 @@ ticketsController.getActive = function (req, res, next) {
   }
 
   var processor = {}
-  processor.title = 'All Tickets'
+  processor.title = 'Active Tickets'
   processor.nav = 'tickets'
   processor.subnav = 'tickets-active'
   processor.renderpage = 'tickets'

@@ -122,6 +122,7 @@ ticketSchema.pre('findOne', autoPopulate).pre('find', autoPopulate)
 ticketSchema.pre('save', function (next) {
   this.subject = this.subject.trim()
   this.wasNew = this.isNew
+  this.updated = Date.now()
 
   if (!_.isUndefined(this.uid) || this.uid) {
     return next()
@@ -249,7 +250,11 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
 
   var self = this
 
-  if (status === 3) {
+  if ([2, 4, 5].includes(status)) {
+    if (!self.assignee) {
+      self.assignee = ownerId
+    }
+  } if (status === 3) {
     self.closedDate = new Date()
   } else {
     self.closedDate = null

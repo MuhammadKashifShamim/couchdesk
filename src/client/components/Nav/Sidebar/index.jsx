@@ -138,7 +138,7 @@ class Sidebar extends React.Component {
                 />
                 <NavSeparator />
                 <SubmenuItem
-                  text='All'
+                  text='Active'
                   icon='source'
                   href='/tickets/active'
                   active={activeSubItem === 'tickets-active'}

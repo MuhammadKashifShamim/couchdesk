@@ -312,7 +312,10 @@ class SingleTicketContainer extends React.Component {
                   <StatusSelector
                     ticketId={this.ticket._id}
                     status={this.ticket.status}
-                    onStatusChange={status => (this.ticket.status = status)}
+                    onStatusChange={(status, assignee) => {
+                      this.ticket.status = status
+                      this.ticket.assignee = assignee
+                    }}
                     hasPerm={helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)}
                   />
                 </div>

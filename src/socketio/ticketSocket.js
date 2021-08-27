@@ -81,7 +81,8 @@ events.onUpdateTicketStatus = function (socket) {
           utils.sendToAllConnectedClients(io, 'updateTicketStatus', {
             tid: t._id,
             owner: t.owner,
-            status: status
+            status: status,
+            assignee: t.assignee,
           })
         })
       })
