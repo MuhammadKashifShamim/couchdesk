@@ -639,6 +639,36 @@ class SingleTicketContainer extends React.Component {
                       </a>
                     </div>
                   )}
+                  {this.ticket.status === 4 && (
+                    <div className='page-top-comments uk-float-left'>
+                      <a
+                        role='button'
+                        className='btn no-ajaxy ticket-status-pending'
+                        onClick={e => {
+                          e.preventDefault()
+                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 2)
+                          this.ticket.status = 2
+                        }}
+                      >
+                        Pause
+                      </a>
+                    </div>
+                  )}
+                  {[1, 2, 4].includes(this.ticket.status) && (
+                    <div className='page-top-comments uk-float-left'>
+                      <a
+                        role='button'
+                        className='btn no-ajaxy ticket-status-done'
+                        onClick={e => {
+                          e.preventDefault()
+                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 5)
+                          this.ticket.status = 5
+                        }}
+                      >
+                        Done
+                      </a>
+                    </div>
+                  )}
                   {this.props.common.hasThirdParty && (
                     <div className='page-top-comments uk-float-right'>
                       <a
