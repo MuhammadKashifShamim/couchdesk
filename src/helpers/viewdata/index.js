@@ -499,8 +499,48 @@ viewController.getConversations = function (request, callback) {
 }
 
 viewController.getUsers = function (request, callback) {
-  var userSchema = require('../../models/user')
-  if (request.user.role.isAdmin || request.user.role.isAgent) {
+  // var userSchema = require('../../models/user')
+
+  var departmentSchema = require('../../models/department')
+  var groupSchema = require('../../models/group')
+
+  async.waterfall(
+    [
+      function (next) {
+        if (request.user.role.isAdmin || request.user.role.isAgent) {
+          departmentSchema.getDepartmentGroupsOfUser(request.user._id, function (err, groups, departments) {
+            if (err) return next(err)
+
+            next(null, departments, groups)
+          })
+        } else {
+          groupSchema.getAllGroupsOfUser(request.user._id, function (err, groups) {
+            if (err) return next(err)
+
+            departmentSchema.getDepartmentsByGroup(groups.map(group => group._id), function (err, departments) {
+              if (err) return next(err)
+
+              next(null, departments, groups)
+            })
+          })
+        }
+      }
+    ],
+    function (err, departments, groups) {
+      if (err) {
+        winston.warn(err)
+        return callback()
+      }
+
+      var departmentAccounts = departments.flatMap(department => department.teams.flatMap(team => team.members))
+      var groupAccounts = groups.flatMap(group => group.members)
+      var accounts = _.uniqBy(departmentAccounts.concat(groupAccounts), 'id')
+
+      return callback(_.sortBy(accounts, 'fullname'))
+    }
+  )
+
+  /* if (request.user.role.isAdmin || request.user.role.isAgent) {
     userSchema.findAll(function (err, users) {
       if (err) {
         winston.warn(err)
@@ -554,7 +594,7 @@ viewController.getUsers = function (request, callback) {
 
       return callback(users)
     })
-  }
+  } */
 }
 
 viewController.loggedInAccount = function (request, callback) {

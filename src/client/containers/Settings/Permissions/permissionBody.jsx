@@ -113,7 +113,10 @@ class PermissionBody extends React.Component {
   }
 
   static mapAccountSpecials () {
-    return [{ title: 'Import', perm: 'import' }]
+    return [
+      { title: 'Import', perm: 'import' },
+      { title: 'Allow Chat Between Agents And Users', perm: 'chat' }
+    ]
   }
 
   static mapNoticeSpecials () {

@@ -277,7 +277,7 @@ accountsApi.get = function (req, res) {
             accounts = accounts.filter(account => account.role.isAdmin)
           }
 
-          return apiUtil.sendApiSuccess(res, { accounts: accounts, count: accounts.length })
+          return apiUtil.sendApiSuccess(res, { accounts: _.sortBy(accounts, 'fullname'), count: accounts.length })
         }
       )
       break
