@@ -1666,6 +1666,42 @@ define([
     return _.indexOf(typePerm, action) !== -1
   }
 
+  helpers.canOtherUser = function (user, a, adminOverride) {
+    var role = user.role
+    var roles = window.trudeskSessionService.getRoles()
+
+    if (adminOverride === true && role.isAdmin) return true
+
+    if (_.isUndefined(role)) return false
+    if (_.isUndefined(roles)) return false
+    if (__.hasIn(role, '_id')) role = role._id
+    var rolePerm = _.find(roles, { _id: role })
+    if (_.isUndefined(rolePerm)) return false
+    if (_.indexOf(rolePerm.grants, '*') !== -1) return true
+    if (_.isUndefined(a)) return false
+
+    var actionType = a.split(':')[0]
+    var action = a.split(':')[1]
+
+    if (_.isUndefined(actionType) || _.isUndefined(action)) return false
+
+    var result = _.filter(rolePerm.grants, function (value) {
+      if (__.startsWith(value, actionType + ':')) return value
+    })
+
+    if (_.isUndefined(result) || _.size(result) < 1) return false
+    if (_.size(result) === 1) {
+      if (result[0] === '*') return true
+    }
+
+    var typePerm = result[0].split(':')[1].split(' ')
+    typePerm = _.uniq(typePerm)
+
+    if (_.indexOf(typePerm, '*') !== -1) return true
+
+    return _.indexOf(typePerm, action) !== -1
+  }
+
   helpers.hasHierarchyEnabled = function (roleId) {
     var roles = window.trudeskSessionService.getRoles()
     var role = _.find(roles, function (o) {

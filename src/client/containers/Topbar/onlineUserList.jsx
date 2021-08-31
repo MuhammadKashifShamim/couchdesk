@@ -23,6 +23,7 @@ import OffCanvas from 'components/OffCanvas'
 
 import UIkit from 'uikit'
 import socket from 'lib/socket'
+import helpers from 'lib/helpers'
 
 @observer
 class OnlineUserListPartial extends React.Component {
@@ -94,7 +95,21 @@ class OnlineUserListPartial extends React.Component {
             <div className='online-list-wrapper'>
               <ul className='online-list'>
                 {entries(this.activeUsers).map(([key, value]) => {
-                  if (this.props.sessionUser && value.user._id === this.props.sessionUser._id) return
+                  if (this.props.sessionUser) {
+                    if (value.user._id === this.props.sessionUser._id) return
+
+                    if (this.props.sessionUser.role.isAdmin || this.props.sessionUser.role.isAgent) {
+                      if (
+                        !value.user.role.isAdmin && !value.user.role.isAgent
+                        && (!helpers.canUser('accounts:chat') || !helpers.canOtherUser(value.user, 'accounts:chat'))
+                      ) return
+                    } else if (
+                      (!value.user.role.isAdmin && !value.user.role.isAgent)
+                      || !helpers.canUser('accounts:chat')
+                      || !helpers.canOtherUser(value.user, 'accounts:chat')
+                    ) return
+                  }
+
                   const image = value.user.image || 'defaultProfile.jpg'
                   const isAgentOrAdmin = value.user.role.isAdmin || value.user.role.isAgent
                   return (
@@ -127,7 +142,21 @@ class OnlineUserListPartial extends React.Component {
             </div>
             <ul className='user-list'>
               {users.map(user => {
-                if (this.props.sessionUser && user._id === this.props.sessionUser._id) return
+                if (this.props.sessionUser) {
+                  if (user._id === this.props.sessionUser._id) return
+
+                  if (this.props.sessionUser.role.isAdmin || this.props.sessionUser.role.isAgent) {
+                    if (
+                      !user.role.isAdmin && !user.role.isAgent
+                      && (!helpers.canUser('accounts:chat') || !helpers.canOtherUser(user, 'accounts:chat'))
+                    ) return
+                  } else if (
+                    (!user.role.isAdmin && !user.role.isAgent)
+                    || !helpers.canUser('accounts:chat')
+                    || !helpers.canOtherUser(user, 'accounts:chat')
+                  ) return
+                }
+
                 const image = user.image || 'defaultProfile.jpg'
                 return (
                   <li key={user._id} data-search-term={user.fullname.toLowerCase()}>

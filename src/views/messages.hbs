@@ -15,21 +15,68 @@
         <div id="convo-list" class="page-content-left noborder full-height">
             <ul class="message-items scrollable">
                 {{#foreach data.conversations}}
-                    <li ng-click="loadConversation('{{_id}}');" data-conversation-id="{{_id}}" data-updatedAt="{{updatedAt}}">
-                        <div class="profile-pic">
-                            {{#if partner.image}}
-                                <img src="/uploads/users/{{partner.image}}" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
-                            {{else}}
-                                <img src="/uploads/users/defaultProfile.jpg" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
-                            {{/if}}
-                            <span class="user-offline uk-border-circle" data-user-status-id="{{partner._id}}"></span>
-                        </div>
-                        <div class="convo-info">
-                            <span class="message-from">{{partner.fullname}}</span>
-                            <span class="message-date">{{calendarDate updatedAt}}</span>
-                            <span class="message-subject">{{recentMessage}}</span>
-                        </div>
-                    </li>
+                    {{#or ../data.common.loggedInAccount.role.isAdmin ../data.common.loggedInAccount.role.isAgent}}
+                        {{#or partner.role.isAdmin partner.role.isAgent }}
+                            <li ng-click="loadConversation('{{_id}}');" data-conversation-id="{{_id}}" data-updatedAt="{{updatedAt}}">
+                                <div class="profile-pic">
+                                    {{#if partner.image}}
+                                        <img src="/uploads/users/{{partner.image}}" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                    {{else}}
+                                        <img src="/uploads/users/defaultProfile.jpg" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                    {{/if}}
+                                    <span class="user-offline uk-border-circle" data-user-status-id="{{partner._id}}"></span>
+                                </div>
+                                <div class="convo-info">
+                                    <span class="message-from">{{partner.fullname}}</span>
+                                    <span class="message-date">{{calendarDate updatedAt}}</span>
+                                    <span class="message-subject">{{recentMessage}}</span>
+                                </div>
+                            </li>
+                        {{else}}
+                            {{#canUser ../data.common.loggedInAccount 'accounts:chat'}}
+                                {{#canUser partner 'accounts:chat'}}
+                                    <li ng-click="loadConversation('{{_id}}');" data-conversation-id="{{_id}}" data-updatedAt="{{updatedAt}}">
+                                        <div class="profile-pic">
+                                            {{#if partner.image}}
+                                                <img src="/uploads/users/{{partner.image}}" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                            {{else}}
+                                                <img src="/uploads/users/defaultProfile.jpg" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                            {{/if}}
+                                            <span class="user-offline uk-border-circle" data-user-status-id="{{partner._id}}"></span>
+                                        </div>
+                                        <div class="convo-info">
+                                            <span class="message-from">{{partner.fullname}}</span>
+                                            <span class="message-date">{{calendarDate updatedAt}}</span>
+                                            <span class="message-subject">{{recentMessage}}</span>
+                                        </div>
+                                    </li>
+                                {{/canUser}}
+                            {{/canUser}}
+                        {{/or}}
+                    {{else}}
+                        <!-- Only allow 'user' role to see 'support' and 'admin' -->
+                        {{#or partner.role.isAdmin partner.role.isAgent}}
+                            {{#canUser ../data.common.loggedInAccount 'accounts:chat'}}
+                                {{#canUser partner 'accounts:chat'}}
+                                    <li ng-click="loadConversation('{{_id}}');" data-conversation-id="{{_id}}" data-updatedAt="{{updatedAt}}">
+                                        <div class="profile-pic">
+                                            {{#if partner.image}}
+                                                <img src="/uploads/users/{{partner.image}}" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                            {{else}}
+                                                <img src="/uploads/users/defaultProfile.jpg" class="uk-border-circle profileImage" data-userid="{{partner._id}}" />
+                                            {{/if}}
+                                            <span class="user-offline uk-border-circle" data-user-status-id="{{partner._id}}"></span>
+                                        </div>
+                                        <div class="convo-info">
+                                            <span class="message-from">{{partner.fullname}}</span>
+                                            <span class="message-date">{{calendarDate updatedAt}}</span>
+                                            <span class="message-subject">{{recentMessage}}</span>
+                                        </div>
+                                    </li>
+                                {{/canUser}}
+                            {{/canUser}}
+                        {{/or}}
+                    {{/or}}
                 {{/foreach}}
             </ul>
         </div>
@@ -41,7 +88,7 @@
             <ul class="all-user-list message-items scrollable">
                 {{#each data.common.users}}
                     {{#compare username '!=' ../data.common.loggedInAccount.username}}
-                        {{#or ../data.common.loggedInAccount.role.isAdmin ../data.common.loggedInAccount.role.isAgent }}
+                        {{#or ../data.common.loggedInAccount.role.isAdmin ../data.common.loggedInAccount.role.isAgent}}
                             {{#or role.isAdmin role.isAgent }}
                                 <li data-search-term="{{lowercase fullname}}" ng-click="startNewConversation('{{_id}}');">
                                     <div class="profile-pic">

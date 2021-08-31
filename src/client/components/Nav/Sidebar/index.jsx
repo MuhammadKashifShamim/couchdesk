@@ -189,13 +189,15 @@ class Sidebar extends React.Component {
             </SidebarItem>
           </>
         )}
-        <SidebarItem
-          text='Messages'
-          icon='chat'
-          href='/messages'
-          class='navMessages'
-          active={activeItem === 'messages'}
-        />
+        {sessionUser && (sessionUser.role.isAdmin || sessionUser.role.isAgent || Helpers.canUser('accounts:chat')) && (
+          <SidebarItem
+            text='Messages'
+            icon='chat'
+            href='/messages'
+            class='navMessages'
+            active={activeItem === 'messages'}
+          />
+        )}
         {sessionUser && Helpers.canUser('accounts:view') && (
           <SidebarItem
             text='Accounts'
