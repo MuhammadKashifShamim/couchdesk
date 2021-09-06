@@ -164,6 +164,7 @@ class CreateTicketModal extends React.Component {
     data.priority = this.selectedPriority
     data.issue = this.issueMde.easymde.value()
     data.socketid = socket.ui.socket.io.engine.id
+    data.public = this.publicSwitch ? this.publicSwitch.checked : true
 
     this.props.createTicket(data)
   }
@@ -299,16 +300,38 @@ class CreateTicketModal extends React.Component {
           )}
           {allowAgentUserTickets && (
             <div className='uk-margin-medium-bottom'>
-              <label className={'uk-form-label'}>Assignee</label>
-              <SingleSelect
-                showTextbox={false}
-                items={mappedAgentAccounts}
-                width={'100%'}
-                onSelectChange={() => {
-                  this.forceUpdate()
-                }}
-                ref={i => (this.assigneeSelect = i)}
-              />
+              <Grid>
+                <GridItem width={'2-3'}>
+                  <label className={'uk-form-label'}>Assignee</label>
+                  <SingleSelect
+                    showTextbox={false}
+                    items={mappedAgentAccounts}
+                    width={'100%'}
+                    onSelectChange={() => {
+                      this.forceUpdate()
+                    }}
+                    ref={i => (this.assigneeSelect = i)}
+                  />
+                </GridItem>
+                <GridItem width={'1-3'}>
+                  <div
+                    className='onoffswitch subscribeSwitch'
+                    style={{ marginLeft: 20, marginTop: 30 }}
+                  >
+                    <input
+                      id={'publicSwitch'}
+                      type='checkbox'
+                      name='publicSwitch'
+                      className='onoffswitch-checkbox'
+                      ref={i => (this.publicSwitch = i)}
+                    />
+                    <label className='onoffswitch-label' htmlFor='publicSwitch'>
+                      <span className='onoffswitch-inner publicSwitch-inner' />
+                      <span className='onoffswitch-switch subscribeSwitch-switch' />
+                    </label>
+                  </div>
+                </GridItem>
+              </Grid>
             </div>
           )}
           {helpers.canUser('tickets:priority', true) && (

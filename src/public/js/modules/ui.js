@@ -179,6 +179,14 @@ define('modules/ui', [
 
     socket.emit('setTicketIssue', payload)
   }
+  socketUi.setTicketPublic = function (ticketId, public_) {
+    var payload = {
+      ticketId: ticketId,
+      public: public_
+    }
+
+    socket.emit('setTicketPublic', payload)
+  }
   socketUi.setCommentText = function (ticketId, commentId, commentText) {
     var payload = {
       ticketId: ticketId,

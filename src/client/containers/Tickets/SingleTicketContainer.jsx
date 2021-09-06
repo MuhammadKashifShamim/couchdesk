@@ -87,6 +87,7 @@ class SingleTicketContainer extends React.Component {
     this.onUpdateTicketGroup = this.onUpdateTicketGroup.bind(this)
     this.onUpdateTicketDueDate = this.onUpdateTicketDueDate.bind(this)
     this.onUpdateTicketTags = this.onUpdateTicketTags.bind(this)
+    this.onUpdateTicketPublic = this.onUpdateTicketPublic.bind(this)
   }
 
   componentDidMount () {
@@ -99,6 +100,7 @@ class SingleTicketContainer extends React.Component {
     socket.socket.on('updateTicketGroup', this.onUpdateTicketGroup)
     socket.socket.on('updateTicketDueDate', this.onUpdateTicketDueDate)
     socket.socket.on('updateTicketTags', this.onUpdateTicketTags)
+    socket.socket.on('updateTicketPublic', this.onUpdateTicketPublic)
 
     fetchTicket(this)
     this.props.fetchAccounts({ type: 'all:available', limit: -1 })
@@ -120,6 +122,7 @@ class SingleTicketContainer extends React.Component {
     socket.socket.off('updateTicketGroup', this.onUpdateTicketGroup)
     socket.socket.off('updateTicketDueDate', this.onUpdateTicketDueDate)
     socket.socket.off('updateTicketTags', this.onUpdateTicketTags)
+    socket.socket.off('updateTicketPublic', this.onUpdateTicketPublic)
 
     this.props.unloadAccounts()
     this.props.unloadGroups()
@@ -170,6 +173,10 @@ class SingleTicketContainer extends React.Component {
 
   onUpdateTicketTags (data) {
     if (this.ticket._id === data._id) this.ticket.tags = data.tags
+  }
+
+  onUpdateTicketPublic (data) {
+    if (this.ticket._id === data._id) this.ticket.public = data.public
   }
 
   onCommentNoteSubmit (e, type) {
@@ -323,77 +330,99 @@ class SingleTicketContainer extends React.Component {
                 <div className='page-content-left full-height scrollable'>
                   <div className='ticket-details-wrap uk-position-relative uk-clearfix'>
                     {isAdminOrAgent ? (
-                      <div className='ticket-assignee-wrap uk-clearfix' style={{ paddingRight: 30 }}>
-                        <h4>Assignee</h4>
-                        <div className='ticket-assignee uk-clearfix'>
+                      <>
+                        <div
+                          className='onoffswitch subscribeSwitch uk-float-left'
+                          style={{ top: 14, left: 240 }}
+                        >
+                          <input
+                            id={'publicSwitch_'}
+                            type='checkbox'
+                            name='publicSwitch'
+                            className='onoffswitch-checkbox'
+                            checked={this.ticket.public}
+                            onChange={e => {
+                              e.preventDefault()
+                              socket.ui.setTicketPublic(this.ticket._id, e.target.checked)
+                            }}
+                          />
+                          <label className='onoffswitch-label' htmlFor='publicSwitch_'>
+                            <span className='onoffswitch-inner publicSwitch-inner' />
+                            <span className='onoffswitch-switch subscribeSwitch-switch' />
+                          </label>
+                        </div>
+                        <div className='ticket-assignee-wrap uk-clearfix' style={{ paddingRight: 30 }}>
+                          <h4>Assignee</h4>
+                          <div className='ticket-assignee uk-clearfix'>
+                            {hasTicketUpdate && (
+                              <a
+                                role='button'
+                                title='Set Assignee'
+                                style={{ float: 'left' }}
+                                className='relative no-ajaxy'
+                                onClick={() => socket.socket.emit('updateAssigneeList')}
+                              >
+                                <PDropdownTrigger target={'assigneeDropdown'}>
+                                  <Avatar
+                                    image={this.ticket.assignee && this.ticket.assignee.image}
+                                    showOnlineBubble={this.ticket.assignee !== undefined}
+                                    userId={this.ticket.assignee && this.ticket.assignee._id}
+                                  />
+                                  <span className='drop-icon material-icons'>keyboard_arrow_down</span>
+                                </PDropdownTrigger>
+                              </a>
+                            )}
+                            {!hasTicketUpdate && (
+                              <Avatar
+                                image={this.ticket.assignee && this.ticket.assignee.image}
+                                showOnlineBubble={this.ticket.assignee !== undefined}
+                                userId={this.ticket.assignee && this.ticket.assignee._id}
+                              />
+                            )}
+                            <div className='ticket-assignee-details'>
+                              {!this.ticket.assignee && (
+                                <>
+                                  <h3>No User Assigned</h3>
+                                  {isAdminOrAgent && (
+                                    <a
+                                      role='button'
+                                      className='btn no-ajaxy grab-ticket'
+                                      onClick={e => {
+                                        e.preventDefault()
+                                        socket.socket.emit('setAssignee', { _id: this.props.shared.sessionUser._id, ticketId: this.ticket._id })
+                                        this.ticket.assignee = this.props.shared.sessionUser
+                                      }}
+                                    >
+                                      Grab The Ticket
+                                    </a>
+                                  )}
+                                </>
+                              )}
+                              {this.ticket.assignee && (
+                                <Fragment>
+                                  <h3>{this.ticket.assignee.fullname}</h3>
+                                  <a
+                                    className='comment-email-link uk-text-truncate uk-display-inline-block'
+                                    href={`mailto:${this.ticket.assignee.email}`}
+                                  >
+                                    {this.ticket.assignee.email}
+                                  </a>
+                                  <span className={'uk-display-block'}>{this.ticket.assignee.title}</span>
+                                </Fragment>
+                              )}
+                            </div>
+                          </div>
+
                           {hasTicketUpdate && (
-                            <a
-                              role='button'
-                              title='Set Assignee'
-                              style={{ float: 'left' }}
-                              className='relative no-ajaxy'
-                              onClick={() => socket.socket.emit('updateAssigneeList')}
-                            >
-                              <PDropdownTrigger target={'assigneeDropdown'}>
-                                <Avatar
-                                  image={this.ticket.assignee && this.ticket.assignee.image}
-                                  showOnlineBubble={this.ticket.assignee !== undefined}
-                                  userId={this.ticket.assignee && this.ticket.assignee._id}
-                                />
-                                <span className='drop-icon material-icons'>keyboard_arrow_down</span>
-                              </PDropdownTrigger>
-                            </a>
-                          )}
-                          {!hasTicketUpdate && (
-                            <Avatar
-                              image={this.ticket.assignee && this.ticket.assignee.image}
-                              showOnlineBubble={this.ticket.assignee !== undefined}
-                              userId={this.ticket.assignee && this.ticket.assignee._id}
+                            <AssigneeDropdownPartial
+                              ticketId={this.ticket._id}
+                              availableAccountIds={availableAccounts.map((account) => account.get('_id'))}
+                              onClearClick={() => (this.ticket.assignee = undefined)}
+                              onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
                             />
                           )}
-                          <div className='ticket-assignee-details'>
-                            {!this.ticket.assignee && (
-                              <>
-                                <h3>No User Assigned</h3>
-                                {isAdminOrAgent && (
-                                  <a
-                                    role='button'
-                                    className='btn no-ajaxy grab-ticket'
-                                    onClick={e => {
-                                      e.preventDefault()
-                                      socket.socket.emit('setAssignee', { _id: this.props.shared.sessionUser._id, ticketId: this.ticket._id })
-                                      this.ticket.assignee = this.props.shared.sessionUser
-                                    }}
-                                  >
-                                    Grab The Ticket
-                                  </a>
-                                )}
-                              </>
-                            )}
-                            {this.ticket.assignee && (
-                              <Fragment>
-                                <h3>{this.ticket.assignee.fullname}</h3>
-                                <a
-                                  className='comment-email-link uk-text-truncate uk-display-inline-block'
-                                  href={`mailto:${this.ticket.assignee.email}`}
-                                >
-                                  {this.ticket.assignee.email}
-                                </a>
-                                <span className={'uk-display-block'}>{this.ticket.assignee.title}</span>
-                              </Fragment>
-                            )}
-                          </div>
                         </div>
-
-                        {hasTicketUpdate && (
-                          <AssigneeDropdownPartial
-                            ticketId={this.ticket._id}
-                            availableAccountIds={availableAccounts.map((account) => account.get('_id'))}
-                            onClearClick={() => (this.ticket.assignee = undefined)}
-                            onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
-                          />
-                        )}
-                      </div>
+                      </>
                     ) : <div style={{ marginBottom: 30, paddingRight: 30 }} />}
 
                     <div className='uk-width-1-1 padding-left-right-15'>

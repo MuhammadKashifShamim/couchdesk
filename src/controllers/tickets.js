@@ -419,6 +419,8 @@ ticketsController.filter = function (req, res, next) {
  * @see Ticket
  */
 ticketsController.processor = function (req, res) {
+  var user = req.user
+
   var processor = req.processor
   if (_.isUndefined(processor)) return res.redirect('/')
 
@@ -432,6 +434,10 @@ ticketsController.processor = function (req, res) {
         groups: groups
       })
     }
+  }
+
+  if (!user.role.isAdmin && !user.role.isAgent) {
+    processor.object.public = true
   }
 
   var content = {}

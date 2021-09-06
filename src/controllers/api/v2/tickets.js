@@ -151,6 +151,10 @@ ticketsV2.get = function (req, res) {
             break
         }
 
+        if (!req.user.role.isAdmin && !req.user.role.isAgent) {
+          queryObject.public = true
+        }
+
         Ticket.getTicketsWithObject(mappedGroups, queryObject, ownerIdForNewTickets, function (err, tickets) {
           if (err) return next(err)
           return next(null, mappedGroups, tickets)

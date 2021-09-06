@@ -106,7 +106,8 @@ var ticketSchema = mongoose.Schema({
   notes: [noteSchema],
   attachments: [attachmentSchema],
   history: [historySchema],
-  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'accounts' }]
+  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'accounts' }],
+  public: { type: Boolean, default: false, required: true, index: true }
 })
 
 ticketSchema.index({ deleted: -1, group: 1, status: 1 })
@@ -521,6 +522,14 @@ ticketSchema.methods.setSubject = function (ownerId, subject, callback) {
   }
 
   self.history.push(historyItem)
+
+  return callback(null, self)
+}
+
+ticketSchema.methods.setPublic = function (public_, callback) {
+  var self = this
+
+  self.public = public_
 
   return callback(null, self)
 }
@@ -982,6 +991,7 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForN
   if (!_.isUndefined(object.assignedSelf) && !_.isNull(object.assignedSelf)) q.where('assignee', object.user)
   if (!_.isUndefined(object.assignedOthers) && !_.isNull(object.assignedOthers)) q.where({ assignee: { $ne: object.user }})
   if (!_.isUndefined(object.unassigned) && !_.isNull(object.unassigned)) q.where({ assignee: { $exists: false } })
+  if (!_.isUndefined(object.public) && !_.isNull(object.public)) q.where('public', object.public)
 
   return new Promise(resolve => {
     q.exec(function (err, tickets) {

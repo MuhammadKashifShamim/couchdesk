@@ -40,6 +40,7 @@ function register (socket) {
   events.onSetTicketGroup(socket)
   events.onSetTicketDueDate(socket)
   events.onSetTicketIssue(socket)
+  events.onSetTicketPublic(socket)
   events.onSetCommentText(socket)
   events.onRemoveComment(socket)
   events.onSetNoteText(socket)
@@ -364,6 +365,30 @@ events.onSetTicketIssue = function (socket) {
 
             utils.sendToAllConnectedClients(io, 'updateTicketIssue', tt)
           })
+        })
+      })
+    })
+  })
+}
+
+events.onSetTicketPublic = function (socket) {
+  socket.on('setTicketPublic', function (data) {
+    var ticketId = data.ticketId
+    var public_ = data.public
+
+    if (_.isUndefined(ticketId) || _.isUndefined(public_)) return true
+    ticketSchema.getTicketById(ticketId, function (err, ticket) {
+      if (err) return true
+
+      ticket.setPublic(public_, function (err, t) {
+        if (err) return true
+
+        t.skipUpdatedMail = true
+        t.save(function (err, tt) {
+          if (err) return true
+
+          // emitter.emit('ticket:updated', tt)
+          utils.sendToAllConnectedClients(io, 'updateTicketPublic', tt)
         })
       })
     })
