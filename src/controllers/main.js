@@ -117,7 +117,7 @@ mainController.loginPost = function (req, res, next) {
     }
 
     if (req.user.role === 'user') {
-      redirectUrl = '/tickets/new'
+      redirectUrl = '/tickets/live'
     }
 
     req.logIn(user, function (err) {

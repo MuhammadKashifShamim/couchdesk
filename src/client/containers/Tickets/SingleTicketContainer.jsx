@@ -649,7 +649,7 @@ class SingleTicketContainer extends React.Component {
                           this.ticket.status = 4
                         }}
                       >
-                        Activate
+                        Start Ticket
                       </a>
                     </div>
                   )}

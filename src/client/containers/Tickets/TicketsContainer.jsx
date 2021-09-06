@@ -167,6 +167,28 @@ class TicketsContainer extends React.Component {
       })
   }
 
+  onSetPublic (public_) {
+    const batch = this.selectedTickets.map(id => {
+      return { id, public: public_ }
+    })
+
+    axios
+      .put(`/api/v2/tickets/batch`, { batch })
+      .then(res => {
+        if (res.data.success) {
+          helpers.UI.showSnackbar({ text: `Ticket set to ${public_ ? 'public' : 'private'}` })
+          this._clearChecked()
+        } else {
+          helpers.UI.showSnackbar('An unknown error occurred.', true)
+          Log.error(res.data.error)
+        }
+      })
+      .catch(error => {
+        Log.error(error)
+        helpers.UI.showSnackbar('An Error occurred. Please check console.', true)
+      })
+  }
+
   onDeleteClicked () {
     each(this.selectedTickets, id => {
       this.props.deleteTicket({ id })
@@ -380,6 +402,12 @@ class TicketsContainer extends React.Component {
                       <>
                         <DropdownItem text={'Set Hold'} onClick={() => this.onSetStatus(6)} />
                         <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
+                      </>
+                    )}
+                    {isAdminOrAgent && (
+                      <>
+                        <DropdownItem text={'Set Public'} onClick={() => this.onSetPublic(true)} />
+                        <DropdownItem text={'Set Private'} onClick={() => this.onSetPublic(false)} />
                       </>
                     )}
                     {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}

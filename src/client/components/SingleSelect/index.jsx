@@ -45,12 +45,12 @@ class SingleSelect extends React.Component {
   }
 
   onSelectChange (e) {
-    if (!this.props.multiple && e.target.value === '') return
+    // if (!this.props.multiple && e.target.value === '') return
 
     if (this.props.multiple) this.value = this.select.selectize.items
     else this.value = e.target.value
 
-    if (this.value && this.props.onSelectChange) this.props.onSelectChange(e)
+    if (this.props.onSelectChange) this.props.onSelectChange(e)
   }
 
   componentDidUpdate (prevProps) {

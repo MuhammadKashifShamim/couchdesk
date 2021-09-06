@@ -561,7 +561,7 @@ accountsController.login = function (req, res, next) {
         return next(err)
       }
 
-      return res.redirect('/tickets/new')
+      return res.redirect(req.user.role === 'user' ? '/tickets/live' : '/tickets/new')
     })
   })
 }

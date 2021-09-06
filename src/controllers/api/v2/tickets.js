@@ -233,6 +233,10 @@ ticketsV2.batchUpdate = function (req, res) {
           ticket.history.push(HistoryItem)
         }
 
+        if (!_.isUndefined(batchTicket.public)) {
+          ticket.public = batchTicket.public
+        }
+
         return ticket.save(next)
       })
     },

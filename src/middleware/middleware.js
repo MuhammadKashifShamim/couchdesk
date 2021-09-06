@@ -43,7 +43,7 @@ middleware.redirectToDashboardIfLoggedIn = function (req, res, next) {
     }
 
     if (req.user.role === 'user') {
-      return res.redirect('/tickets/new')
+      return res.redirect('/tickets/live')
     }
 
     return res.redirect('/tickets/new')
@@ -97,7 +97,7 @@ middleware.ensurel2Auth = function (req, res, next) {
   if (req.session.l2auth === 'totp') {
     if (req.user) {
       if (req.user.role !== 'user') {
-        return res.redirect('/tickets/new')
+        return res.redirect('/tickets/live')
       }
 
       return res.redirect('/tickets/new')

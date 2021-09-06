@@ -92,6 +92,8 @@ class CreateTicketModal extends React.Component {
   }
 
   onTicketTypeSelectChange (e) {
+    if (!e.target.value) return
+
     this.priorityWrapper.classList.add('hide')
     this.priorityLoader.classList.remove('hide')
     axios
@@ -148,6 +150,11 @@ class CreateTicketModal extends React.Component {
     if ($mdeError.length > 0) $mdeError.remove()
 
     if (!$form.isValid(null, null, false)) return true
+    if (!this.groupSelect.value) return true
+
+    if (this.statusSelect) {
+      data.status = this.statusSelect.value
+    }
 
     if (this.isGrabbed) {
       data.assignee = this.props.shared.sessionUser._id
@@ -220,12 +227,18 @@ class CreateTicketModal extends React.Component {
       return { text: tag.name, value: tag._id }
     })
 
+    const mappedTicketStatuses = [
+      { text: 'New', value: '0' },
+      { text: 'Open', value: '1' },
+      { text: 'Hold', value: '6' }
+    ]
+
     let defaultGroupValue
     if (this.filter.groups && this.filter.groups.length > 0) {
       defaultGroupValue = this.filter.groups[0]
-    } else {
+    } /* else {
       defaultGroupValue = head(mappedGroups) ? head(mappedGroups).value : ''
-    }
+    } */
 
     return (
       <BaseModal {...this.props} options={{ bgclose: false }}>
@@ -312,24 +325,19 @@ class CreateTicketModal extends React.Component {
                     }}
                     ref={i => (this.assigneeSelect = i)}
                   />
+                  <span style={{ marginTop: '10px', display: 'inline-block', fontSize: '11px' }} className={'uk-text-muted'}>
+                    Please use the backspace key to clear the value
+                  </span>
                 </GridItem>
                 <GridItem width={'1-3'}>
-                  <div
-                    className='onoffswitch subscribeSwitch'
-                    style={{ marginLeft: 20, marginTop: 30 }}
-                  >
-                    <input
-                      id={'publicSwitch'}
-                      type='checkbox'
-                      name='publicSwitch'
-                      className='onoffswitch-checkbox'
-                      ref={i => (this.publicSwitch = i)}
-                    />
-                    <label className='onoffswitch-label' htmlFor='publicSwitch'>
-                      <span className='onoffswitch-inner publicSwitch-inner' />
-                      <span className='onoffswitch-switch subscribeSwitch-switch' />
-                    </label>
-                  </div>
+                  <label className={'uk-form-label'}>Status</label>
+                  <SingleSelect
+                    showTextbox={false}
+                    items={mappedTicketStatuses}
+                    width={'100%'}
+                    defaultValue={head(mappedTicketStatuses).value}
+                    ref={i => (this.statusSelect = i)}
+                  />
                 </GridItem>
               </Grid>
             </div>
@@ -395,6 +403,22 @@ class CreateTicketModal extends React.Component {
             </span>
           </div>
           <div className='uk-modal-footer uk-text-right'>
+            <div
+              className='onoffswitch subscribeSwitch'
+              style={{ display: 'inline-block', float: 'left' }}
+            >
+              <input
+                id={'publicSwitch'}
+                type='checkbox'
+                name='publicSwitch'
+                className='onoffswitch-checkbox'
+                ref={i => (this.publicSwitch = i)}
+              />
+              <label className='onoffswitch-label' htmlFor='publicSwitch'>
+                <span className='onoffswitch-inner publicSwitch-inner' />
+                <span className='onoffswitch-switch subscribeSwitch-switch' />
+              </label>
+            </div>
             <Button text={'Cancel'} flat={true} waves={true} extraClass={'uk-modal-close'} />
             <Button text={'Create'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = false} />
             {allowAgentUserTickets && this.assigneeSelect && !this.assigneeSelect.value && (
