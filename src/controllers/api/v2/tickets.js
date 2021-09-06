@@ -64,6 +64,7 @@ ticketsV2.get = function (req, res) {
           Group.getAllGroupsOfUser(req.user._id, next)
         }
       },
+      // eslint-disable-next-line complexity
       function (groups, next) {
         var mappedGroups = groups.map(function (g) {
           return g._id
@@ -147,7 +148,9 @@ ticketsV2.get = function (req, res) {
             queryObject.status = [6]
             break
           case 'filter':
-            queryObject.status = queryObject.filter.status
+            if (queryObject.filter && queryObject.filter.status) {
+              queryObject.status = queryObject.filter.status
+            }
             break
         }
 
