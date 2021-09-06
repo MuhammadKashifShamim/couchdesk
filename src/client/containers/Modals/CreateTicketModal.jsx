@@ -403,22 +403,24 @@ class CreateTicketModal extends React.Component {
             </span>
           </div>
           <div className='uk-modal-footer uk-text-right'>
-            <div
-              className='onoffswitch subscribeSwitch'
-              style={{ display: 'inline-block', float: 'left' }}
-            >
-              <input
-                id={'publicSwitch'}
-                type='checkbox'
-                name='publicSwitch'
-                className='onoffswitch-checkbox'
-                ref={i => (this.publicSwitch = i)}
-              />
-              <label className='onoffswitch-label' htmlFor='publicSwitch'>
-                <span className='onoffswitch-inner publicSwitch-inner' />
-                <span className='onoffswitch-switch subscribeSwitch-switch' />
-              </label>
-            </div>
+            {allowAgentUserTickets && (
+              <div
+                className='onoffswitch subscribeSwitch'
+                style={{ display: 'inline-block', float: 'left' }}
+              >
+                <input
+                  id={'publicSwitch'}
+                  type='checkbox'
+                  name='publicSwitch'
+                  className='onoffswitch-checkbox'
+                  ref={i => (this.publicSwitch = i)}
+                />
+                <label className='onoffswitch-label' htmlFor='publicSwitch'>
+                  <span className='onoffswitch-inner publicSwitch-inner' />
+                  <span className='onoffswitch-switch subscribeSwitch-switch' />
+                </label>
+              </div>
+            )}
             <Button text={'Cancel'} flat={true} waves={true} extraClass={'uk-modal-close'} />
             <Button text={'Create'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = false} />
             {allowAgentUserTickets && this.assigneeSelect && !this.assigneeSelect.value && (
