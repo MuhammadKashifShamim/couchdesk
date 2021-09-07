@@ -323,7 +323,10 @@ class SingleTicketContainer extends React.Component {
                       this.ticket.status = status
                       this.ticket.assignee = assignee
                     }}
-                    hasPerm={helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)}
+                    hasPerm={
+                      helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)
+                      && (isAdminOrAgent || ![2, 4].includes(this.ticket.status))
+                    }
                   />
                 </div>
                 {/*  Left Side */}
@@ -486,7 +489,7 @@ class SingleTicketContainer extends React.Component {
                         <div className='uk-width-1-2 uk-float-left nopadding'>
                           <div className='marginleft5'>
                             <span>Priority</span>
-                            {hasTicketUpdate && (
+                            {hasTicketUpdate && (isAdminOrAgent || helpers.canUser('tickets:priority', true)) ? (
                               <select
                                 name='tPriority'
                                 id='tPriority'
@@ -501,8 +504,9 @@ class SingleTicketContainer extends React.Component {
                                     </option>
                                   ))}
                               </select>
+                            ) : (
+                              <div className={'input-box'}>{this.ticket.priority.name}</div>
                             )}
-                            {!hasTicketUpdate && <div className={'input-box'}>{this.ticket.priority.name}</div>}
                           </div>
                         </div>
                         {/*  Group */}
@@ -579,7 +583,7 @@ class SingleTicketContainer extends React.Component {
                         <div className='uk-width-1-1 nopadding'>
                           <span>
                             Tags
-                            {hasTicketUpdate && (
+                            {hasTicketUpdate && isAdminOrAgent && (
                               <Fragment>
                                 <span> - </span>
                                 <div id='editTags' className={'uk-display-inline'}>
@@ -638,65 +642,69 @@ class SingleTicketContainer extends React.Component {
               {/* Right Side */}
               <div className='page-message nopadding' style={{ marginLeft: 360 }}>
                 <div className='page-title-right noshadow'>
-                  {this.ticket.status !== 4 && (
-                    <div className='page-top-comments uk-float-left'>
-                      <a
-                        role='button'
-                        className='btn no-ajaxy ticket-status-live'
-                        onClick={e => {
-                          e.preventDefault()
-                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 4)
-                          this.ticket.status = 4
-                        }}
-                      >
-                        Start Ticket
-                      </a>
-                    </div>
-                  )}
-                  {this.ticket.status !== 6 && helpers.canUser('tickets:closing', true) && (
-                    <div className='page-top-comments uk-float-left'>
-                      <a
-                        role='button'
-                        className='btn no-ajaxy ticket-status-hold'
-                        onClick={e => {
-                          e.preventDefault()
-                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 6)
-                          this.ticket.status = 6
-                        }}
-                      >
-                        Put On Hold
-                      </a>
-                    </div>
-                  )}
-                  {this.ticket.status === 4 && (
-                    <div className='page-top-comments uk-float-left'>
-                      <a
-                        role='button'
-                        className='btn no-ajaxy ticket-status-pending'
-                        onClick={e => {
-                          e.preventDefault()
-                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 2)
-                          this.ticket.status = 2
-                        }}
-                      >
-                        Pause
-                      </a>
-                    </div>
-                  )}
-                  {[1, 2, 4].includes(this.ticket.status) && (
-                    <div className='page-top-comments uk-float-left'>
-                      <a
-                        role='button'
-                        className='btn no-ajaxy ticket-status-done'
-                        onClick={e => {
-                          e.preventDefault()
-                          socket.ui.sendUpdateTicketStatus(this.ticket._id, 5)
-                          this.ticket.status = 5
-                        }}
-                      >
-                        Done
-                      </a>
-                    </div>
+                  {isAdminOrAgent && (
+                    <>
+                      {this.ticket.status !== 4 && (
+                        <div className='page-top-comments uk-float-left'>
+                          <a
+                            role='button'
+                            className='btn no-ajaxy ticket-status-live'
+                            onClick={e => {
+                              e.preventDefault()
+                              socket.ui.sendUpdateTicketStatus(this.ticket._id, 4)
+                              this.ticket.status = 4
+                            }}
+                          >
+                            Start Ticket
+                          </a>
+                        </div>
+                      )}
+                      {this.ticket.status !== 6 && helpers.canUser('tickets:closing', true) && (
+                        <div className='page-top-comments uk-float-left'>
+                          <a
+                            role='button'
+                            className='btn no-ajaxy ticket-status-hold'
+                            onClick={e => {
+                              e.preventDefault()
+                              socket.ui.sendUpdateTicketStatus(this.ticket._id, 6)
+                              this.ticket.status = 6
+                            }}
+                          >
+                            Put On Hold
+                          </a>
+                        </div>
+                      )}
+                      {this.ticket.status === 4 && (
+                        <div className='page-top-comments uk-float-left'>
+                          <a
+                            role='button'
+                            className='btn no-ajaxy ticket-status-pending'
+                            onClick={e => {
+                              e.preventDefault()
+                              socket.ui.sendUpdateTicketStatus(this.ticket._id, 2)
+                              this.ticket.status = 2
+                            }}
+                          >
+                            Pause
+                          </a>
+                        </div>
+                      )}
+                      {[1, 2, 4].includes(this.ticket.status) && (
+                        <div className='page-top-comments uk-float-left'>
+                          <a
+                            role='button'
+                            className='btn no-ajaxy ticket-status-done'
+                            onClick={e => {
+                              e.preventDefault()
+                              socket.ui.sendUpdateTicketStatus(this.ticket._id, 5)
+                              this.ticket.status = 5
+                            }}
+                          >
+                            Done
+                          </a>
+                        </div>
+                      )}
+                    </>
                   )}
                   {this.props.common.hasThirdParty && (
                     <div className='page-top-comments uk-float-right'>
