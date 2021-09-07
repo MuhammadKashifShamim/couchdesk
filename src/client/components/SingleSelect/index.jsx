@@ -91,6 +91,14 @@ class SingleSelect extends React.Component {
     }
   }
 
+  setValue (value = '') {
+    this.value = value
+
+    if (value === '') {
+      this.select.selectize.clear()
+    }
+  }
+
   render () {
     let width = '100%'
 

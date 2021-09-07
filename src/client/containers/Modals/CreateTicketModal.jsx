@@ -44,7 +44,6 @@ class CreateTicketModal extends React.Component {
   @observable selectedGroup = null
   @observable selectedPriority = ''
   issueText = ''
-  isGrabbed = false
 
   constructor (props) {
     super(props)
@@ -230,11 +229,14 @@ class CreateTicketModal extends React.Component {
     const mappedTicketStatuses = [
       { text: 'New', value: '0' },
       { text: 'Open', value: '1' },
+      { text: 'Pedning', value: '2'},
       { text: 'Hold', value: '6' }
     ]
 
     let defaultGroupValue
-    if (this.filter.groups && this.filter.groups.length > 0) {
+    if (mappedGroups.length === 1) {
+      defaultGroupValue = mappedGroups[0].value
+    } else if (this.filter.groups && this.filter.groups.length > 0) {
       defaultGroupValue = this.filter.groups[0]
     } /* else {
       defaultGroupValue = head(mappedGroups) ? head(mappedGroups).value : ''
@@ -277,6 +279,7 @@ class CreateTicketModal extends React.Component {
                   defaultValue={defaultGroupValue}
                   onSelectChange={e => this.onGroupSelectChange(e)}
                   width={'100%'}
+                  disabled={mappedGroups.length === 1}
                   ref={i => (this.groupSelect = i)}
                 />
               </GridItem>
@@ -315,12 +318,29 @@ class CreateTicketModal extends React.Component {
             <div className='uk-margin-medium-bottom'>
               <Grid>
                 <GridItem width={'2-3'}>
-                  <label className={'uk-form-label'}>Assignee</label>
+                  <label className={'uk-form-label'}>
+                    Assignee
+                    <a
+                      href={() => false}
+                      style={{ marginLeft: 10, opacity: 0.7 }}
+                      onClick={() => {
+                        this.assigneeSelect.setValue(this.props.viewdata.loggedInAccount._id)
+                        this.statusSelect.setValue(1)
+                        this.forceUpdate()
+                      }}
+                    >
+                      Grab the ticket
+                    </a>
+                  </label>
                   <SingleSelect
                     showTextbox={false}
                     items={mappedAgentAccounts}
                     width={'100%'}
-                    onSelectChange={() => {
+                    onSelectChange={(e) => {
+                      if (e.target.value) {
+                        this.statusSelect.setValue(1)
+                      }
+
                       this.forceUpdate()
                     }}
                     ref={i => (this.assigneeSelect = i)}
@@ -336,6 +356,13 @@ class CreateTicketModal extends React.Component {
                     items={mappedTicketStatuses}
                     width={'100%'}
                     defaultValue={head(mappedTicketStatuses).value}
+                    onSelectChange={(e) => {
+                      if (e.target.value === '0') {
+                        this.assigneeSelect.setValue()
+                      }
+
+                      this.forceUpdate()
+                    }}
                     ref={i => (this.statusSelect = i)}
                   />
                 </GridItem>
@@ -422,10 +449,7 @@ class CreateTicketModal extends React.Component {
               </div>
             )}
             <Button text={'Cancel'} flat={true} waves={true} extraClass={'uk-modal-close'} />
-            <Button text={'Create'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = false} />
-            {allowAgentUserTickets && this.assigneeSelect && !this.assigneeSelect.value && (
-              <Button text={'Create And Grab'} style={'primary'} flat={true} type={'submit'} onClick={() => this.isGrabbed = true} />
-            )}
+            <Button text={'Create'} style={'primary'} flat={true} type={'submit'} />
           </div>
         </form>
       </BaseModal>

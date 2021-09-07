@@ -80,7 +80,7 @@ ticketsV2.get = function (req, res) {
 
         switch (type.toLowerCase()) {
           case 'active':
-            queryObject.status = [0, 1, 2, 4]
+            queryObject.status = [1, 2, 4]
             break
           case 'assigned':
             Object.assign(queryObject, {

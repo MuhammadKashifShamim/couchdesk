@@ -522,7 +522,7 @@ class SingleTicketContainer extends React.Component {
                                   socket.ui.setTicketOwner(this.ticket._id, this.props.shared.sessionUser._id)
                                 }
 
-                                if (!selectedGroup.get('availableAccountIds').includes(this.ticket.assignee._id)) {
+                                if (this.ticket.assignee && !selectedGroup.get('availableAccountIds').includes(this.ticket.assignee._id)) {
                                   this.ticket.assignee = undefined
                                   socket.socket.emit('clearAssignee', this.props.ticketId)
                                 }

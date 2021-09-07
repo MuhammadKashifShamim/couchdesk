@@ -2051,7 +2051,7 @@ define([
     } else if (deltaMonths === 1) {
       result = deltaWeeks + 'a month ago'
     } else {
-      result = deltaMonths + ' montha ago'
+      result = deltaMonths + ' months ago'
     }
 
     return result

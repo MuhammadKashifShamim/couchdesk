@@ -293,10 +293,16 @@ class TicketsContainer extends React.Component {
     let title
     if (this.props.view === 'live' && isAdminOrAgent) {
       title = 'My Live Tickets'
-    } else if (this.props.view === 'upcoming') {
-      title = 'Next Tickets'
+    } else if (this.props.view === 'active' && !isAdminOrAgent) {
+      title = 'All Tickets'
+    } else if (this.props.view === 'open' && !isAdminOrAgent) {
+      title = 'Unfinished Tickets'
+    } else if (this.props.view === 'done' && !isAdminOrAgent) {
+      title = 'Completed Tickets'
     } else if (this.props.view === 'assigned') {
       title = 'My Tickets'
+    } else if (this.props.view === 'upcoming') {
+      title = 'Next Tickets'
     } else if (this.props.view === 'filter') {
       title = 'Tickets'
     } else {
@@ -583,7 +589,7 @@ class TicketsContainer extends React.Component {
                     <TableCell className={'vam nbb'}>{ticket.getIn(['owner', 'fullname'])}</TableCell>
                     <TableCell className={'vam nbb'}>
                       <div className='tag-list uk-clearfix' style={{ marginTop: '6px' }}>
-                        <div className={'custom-tag group'}>
+                        <div className={`custom-tag group${ticket.get('public') ? ' public' : ''}`}>
                           {ticket.getIn(['group', 'name'])}
                         </div>
                       </div>

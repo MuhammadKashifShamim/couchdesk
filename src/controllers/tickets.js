@@ -76,6 +76,8 @@ ticketsController.pubNewIssue = function (req, res) {
  * @see Ticket
  */
 ticketsController.getByStatus = function (req, res, next) {
+  var user = req.user
+
   var url = require('url')
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
@@ -122,6 +124,8 @@ ticketsController.getByStatus = function (req, res, next) {
 
   if (tType === 'new') {
     processor.nav = 'tickets-new'
+  } else if (['open', 'done'].includes(tType) && !user.role.isAdmin && !user.role.isAgent) {
+    processor.nav = 'tickets-' + tType
   } else {
     processor.nav = 'tickets'
     processor.subnav = 'tickets-' + tType
@@ -150,17 +154,25 @@ ticketsController.getByStatus = function (req, res, next) {
  * @see Ticket
  */
 ticketsController.getActive = function (req, res, next) {
+  var user = req.user
+
   var page = req.params.page
   if (_.isUndefined(page)) page = 0
 
   var filter = {
-    status: [0, 1, 2, 4]
+    status: [1, 2, 4]
   }
 
   var processor = {}
   processor.title = 'Active Tickets'
-  processor.nav = 'tickets'
-  processor.subnav = 'tickets-active'
+
+  if (user.role.isAdmin || user.role.isAgent) {
+    processor.nav = 'tickets'
+    processor.subnav = 'tickets-active'
+  } else {
+    processor.nav = 'tickets-active'
+  }
+
   processor.renderpage = 'tickets'
   processor.pagetype = 'active'
   processor.object = {

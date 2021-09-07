@@ -251,11 +251,16 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
 
   var self = this
 
-  if ([2, 4, 5].includes(status)) {
+  if (status === 0) {
+    if (self.status !== 0) {
+      self.assignee = undefined
+    }
+  } else if ([2, 4, 5].includes(status)) {
     if (!self.assignee) {
       self.assignee = ownerId
     }
   }
+
   if (status === 3) {
     self.closedDate = new Date()
   } else {
@@ -290,7 +295,7 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
 
   if (self.status === 0) {
     if (!self.assignee) {
-      self.status = 2
+      self.status = 1
     }
   } else if (![3, 5, 6].includes(self.status)) {
     self.status = 0

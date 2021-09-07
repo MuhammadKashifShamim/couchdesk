@@ -94,16 +94,14 @@ class Sidebar extends React.Component {
               text='Live Tickets'
               icon='chair'
               href='/tickets/live'
-              class='navHome'
               active={activeItem === 'tickets-live'}
             />
-            {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
+            {(sessionUser.role.isAdmin || sessionUser.role.isAgent) ? (
               <>
                 <SidebarItem
                   text='Next Tickets'
                   icon='collections_bookmark'
                   href='/tickets/upcoming'
-                  class='navHome'
                   active={activeItem === 'tickets-upcoming'}
                 />
                 <SubmenuItem
@@ -118,77 +116,94 @@ class Sidebar extends React.Component {
                   href='/tickets/delegated'
                   active={activeItem === 'tickets-delegated'}
                 />
-              </>
-            )}
-            <SubmenuItem
-              text='New Tickets'
-              icon='move_to_inbox'
-              href='/tickets/new'
-              active={activeItem === 'tickets-new'}
-            />
-            <SidebarItem
-              text='Tickets'
-              icon='assignment'
-              href='/tickets/new'
-              class='navTickets no-ajaxy'
-              hasSubmenu={true}
-              subMenuTarget='tickets'
-              active={activeItem === 'tickets'}
-            >
-              <Submenu id='tickets'>
-                {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
-                  <SubmenuItem
-                    text='Mine'
-                    icon='assignment_ind'
-                    href='/tickets/assigned'
-                    active={activeSubItem === 'tickets-assigned'}
-                  />
-                )}
-                {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && <NavSeparator />}
                 <SubmenuItem
-                  text='Active'
+                  text='New Tickets'
+                  icon='move_to_inbox'
+                  href='/tickets/new'
+                  active={activeItem === 'tickets-new'}
+                />
+                <SidebarItem
+                  text='Tickets'
+                  icon='assignment'
+                  href='/tickets/new'
+                  class='navTickets no-ajaxy'
+                  hasSubmenu={true}
+                  subMenuTarget='tickets'
+                  active={activeItem === 'tickets'}
+                >
+                  <Submenu id='tickets'>
+                    {/* <SubmenuItem
+                      text='Mine'
+                      icon='assignment_ind'
+                      href='/tickets/assigned'
+                      active={activeSubItem === 'tickets-assigned'}
+                    />
+                    <NavSeparator /> */}
+                    <SubmenuItem
+                      text='Active'
+                      icon='source'
+                      href='/tickets/active'
+                      active={activeSubItem === 'tickets-active'}
+                    />
+                    <SubmenuItem
+                      text='Pending'
+                      icon='pending'
+                      href='/tickets/pending'
+                      active={activeSubItem === 'tickets-pending'}
+                    />
+                    <SubmenuItem
+                      text='Open'
+                      icon='&#xE2C8;'
+                      href='/tickets/open'
+                      active={activeSubItem === 'tickets-open'}
+                    />
+                    <SubmenuItem
+                      text='Done'
+                      icon='assignment_turned_in'
+                      href='/tickets/done'
+                      active={activeSubItem === 'tickets-done'}
+                    />
+                    {Helpers.canUser('tickets:closing', true) && (
+                      <SubmenuItem
+                        text='Hold'
+                        icon='hourglass_top'
+                        href='/tickets/hold'
+                        active={activeSubItem === 'tickets-hold'}
+                      />
+                    )}
+                    {Helpers.canUser('tickets:closing', true) && (
+                      <SubmenuItem
+                        text='Closed'
+                        icon='&#xE2C7;'
+                        href='/tickets/closed'
+                        active={activeSubItem === 'tickets-closed'}
+                      />
+                    )}
+                  </Submenu>
+                </SidebarItem>
+              </>
+            ) : (
+              <>
+                <SidebarItem
+                  text='All Tickets'
                   icon='source'
                   href='/tickets/active'
-                  active={activeSubItem === 'tickets-active'}
+                  active={activeItem === 'tickets-active'}
                 />
-                {(sessionUser.role.isAdmin || sessionUser.role.isAgent) && (
-                  <SubmenuItem
-                    text='Pending'
-                    icon='pending'
-                    href='/tickets/pending'
-                    active={activeSubItem === 'tickets-pending'}
-                  />
-                )}
                 <SubmenuItem
-                  text='Open'
+                  text='Unfinished Tickets'
                   icon='&#xE2C8;'
                   href='/tickets/open'
-                  active={activeSubItem === 'tickets-open'}
+                  active={activeItem === 'tickets-open'}
                 />
                 <SubmenuItem
-                  text='Done'
+                  text='Completed Tickets'
                   icon='assignment_turned_in'
                   href='/tickets/done'
-                  active={activeSubItem === 'tickets-done'}
+                  active={activeItem === 'tickets-done'}
                 />
-                {Helpers.canUser('tickets:closing', true) && (
-                  <SubmenuItem
-                    text='Hold'
-                    icon='hourglass_top'
-                    href='/tickets/hold'
-                    active={activeSubItem === 'tickets-hold'}
-                  />
-                )}
-                {Helpers.canUser('tickets:closing', true) && (
-                  <SubmenuItem
-                    text='Closed'
-                    icon='&#xE2C7;'
-                    href='/tickets/closed'
-                    active={activeSubItem === 'tickets-closed'}
-                  />
-                )}
-              </Submenu>
-            </SidebarItem>
+              </>
+            )}
           </>
         )}
         {sessionUser && (sessionUser.role.isAdmin || sessionUser.role.isAgent || Helpers.canUser('accounts:chat')) && (
