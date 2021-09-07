@@ -163,7 +163,9 @@ define('modules/ajaxify', [
     }
 
     // Ajaxify our Internal Links
-    $body.ajaxify()
+    setTimeout(function () {
+      $body.ajaxify() // FIXME: hack
+    }, 100)
 
     // Hook into State Changes
     $window.bind('statechange', function () {
