@@ -323,10 +323,7 @@ class SingleTicketContainer extends React.Component {
                       this.ticket.status = status
                       this.ticket.assignee = assignee
                     }}
-                    hasPerm={
-                      helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true)
-                      && (isAdminOrAgent || ![2, 4].includes(this.ticket.status))
-                    }
+                    hasPerm={helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true) && isAdminOrAgent}
                   />
                 </div>
                 {/*  Left Side */}

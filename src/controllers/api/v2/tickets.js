@@ -81,6 +81,9 @@ ticketsV2.get = function (req, res) {
         switch (type.toLowerCase()) {
           case 'active':
             queryObject.status = [1, 2, 4]
+            if (!req.user.role.isAdmin && !req.user.role.isAgent) {
+              queryObject.status.unshift(0)
+            }
             break
           case 'assigned':
             Object.assign(queryObject, {

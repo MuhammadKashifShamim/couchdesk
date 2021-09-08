@@ -170,6 +170,8 @@ ticketsController.getActive = function (req, res, next) {
     processor.nav = 'tickets'
     processor.subnav = 'tickets-active'
   } else {
+    filter.status.unshift(0)
+
     processor.nav = 'tickets-active'
   }
 
