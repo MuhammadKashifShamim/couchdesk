@@ -65,12 +65,10 @@ Password: demo123
 ```
 
 #### Deploy Couchdesk Anywhere
-As with Trudesk, **Couchdesk** is also built with <a href="https://nodejs.org">nodejs</a> and <a href="https://mongodb.org">mongodb</a> and can run on any cloud provider, docker, bare-metal, or even a raspberry pi.
-We recomment to try our prebuild docker image from:
+**Couchdesk** is built with <a href="https://nodejs.org">nodejs</a> and <a href="https://mongodb.org">mongodb</a> and can run on any cloud provider, docker, bare-metal, or even a raspberry pi. We recomment to try our prebuild docker images.
 
 ### Documentation
-An online documentation of all basic functionalities can be found here: [https://docs.trudesk.io/docs](https://docs.trudesk.io/docs)
-Extended documentation of all Couchdesk capabilities and usage examples will be provided shortly after the first official release.
+A full documentation of all Couchdesk capabilities and usage examples will be provided shortly after the first official release.
 
 ### Contributing
 If you like what you see here, and want to help support the work being done, you could:
@@ -78,7 +76,7 @@ If you like what you see here, and want to help support the work being done, you
 + Request/Implement Features
 + Refactor Codebase
 + Help Write Documentation
-+ Translation - Help translate trudesk on [Crowdin](https://crwd.in/couchdesk).
++ Translation - Help translate Couchdesk
 
 ### Sponsoring
 
@@ -100,3 +98,17 @@ The development of Couchdesk is sponsored by Allgäu Informatik GmbH.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.   
+
+### Restrictions
+    
+    All parts of the Couchdesk extensions can be freely downloaded and used
+    without any support or warranties in a private or commercial environment. 
+    The authors are not responsible for any kind of failure or resulting
+    situations.
+    
+    However reselling the modified parts and extensions or offering a commercial
+    couchdesk based service by renting or selling the couchdesk extensions to third
+    party users is not allowed without prior permission by the authors.
+    
+    Professional services and commcercial support for the couchdesk project can be
+    ordered directly by contacting us.
