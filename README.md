@@ -100,3 +100,17 @@ The development of Couchdesk is sponsored by Allgäu Informatik GmbH.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.   
+
+### Restrictions
+    
+    All parts of the Couchdesk extensions can be freely downloaded and used
+    without any support or warranties in a private or commercial environment. 
+    The authors are not responsible for any kind of failure or resulting
+    situations.
+    
+    However reselling the modified parts and extensions or offering a commercial
+    couchdesk based service by renting or selling the couchdesk extensions to third
+    party users is not allowed without prior permission by the authors.
+    
+    Professional services and commcercial support for the couchdesk project can be
+    ordered directly by contacting us.
