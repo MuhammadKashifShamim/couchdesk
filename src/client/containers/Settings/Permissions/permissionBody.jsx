@@ -106,6 +106,7 @@ class PermissionBody extends React.Component {
     return [
       { title: 'Notes', perm: 'notes' },
       { title: 'Manage Public Tickets', perm: 'public' },
+      { title: 'Allowed To Create Tickets For Others', perm: 'createForOthers' },
       { title: 'Set Priority In Tickets', perm: 'priority' },
       { title: 'Allow Handling New Tickets', perm: 'handling' },
       { title: 'Allow Holding And Closing Tickets', perm: 'closing' }

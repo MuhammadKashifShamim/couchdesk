@@ -428,7 +428,7 @@ class SingleTicketContainer extends React.Component {
                     <div className='uk-width-1-1 padding-left-right-15'>
                       <div className='tru-card ticket-details uk-clearfix'>
                         {/*  Owner */}
-                        {this.props.shared.sessionUser.role.isAdmin && (
+                        {helpers.canUser('tickets:createForOthers', true) && (
                           <div className='uk-width-1-1 nopadding uk-clearfix'>
                             <span>Author</span>
                             {hasTicketUpdate && (

@@ -267,7 +267,7 @@ class CreateTicketModal extends React.Component {
                   items={mappedAccounts}
                   defaultValue={[this.props.viewdata.loggedInAccount._id]}
                   width={'100%'}
-                  disabled={!allowAgentUserTickets}
+                  disabled={!allowAgentUserTickets || !helpers.canUser('tickets:createForOthers', true)}
                   ref={i => (this.ownerSelect = i)}
                 />
               </GridItem>
