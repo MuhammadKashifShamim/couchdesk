@@ -28,6 +28,7 @@ import Button from 'components/Button'
 import SettingSubItem from 'components/Settings/SettingSubItem'
 import ButtonGroup from 'components/ButtonGroup'
 import EditPriorityPartial from './editPriorityPartial'
+import ColorSelector from 'components/ColorSelector'
 
 class TicketTypeBody extends React.Component {
   constructor (props) {
@@ -47,6 +48,21 @@ class TicketTypeBody extends React.Component {
       .renameTicketType(this.props.type.get('_id'), name)
       .then(response => {
         if (response.success) helpers.UI.showSnackbar('Type Updated Successfully')
+        this.props.fetchSettings()
+      })
+      .catch(err => {
+        helpers.UI.showSnackbar(err, true)
+      })
+  }
+
+  handleColorChange (event) {
+    event.preventDefault()
+    const color = event.target.color.value
+
+    api.tickets
+      .changeTicketTypeColor(this.props.type.get('_id'), color)
+      .then(response => {
+        if (response.success) helpers.UI.showSnackbar('Color Updated Successfully')
         this.props.fetchSettings()
       })
       .catch(err => {
@@ -114,6 +130,34 @@ class TicketTypeBody extends React.Component {
               </div>
             </div>
           </form>
+          <br />
+          <form
+            onSubmit={e => {
+              this.handleColorChange(e)
+            }}
+          >
+            <div className='uk-input-group'>
+              <div className='md-input-wrapper md-input-filled'>
+                <label htmlFor='ticket-type-name'>Color</label>
+                <div style={{ marginLeft: 4 }}>
+                  <ColorSelector
+                    hideLabel
+                    ref={cs => {
+                      this.headerBGColorSelect = cs
+                    }}
+                    inputName='color'
+                    defaultColor={type.get('color')}
+                  />
+                </div>
+              </div>
+              <div className='uk-input-group-addon'>
+                <button type='submit' className={'md-btn md-btn-small'}>
+                  Change
+                </button>
+              </div>
+            </div>
+          </form>
+          
         </div>
         <div className='ticket-type-priorities-wrapper uk-margin-medium-top'>
           <h2 className='text-light uk-display-inline-block'>

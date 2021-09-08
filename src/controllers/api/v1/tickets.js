@@ -1138,7 +1138,12 @@ apiTickets.updateType = function (req, res) {
   ticketTypeSchema.getType(id, function (err, type) {
     if (err) return res.status(400).json({ success: false, error: err.message })
 
-    type.name = data.name
+    if (!_.isUndefined(data.name)) {
+      type.name = data.name
+    }
+    if (!_.isUndefined(data.color)) {
+      type.color = data.color
+    }
 
     type.save(function (err, t) {
       if (err) return res.status(400).json({ success: false, error: err.message })

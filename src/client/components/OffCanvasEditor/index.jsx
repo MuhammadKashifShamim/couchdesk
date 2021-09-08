@@ -103,6 +103,7 @@ class OffCanvasEditor extends React.Component {
                   ref={r => (this.editor = r)}
                   allowImageUpload={this.props.allowUploads}
                   inlineImageUploadUrl={this.props.uploadURL}
+                  inlineImageUploadHeaders={this.props.uploadHeaders}
                 />
               </div>
             </div>
@@ -130,7 +131,8 @@ OffCanvasEditor.propTypes = {
   onPrimaryClick: PropTypes.func,
   closeLabel: PropTypes.string,
   allowUploads: PropTypes.bool,
-  uploadURL: PropTypes.string
+  uploadURL: PropTypes.string,
+  uploadHeaders: PropTypes.object
 }
 
 OffCanvasEditor.defaultProps = {

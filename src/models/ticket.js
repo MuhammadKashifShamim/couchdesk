@@ -295,8 +295,8 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
 
   if (self.status === 0) {
     self.status = 1
-  } else if (![3, 5, 6].includes(self.status)) {
-    self.status = 0
+  } else if (self.status === 4) {
+    self.status = 2
   }
 
   self.assignee = userId
@@ -331,8 +331,8 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
 ticketSchema.methods.clearAssignee = function (ownerId, callback) {
   var self = this
 
-  if (![0, 3, 5, 6].includes(self.status)) {
-    self.status = 0
+  if ([2, 4].includes(self.status)) {
+    self.status = 1
   }
 
   self.assignee = undefined

@@ -14,6 +14,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { ChromePicker } from 'react-color'
 
 import $ from 'jquery'
 import helpers from 'lib/helpers'
@@ -22,7 +23,9 @@ class ColorSelector extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      selectedColor: ''
+      selectedColor: '',
+      pickerColor: '',
+      displayColorPicker: false
     }
   }
 
@@ -108,6 +111,34 @@ class ColorSelector extends React.Component {
     )
   }
 
+  displayColorPicker () {
+    this.setState({
+      displayColorPicker: !this.state.displayColorPicker,
+      pickerColor: this.state.selectedColor
+    })
+  }
+
+  hideColorPicker () {
+    this.setState({
+      displayColorPicker: false
+    })
+  }
+
+  setPickerColor (color) {
+    this.setState({
+      pickerColor: color
+    })
+  }
+
+  setSelectedColor (color) {
+    this.setState(
+      {
+        selectedColor: color
+      },
+      this.updateColorButton
+    )
+  }
+
   render () {
     return (
       <div className={this.props.parentClass}>
@@ -129,7 +160,7 @@ class ColorSelector extends React.Component {
           className='md-input-wrapper uk-float-left md-input-filled'
           style={{ width: this.props.hideRevert ? '70%' : '50%' }}
         >
-          <label>Color</label>
+          {!this.props.hideLabel && <label>Color</label>}
           {this.props.validationEnabled && (
             <input
               name={this.props.inputName ? this.props.inputName : ''}
@@ -138,6 +169,9 @@ class ColorSelector extends React.Component {
               value={this.state.selectedColor}
               onChange={e => {
                 this.onInputValueChange(e)
+              }}
+              onClick={() => {
+                this.displayColorPicker()
               }}
               data-validation='custom'
               data-validation-regexp='^\#([0-9a-fA-F]){3,6}$'
@@ -153,12 +187,36 @@ class ColorSelector extends React.Component {
               onChange={e => {
                 this.onInputValueChange(e)
               }}
+              onClick={() => {
+                this.displayColorPicker()
+              }}
             />
+          )}
+          {this.state.displayColorPicker && (
+            <div style={{ position: 'absolute', zIndex: 2 }}>
+              <div
+                style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0 }}
+                onClick={() => {
+                  this.hideColorPicker()
+                }}
+              />
+                <ChromePicker
+                  disableAlpha
+                  color={this.state.pickerColor}
+                  onChange={(color) => {
+                    this.setPickerColor(color.hex)
+                  }}
+                  onChangeComplete={(color) => {
+                    this.setSelectedColor(color.hex)
+                  }}
+                />
+            </div>
           )}
           <div className='md-input-bar' />
         </div>
         {!this.props.hideRevert && (
           <button
+            type={'button'}
             className={'md-btn md-btn-small md-btn-flat mt-10 uk-float-right uk-width-1-4'}
             onClick={() => {
               this.revertColor()
@@ -176,6 +234,7 @@ ColorSelector.propTypes = {
   inputName: PropTypes.string,
   defaultColor: PropTypes.string.isRequired,
   hideRevert: PropTypes.bool,
+  hideLabel: PropTypes.bool,
   parentClass: PropTypes.string,
   onChange: PropTypes.func,
   validationEnabled: PropTypes.bool
@@ -184,6 +243,7 @@ ColorSelector.propTypes = {
 ColorSelector.defaultProps = {
   defaultColor: '#878982',
   hideRevert: false,
+  hideLabel: false,
   validationEnabled: false
 }
 

@@ -571,7 +571,7 @@ class TicketsContainer extends React.Component {
                             </div>
                           )}
                           {ticket.get('type') && (
-                            <div className={'custom-tag type'}>
+                            <div className={'custom-tag type'} style={{ backgroundColor: ticket.get('type').get('color') }}>
                               {ticket.get('type').get('name')}
                             </div>
                           )}

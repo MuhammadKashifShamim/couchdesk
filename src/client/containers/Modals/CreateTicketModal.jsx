@@ -229,7 +229,7 @@ class CreateTicketModal extends React.Component {
     const mappedTicketStatuses = [
       { text: 'New', value: '0' },
       { text: 'Open', value: '1' },
-      { text: 'Pedning', value: '2'},
+      { text: 'Pending', value: '2'},
       { text: 'Hold', value: '6' }
     ]
 

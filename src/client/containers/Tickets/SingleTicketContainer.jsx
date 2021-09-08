@@ -976,7 +976,13 @@ class SingleTicketContainer extends React.Component {
                 </div>
               </div>
             </div>
-            <OffCanvasEditor primaryLabel={'Save Edit'} ref={r => (this.editorWindow = r)} />
+            <OffCanvasEditor
+              allowUploads
+              primaryLabel={'Save Edit'}
+              uploadURL={'/tickets/uploadmdeimage'}
+              uploadHeaders={{ ticketid: this.ticket._id }}
+              ref={r => (this.editorWindow = r)}
+            />
           </Fragment>
         )}
       </div>
