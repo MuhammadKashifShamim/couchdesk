@@ -31,7 +31,6 @@ require('./ticketpriority')
  */
 var ticketTypeSchema = mongoose.Schema({
   name: { type: String, required: true, unique: true },
-  color: { type: String, default: '#7a7f80', required: true },
   priorities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'priorities' }]
 })
 

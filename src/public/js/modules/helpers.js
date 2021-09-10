@@ -34,10 +34,15 @@ define([
   'peity',
   'multiselect',
   'moment_timezone',
-  'waypoints'
-], function ($, _, __, moment, UIkit, CountUp, Waves, Selectize, Snackbar, Cookies, Tether) {
+  'waypoints',
+  'javascript-time-ago',
+  'javascript-time-ago/locale/en'
+], function ($, _, __, moment, UIkit, CountUp, Waves, Selectize, Snackbar, Cookies, Tether, ___, ____, _____, ______, _______, ________, _________, __________, ___________, TimeAgo, en) {
   var helpers = {}
   var easingSwiftOut = [0.4, 0, 0.2, 1]
+
+  TimeAgo.default.addDefaultLocale(en)
+  var timeAgo = new TimeAgo.default()
 
   helpers.loaded = false
   helpers.init = function (reload) {
@@ -2023,7 +2028,7 @@ define([
       .tz(timezone)
       .toDate()
 
-    const now = new Date()
+    /* const now = new Date()
 
     const deltaMilliseconds = now - date
     const deltaSeconds = Math.floor(deltaMilliseconds / 1000)
@@ -2052,9 +2057,9 @@ define([
       result = deltaWeeks + 'a month ago'
     } else {
       result = deltaMonths + ' months ago'
-    }
+    } */
 
-    return result
+    return timeAgo.format(date)
   }
 
   helpers.UI.hierarchicalShow = function (element) {

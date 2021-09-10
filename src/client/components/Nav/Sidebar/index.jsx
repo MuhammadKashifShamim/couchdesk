@@ -104,12 +104,14 @@ class Sidebar extends React.Component {
                   href='/tickets/upcoming'
                   active={activeItem === 'tickets-upcoming'}
                 />
+                <NavSeparator />
                 <SidebarItem
-                  text='Unassigned Tickets'
-                  icon='person_off'
-                  href='/tickets/unassigned'
-                  active={activeItem === 'tickets-unassigned'}
+                  text='New Tickets'
+                  icon='move_to_inbox'
+                  href='/tickets/new'
+                  active={activeItem === 'tickets-new'}
                 />
+                <NavSeparator />
                 <SidebarItem
                   text='Delegated Tickets'
                   icon='folder_shared'
@@ -117,11 +119,12 @@ class Sidebar extends React.Component {
                   active={activeItem === 'tickets-delegated'}
                 />
                 <SidebarItem
-                  text='New Tickets'
-                  icon='move_to_inbox'
-                  href='/tickets/new'
-                  active={activeItem === 'tickets-new'}
+                  text='Unassigned Tickets'
+                  icon='person_off'
+                  href='/tickets/unassigned'
+                  active={activeItem === 'tickets-unassigned'}
                 />
+                <NavSeparator />
                 <SidebarItem
                   text='Tickets'
                   icon='assignment'

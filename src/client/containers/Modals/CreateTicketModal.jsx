@@ -197,15 +197,15 @@ class CreateTicketModal extends React.Component {
 
     const availableAccounts = this.selectedGroup ? this.props.accounts.filter((account) => this.selectedGroup.get('availableAccountIds').includes(account.get('_id'))) : this.props.accounts
 
-    const mappedAccounts = availableAccounts
+    const mappedOwnerAccounts = availableAccounts
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
       })
       .toArray()
 
-    const mappedAgentAccounts = availableAccounts
+    const mappedAssigneeAccounts = availableAccounts
       .filter(a => {
-        return a.getIn(['role', 'isAgent'])
+        return !a.getIn(['role', 'isAdmin']) || a.getIn(['role', 'isAgent'])
       })
       .map(a => {
         return { text: a.get('fullname'), value: a.get('_id') }
@@ -264,7 +264,7 @@ class CreateTicketModal extends React.Component {
                 <label className={'uk-form-label'}>Author</label>
                 <SingleSelect
                   showTextbox={true}
-                  items={mappedAccounts}
+                  items={mappedOwnerAccounts}
                   defaultValue={[this.props.viewdata.loggedInAccount._id]}
                   width={'100%'}
                   disabled={!allowAgentUserTickets || !helpers.canUser('tickets:createForOthers', true)}
@@ -334,7 +334,7 @@ class CreateTicketModal extends React.Component {
                   </label>
                   <SingleSelect
                     showTextbox={false}
-                    items={mappedAgentAccounts}
+                    items={mappedAssigneeAccounts}
                     width={'100%'}
                     onSelectChange={(e) => {
                       if (e.target.value) {

@@ -52,12 +52,6 @@ api.tickets.renameTicketType = (id, name) => {
   })
 }
 
-api.tickets.changeTicketTypeColor = (id, color) => {
-  return axios.put('/api/v1/tickets/types/' + id, { color }).then(res => {
-    return res.data
-  })
-}
-
 api.tickets.createTicketType = ({ name }) => {
   return axios.post('/api/v1/tickets/types/create', { name }).then(res => {
     return res.data

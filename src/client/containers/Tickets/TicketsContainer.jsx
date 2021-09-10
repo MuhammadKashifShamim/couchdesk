@@ -456,13 +456,13 @@ class TicketsContainer extends React.Component {
               <TableHeader key={0} width={45} height={50} component={selectAllCheckbox} />,
               ...(isAdminOrAgent ? [<TableHeader key={1} width={60} text={'Status'} />] : []),
               <TableHeader key={2} width={65} text={'#'} />,
-              <TableHeader key={3} width={'23%'} text={'Subject'} padding={'0 0 0 66px'} />,
-              <TableHeader key={4} width={110} text={'Created'} />,
+              <TableHeader key={3} text={'Subject'} padding={'0 0 0 66px'} />,
+              <TableHeader key={4} width={125} text={'Created'} />,
               <TableHeader key={5} width={125} text={'Author'} />,
-              <TableHeader key={6} width={225} text={'Project'} />,
-              ...(isAdminOrAgent ? [<TableHeader key={7} text={'Assignee'} />] : []),
-              <TableHeader key={8} width={110} text={'Due Date'} />,
-              ...(isAdminOrAgent ? [<TableHeader key={9} text={'Updated'} />] : [])
+              <TableHeader key={6} width={200} text={'Project'} />,
+              ...(isAdminOrAgent ? [<TableHeader key={7} width={125} text={'Assignee'} />] : []),
+              <TableHeader key={8} width={125} text={'Due Date'} />,
+              ...(isAdminOrAgent ? [<TableHeader key={9} width={125} text={'Updated'} />] : [])
             ]}
           >
             {!this.props.loading && this.props.tickets.size < 1 && (
@@ -568,11 +568,7 @@ class TicketsContainer extends React.Component {
                           {ticket.get('priority') && (
                             <div className={'custom-tag'} style={{ background: ticket.get('priority').get('htmlColor') }}>
                               {ticket.get('priority').get('name')}
-                            </div>
-                          )}
-                          {ticket.get('type') && (
-                            <div className={'custom-tag type'} style={{ backgroundColor: ticket.get('type').get('color') }}>
-                              {ticket.get('type').get('name')}
+                              {ticket.get('type') && ` - ${ticket.get('type').get('name')}`}
                             </div>
                           )}
                           {ticket.get('tags').map(tag => (

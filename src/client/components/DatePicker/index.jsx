@@ -42,7 +42,7 @@ class DatePicker extends React.Component {
           ref={r => (this.datepicker = r)}
           type='text'
           readOnly
-          className='md-input small-font p-0'
+          className={`md-input small-font p-0${this.props.className ? ` ${this.props.className}` : ''}`}
           data-uk-datepicker={`{format:'${this.props.format}'}`}
           data-validation='shortDate'
           style={this.style || { width: '97%' }}
@@ -56,7 +56,8 @@ class DatePicker extends React.Component {
 DatePicker.propTypes = {
   format: PropTypes.string.isRequired,
   onChange: PropTypes.func,
-  value: PropTypes.string
+  value: PropTypes.string,
+  className: PropTypes.string
 }
 
 export default DatePicker

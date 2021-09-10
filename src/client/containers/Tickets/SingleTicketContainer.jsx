@@ -273,7 +273,11 @@ class SingleTicketContainer extends React.Component {
       availableAccounts = []
     }
 
-    const mappedAccounts = availableAccounts.map(a => {
+    const availableAssigneeAccounts = availableAccounts = availableAccounts.filter((account) => {
+      return !account.getIn(['role', 'isAdmin']) || account.getIn(['role', 'isAgent'])
+    })
+
+    const mappedOwnerAccounts = availableAccounts.map(a => {
       return { text: a.get('fullname'), value: a.get('_id') }
     })
 
@@ -315,7 +319,10 @@ class SingleTicketContainer extends React.Component {
                 style={{ width: 360, maxWidth: 360, minWidth: 360 }}
               >
                 <div className='page-title-border-right relative' style={{ padding: '0 30px' }}>
-                  <p>Ticket #{this.ticket.uid}</p>
+                  <span className="tag-list" style={{ display: 'inline-block' }}>
+                    <span className="title-tag" style={{ background: this.ticket.priority.htmlColor }}>Ticket</span>
+                  </span>
+                  <p>#{this.ticket.uid}</p>
                   <StatusSelector
                     ticketId={this.ticket._id}
                     status={this.ticket.status}
@@ -401,12 +408,6 @@ class SingleTicketContainer extends React.Component {
                               {this.ticket.assignee && (
                                 <Fragment>
                                   <h3>{this.ticket.assignee.fullname}</h3>
-                                  <a
-                                    className='comment-email-link uk-text-truncate uk-display-inline-block'
-                                    href={`mailto:${this.ticket.assignee.email}`}
-                                  >
-                                    {this.ticket.assignee.email}
-                                  </a>
                                   <span className={'uk-display-block'}>{this.ticket.assignee.title}</span>
                                 </Fragment>
                               )}
@@ -416,7 +417,7 @@ class SingleTicketContainer extends React.Component {
                           {hasTicketUpdate && (
                             <AssigneeDropdownPartial
                               ticketId={this.ticket._id}
-                              availableAccountIds={availableAccounts.map((account) => account.get('_id'))}
+                              availableAccountIds={availableAssigneeAccounts.map((account) => account.get('_id'))}
                               onClearClick={() => (this.ticket.assignee = undefined)}
                               onAssigneeClick={({ agent }) => (this.ticket.assignee = agent)}
                             />
@@ -434,12 +435,13 @@ class SingleTicketContainer extends React.Component {
                             {hasTicketUpdate && (
                               <select
                                 value={this.ticket.owner._id}
+                                className='bold-value'
                                 onChange={e => {
                                   socket.ui.setTicketOwner(this.ticket._id, e.target.value)
                                 }}
                               >
-                                {mappedAccounts &&
-                                  mappedAccounts.map(account => (
+                                {mappedOwnerAccounts &&
+                                  mappedOwnerAccounts.map(account => (
                                     <option key={account.value} value={account.value}>
                                       {account.text}
                                     </option>
@@ -455,6 +457,7 @@ class SingleTicketContainer extends React.Component {
                             {hasTicketUpdate && (
                               <select
                                 value={this.ticket.type._id}
+                                className='bold-value'
                                 onChange={e => {
                                   const type = this.props.common.ticketTypes.find(t => t._id === e.target.value)
                                   const hasPriority =
@@ -479,7 +482,7 @@ class SingleTicketContainer extends React.Component {
                                   ))}
                               </select>
                             )}
-                            {!hasTicketUpdate && <div className='input-box'>{this.ticket.type.name}</div>}
+                            {!hasTicketUpdate && <div className='input-box bold-value'>{this.ticket.type.name}</div>}
                           </div>
                         </div>
                         {/* Priority */}
@@ -491,6 +494,7 @@ class SingleTicketContainer extends React.Component {
                                 name='tPriority'
                                 id='tPriority'
                                 value={this.ticket.priority._id}
+                                className='bold-value'
                                 onChange={e => socket.ui.setTicketPriority(this.ticket._id, e.target.value)}
                               >
                                 {this.ticket.type &&
@@ -502,7 +506,7 @@ class SingleTicketContainer extends React.Component {
                                   ))}
                               </select>
                             ) : (
-                              <div className={'input-box'}>{this.ticket.priority.name}</div>
+                              <div className={'input-box bold-value'}>{this.ticket.priority.name}</div>
                             )}
                           </div>
                         </div>
@@ -512,6 +516,7 @@ class SingleTicketContainer extends React.Component {
                           {hasTicketUpdate && (
                             <select
                               value={this.ticket.group._id}
+                              className='bold-value'
                               onChange={e => {
                                 const selectedGroup = this.props.groupsState && (this.props.groupsState.groups.find((group) => group.get('_id') === e.target.value) || null)
                                 if (!selectedGroup) {
@@ -539,7 +544,7 @@ class SingleTicketContainer extends React.Component {
                                 ))}
                             </select>
                           )}
-                          {!hasTicketUpdate && <div className={'input-box'}>{this.ticket.group.name}</div>}
+                          {!hasTicketUpdate && <div className={'input-box bold-value'}>{this.ticket.group.name}</div>}
                         </div>
                         {/*  Due Date */}
                         {(this.ticket.dueDate || hasTicketUpdate) && (
@@ -559,6 +564,7 @@ class SingleTicketContainer extends React.Component {
                                 <DatePicker
                                   format={helpers.getShortDateFormat()}
                                   value={this.ticket.dueDate}
+                                  className='bold-value'
                                   onChange={e => {
                                     const dueDate = moment(e.target.value, helpers.getShortDateFormat())
                                       .utc()
@@ -569,7 +575,7 @@ class SingleTicketContainer extends React.Component {
                               </div>
                             )}
                             {!hasTicketUpdate && (
-                              <div className='input-box'>
+                              <div className='input-box bold-value'>
                                 {helpers.formatDate(this.ticket.dueDate, this.props.common.shortDateFormat)}
                               </div>
                             )}

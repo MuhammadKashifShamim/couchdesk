@@ -160,7 +160,7 @@ class ColorSelector extends React.Component {
           className='md-input-wrapper uk-float-left md-input-filled'
           style={{ width: this.props.hideRevert ? '70%' : '50%' }}
         >
-          {!this.props.hideLabel && <label>Color</label>}
+          <label>Color</label>
           {this.props.validationEnabled && (
             <input
               name={this.props.inputName ? this.props.inputName : ''}
@@ -234,7 +234,6 @@ ColorSelector.propTypes = {
   inputName: PropTypes.string,
   defaultColor: PropTypes.string.isRequired,
   hideRevert: PropTypes.bool,
-  hideLabel: PropTypes.bool,
   parentClass: PropTypes.string,
   onChange: PropTypes.func,
   validationEnabled: PropTypes.bool
@@ -243,7 +242,6 @@ ColorSelector.propTypes = {
 ColorSelector.defaultProps = {
   defaultColor: '#878982',
   hideRevert: false,
-  hideLabel: false,
   validationEnabled: false
 }
 
