@@ -17,7 +17,7 @@
   </div>
   <div style="border-radius: 25px; display: table; margin: 20px auto; max-width: 720px; overflow: hidden; width: 90%;">
     <div style="background: {{ticket.status.html_color}}; padding: 20px;">
-      <div style="color: white; font-size: 50px; font-weight: bold; margin-bottom: 20px; text-align: center;">
+      <div style="color: white; font-size: 30px; font-weight: bold; margin-bottom: 20px; text-align: center;">
         New Comment In {{ticket.type.name}}
       </div>
       <div style="margin-bottom: 20px; text-align: center;">
@@ -30,10 +30,10 @@
         {{ticket.owner.fullname}} <span style="vertical-align: middle;"><img src="https://i.ibb.co/jymzc26/outline-arrow-right-alt-white-24dp.png" /></span> {{ticket.assignee.fullname}}
       </div>
     </div>
-    <div style="background: #f9f7f7; padding: 20px;">
+    <div style="background: #f9f7f7; padding: 20px 6%;">
       <div style="background: white; border-radius: 10px; display: block; margin: 0 auto; padding: 10px;">
         <div style="background: #ddd; border-radius: 5px; color: #000; display: inline-block; font-size: 18px; height: 30px; line-height: 30px; margin: 0 10px 10px 0; padding: 0 10px; text-align: center; text-decoration: none;">
-          AI Intern (Hosting)
+          {{ticket.group.name}}
         </div>
         <div style="background: {{ticket.priority.html_color}}; border-radius: 5px; color: #fff; display: inline-block; font-size: 18px; height: 30px; line-height: 30px; margin: 0 10px 10px 0; padding: 0 10px; text-align: center; text-decoration: none;">
           {{ticket.priority.name}} - {{ticket.type.name}}
@@ -48,8 +48,8 @@
         </div>
       </div>
       <div style="display: table; margin: 0 auto;">
-        <a href="{{base_url}}/tickets/{{ticket.uid}}" target="_blank" style="background: #ddd; border-radius: 5px; display: block; font-size: 20px; height: 40px; line-height: 40px; margin-top: 20px; padding: 0 20px; text-align: center; text-decoration: none;">
-          Ticket öffnen
+        <a href="{{base_url}}/tickets/{{ticket.uid}}" target="_blank" style="background: #ddd; border-radius: 5px; color: #000; display: block; font-size: 20px; height: 40px; line-height: 40px; margin-top: 20px; padding: 0 20px; text-align: center; text-decoration: none;">
+          Open Ticket
         </a>
       </div>
     </div>

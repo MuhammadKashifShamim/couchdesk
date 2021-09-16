@@ -293,10 +293,9 @@ function statusToColor (status) {
                         email
                           .render('new-ticket', context)
                           .then(function (html) {
-                            var subjectParsed = global.Handlebars.compile(template.subject)(context)
                             var mailOptions = {
                               to: emails.join(),
-                              subject: subjectParsed,
+                              subject: 'Ticket: ' + ticket.subject,
                               html: html,
                               generateTextFromHTML: true
                             }
@@ -639,6 +638,13 @@ function statusToColor (status) {
                             if (_.isUndefined(i) || _.isUndefined(i.email)) return false
                             if (i.deleted) return false
 
+                            if (
+                              !i.isAdmin && !i.isAgent
+                              && ticket.group.sendMailTo.every((member) => !member._id.equals(i._id))
+                            ) {
+                              return false
+                            }
+
                             return !i._id.equals(lastUpdate.userId)
                           })
                           .map(function (i) {
@@ -756,7 +762,7 @@ function statusToColor (status) {
                     .then(function (html) {
                       var mailOptions = {
                         to: emails.join(),
-                        subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                        subject: 'Ticket: ' + ticket.subject,
                         html: html,
                         generateTextFromHTML: true
                       }
@@ -988,7 +994,7 @@ function statusToColor (status) {
                       .then(function (html) {
                         var mailOptions = {
                           to: emails.join(),
-                          subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                          subject: 'Ticket: ' + ticket.subject,
                           html: html,
                           generateTextFromHTML: true
                         }
@@ -1248,7 +1254,7 @@ function statusToColor (status) {
                       .then(function (html) {
                         var mailOptions = {
                           to: emails.join(),
-                          subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                          subject: 'Ticket: ' + ticket.subject,
                           html: html,
                           generateTextFromHTML: true
                         }
