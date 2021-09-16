@@ -65,6 +65,38 @@ function statusToString (status) {
   return str
 }
 
+function statusToColor (status) {
+  var color
+  switch (status) {
+    case 0:
+      color = '#d82b51'
+      break
+    case 1:
+      color = '#52bc76'
+      break
+    case 2:
+      color = '#fcb434'
+      break
+    case 3:
+      color = '#ccc'
+      break
+    case 4:
+      color = '#3581be'
+      break
+    case 5:
+      color = '#00cec9'
+      break
+    case 6:
+      color = '#74b9ff'
+      break
+    default:
+      color = status
+      break
+  }
+
+  return color
+}
+
 ;(function () {
   notifications.init(emitter)
 
@@ -83,6 +115,7 @@ function statusToString (status) {
           'gen:customlogofilename',
           'color:headerbg',
           'color:headerprimary',
+          'color:tags',
           'tps:enable',
           'tps:username',
           'tps:apikey',
@@ -99,6 +132,7 @@ function statusToString (status) {
           var genCustomLogoFilename = _.head(_.filter(settings, ['name', 'gen:customlogofilename']))
           var colorHeaderBG = _.head(_.filter(settings, ['name', 'color:headerbg']))
           var colorHeaderPrimary = _.head(_.filter(settings, ['name', 'color:headerprimary']))
+          var colorTags = _.head(_.filter(settings, ['name', 'color:tags']))
           var tpsEnabled = _.head(_.filter(settings, ['name', 'tps:enable']))
           var tpsUsername = _.head(_.filter(settings, ['name', 'tps:username']))
           var tpsApiKey = _.head(_.filter(settings, ['name', 'tps:apikey']))
@@ -141,9 +175,9 @@ function statusToString (status) {
                   var emailTo = _.concat(teamMembers, ticket.group.sendMailTo)
 
                   emailTo = _.chain(emailTo)
-                    /* .filter(function (i) {
-                    return i.email !== ticket.owner.email
-                  }) */
+                    .filter(function (i) {
+                      return i.email !== ticket.owner.email
+                    })
                     .map(function (i) {
                       return i.email
                     })
@@ -209,20 +243,28 @@ function statusToString (status) {
                         // TODO: hack
                         ticket = {
                           uid: ticket.uid,
-                          status: statusToString(ticket.status),
+                          status: {
+                            name: statusToString(ticket.status),
+                            html_color: statusToColor(ticket.status)
+                          },
                           subject: ticket.subject,
                           group: {
                             name: ticket.group.name
                           },
                           owner: {
-                            fullname: ticket.owner.fullname
+                            fullname: ticket.owner.fullname,
+                            image: ticket.owner.image || 'defaultProfile.jpg'
+                          },
+                          assignee: {
+                            fullname: ticket.assignee ? ticket.assignee.fullname : '???'
                           },
                           date: ticket.date,
                           type: {
                             name: ticket.type.name
                           },
                           priority: {
-                            name: ticket.priority.name
+                            name: ticket.priority.name,
+                            html_color: ticket.priority.htmlColor
                           },
                           tags: ticket.tags.map(tag => ({
                             name: tag.name
@@ -240,7 +282,8 @@ function statusToString (status) {
                                 : '/img/defaultLogoDark.png'),
                             colors: {
                               header_background: colorHeaderBG.value,
-                              header_primary: colorHeaderPrimary.value
+                              header_primary: colorHeaderPrimary.value,
+                              tags: colorTags.value
                             }
                           },
                           base_url: baseUrl,
@@ -469,153 +512,277 @@ function statusToString (status) {
     })
   }
 
-  emitter.on('ticket:updated', function (ticket) {
+  emitter.on('ticket:updated', function (ticket, lastUpdate) {
     io.sockets.emit('$trudesk:client:ticket:updated', { ticket: ticket })
 
-    if (!ticket.skipUpdatedMail) {
-      settingsSchema.getSettingsByName(
-        [
-          'gen:sitetitle',
-          'gen:siteurl',
-          'gen:customlogo',
-          'gen:customlogofilename',
-          'color:headerbg',
-          'color:headerprimary',
-          'tps:enable',
-          'tps:username',
-          'tps:apikey',
-          'mailer:enable'
-        ],
-        function (err, settings) {
-          if (err) return false
+    settingsSchema.getSettingsByName(
+      [
+        'gen:sitetitle',
+        'gen:siteurl',
+        'gen:customlogo',
+        'gen:customlogofilename',
+        'color:headerbg',
+        'color:headerprimary',
+        'color:tags',
+        'tps:enable',
+        'tps:username',
+        'tps:apikey',
+        'gen:siteurl',
+        'mailer:enable'
+      ],
+      function (err, settings) {
+        if (err) return false
 
-          var genSiteTitle = _.head(_.filter(settings, ['name', 'gen:sitetitle']))
-          var genSiteUrl = _.head(_.filter(settings, ['name', 'gen:siteurl']))
-          var genCustomLogo = _.head(_.filter(settings, ['name', 'gen:customlogo']))
-          var genCustomLogoFilename = _.head(_.filter(settings, ['name', 'gen:customlogofilename']))
-          var colorHeaderBG = _.head(_.filter(settings, ['name', 'color:headerbg']))
-          var colorHeaderPrimary = _.head(_.filter(settings, ['name', 'color:headerprimary']))
-          var tpsEnabled = _.head(_.filter(settings, ['name', 'tps:enable']))
-          var tpsUsername = _.head(_.filter(settings, ['name', 'tps:username']))
-          var tpsApiKey = _.head(_.filter(settings), ['name', 'tps:apikey'])
-          var mailerEnabled = _.head(_.filter(settings), ['name', 'mailer:enable'])
-          mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
+        var genSiteTitle = _.head(_.filter(settings, ['name', 'gen:sitetitle']))
+        var genSiteUrl = _.head(_.filter(settings, ['name', 'gen:siteurl']))
+        var genCustomLogo = _.head(_.filter(settings, ['name', 'gen:customlogo']))
+        var genCustomLogoFilename = _.head(_.filter(settings, ['name', 'gen:customlogofilename']))
+        var colorHeaderBG = _.head(_.filter(settings, ['name', 'color:headerbg']))
+        var colorHeaderPrimary = _.head(_.filter(settings, ['name', 'color:headerprimary']))
+        var colorTags = _.head(_.filter(settings, ['name', 'color:tags']))
+        var tpsEnabled = _.head(_.filter(settings, ['name', 'tps:enable']))
+        var tpsUsername = _.head(_.filter(settings, ['name', 'tps:username']))
+        var tpsApiKey = _.head(_.filter(settings), ['name', 'tps:apikey'])
+        var baseUrl = _.head(_.filter(settings, ['name', 'gen:siteurl'])).value
+        var mailerEnabled = _.head(_.filter(settings), ['name', 'mailer:enable'])
+        mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
 
-          if (!tpsEnabled || !tpsUsername || !tpsApiKey) {
-            tpsEnabled = false
-          } else {
-            tpsEnabled = tpsEnabled.value
-            tpsUsername = tpsUsername.value
-            tpsApiKey = tpsApiKey.value
-          }
-
-          async.parallel(
-            [
-              // Send email to subscribed users
-              function (c) {
-                if (!mailerEnabled) return c()
-
-                var mailer = require('../mailer')
-                var emails = []
-                async.each(
-                  ticket.subscribers,
-                  function (member, cb) {
-                    if (_.isUndefined(member) || _.isUndefined(member.email)) return cb()
-                    if (member.deleted) return cb()
-
-                    emails.push(member.email)
-
-                    cb()
-                  },
-                  function (err) {
-                    if (err) return c(err)
-
-                    emails = _.uniq(emails)
-
-                    if (_.size(emails) < 1) {
-                      return c()
-                    }
-
-                    var email = new Email({
-                      views: {
-                        root: templateDir,
-                        options: {
-                          extension: 'handlebars'
-                        }
-                      }
-                    })
-
-                    // TODO: hack
-                    ticket = {
-                      uid: ticket.uid,
-                      status: statusToString(ticket.status),
-                      subject: ticket.subject,
-                      group: {
-                        name: ticket.group.name
-                      },
-                      owner: {
-                        fullname: ticket.owner.fullname
-                      },
-                      date: ticket.date,
-                      type: {
-                        name: ticket.type.name
-                      },
-                      priority: {
-                        name: ticket.priority.name
-                      },
-                      tags: ticket.tags.map(tag => ({
-                        name: tag.name
-                      })),
-                      issue: ticket.issue
-                    }
-
-                    var context = {
-                      settings: {
-                        title: genSiteTitle.value,
-                        logo:
-                          genSiteUrl.value +
-                          (genCustomLogo.value ? `/assets/${genCustomLogoFilename.value}` : '/img/defaultLogoDark.png'),
-                        colors: {
-                          header_background: colorHeaderBG.value,
-                          header_primary: colorHeaderPrimary.value
-                        }
-                      },
-                      ticket: ticket
-                    }
-
-                    email
-                      .render('ticket-updated', context)
-                      .then(function (html) {
-                        var mailOptions = {
-                          to: emails.join(),
-                          subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
-                          html: html,
-                          generateTextFromHTML: true
-                        }
-
-                        mailer.sendMail(mailOptions, function (err) {
-                          if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-
-                          winston.debug('Sent [' + emails.length + '] emails.')
-                        })
-
-                        return c()
-                      })
-                      .catch(function (err) {
-                        winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-                        return c(err)
-                      })
-                  }
-                )
-              }
-            ],
-            function () {
-              // Blank
-            }
-          )
+        if (!tpsEnabled || !tpsUsername || !tpsApiKey) {
+          tpsEnabled = false
+        } else {
+          tpsEnabled = tpsEnabled.value
+          tpsUsername = tpsUsername.value
+          tpsApiKey = tpsApiKey.value
         }
-      )
-    }
+
+        async.parallel(
+          [
+            // eslint-disable-next-line complexity
+            function (c) {
+              if (!lastUpdate) return c()
+              if (!mailerEnabled) return c()
+
+              var context = {}
+              if (lastUpdate.type === 'setStatus') {
+                if (lastUpdate.status === 1 && !lastUpdate.assigneeId) {
+                  // 2. Ticket was set to "open" (without assignment): [ticket type] IS READY FOR WORK
+                  Object.assign(context, {
+                    title: `${ticket.type.name} Is Ready for Work`
+                  })
+                } else if (lastUpdate.prevStatus === 1 && [2, 4].includes(lastUpdate.status)) {
+                  // 4. Ticket was set from open to "live/pending" [ticket type] IS NOW UNDER CONSTRUCTION
+                  Object.assign(context, {
+                    title: `${ticket.type.name} Is Now Under Construction`
+                  })
+                } else if (lastUpdate.status === 5) {
+                  // 5. Ticket was set to "done" [[ticket type] IS FINISHED
+                  Object.assign(context, {
+                    title: `${ticket.type.name} Is Finished`
+                  })
+                } else {
+                  return c()
+                }
+              } else if (lastUpdate.type === 'setAssignee') {
+                if (lastUpdate.assigneeId && !lastUpdate.assigneeId.equals(lastUpdate.userId)) {
+                  // 3. Ticket was assigned to ME (auto status open): [ticket type] WAS ASSIGNED TO YOU
+                  Object.assign(context, {
+                    title: `${ticket.type.name} Was Assigned to You`
+                  })
+                } else {
+                  return c()
+                }
+              } else {
+                return c()
+              }
+
+              var mailer = require('../mailer')
+
+              async.waterfall(
+                [
+                  function (callback) {
+                    if (lastUpdate.type === 'setStatus') {
+                      if (lastUpdate.status === 1 && !lastUpdate.assigneeId) {
+                        // 2. Ticket was set to "open" (without assignment): [ticket type] IS READY FOR WORK
+                        departmentSchema.getDepartmentsByGroup(ticket.group._id, function (err, departments) {
+                          if (err) return callback(err)
+                          if (!departments) return callback('Group is not assigned to any departments. Exiting...')
+
+                          var teamMembers = _.flattenDeep(
+                            departments.map(function (department) {
+                              return department.teams.map(function (team) {
+                                return team.members.map(function (member) {
+                                  return member
+                                })
+                              })
+                            })
+                          )
+
+                          var emails = _.chain(teamMembers)
+                            .filter(function (i) {
+                              if (_.isUndefined(i) || _.isUndefined(i.email)) return false
+                              if (i.deleted) return false
+
+                              return !i._id.equals(lastUpdate.userId)
+                            })
+                            .map(function (i) {
+                              return i.email
+                            })
+                            .uniq()
+                            .value()
+
+                          return callback(null, emails)
+                        })
+                      } else if (lastUpdate.prevStatus === 1 && [2, 4].includes(lastUpdate.status)) {
+                        // 4. Ticket was set from open to "live/pending" [ticket type] IS NOW UNDER CONSTRUCTION
+                        var emails = _.chain(ticket.subscribers)
+                          .filter(function (i) {
+                            if (_.isUndefined(i) || _.isUndefined(i.email)) return false
+                            if (i.deleted) return false
+
+                            return !i._id.equals(lastUpdate.userId)
+                          })
+                          .map(function (i) {
+                            return i.email
+                          })
+                          .uniq()
+                          .value()
+
+                        return callback(null, emails)
+                      } else if (lastUpdate.status === 5) {
+                        // 5. Ticket was set to "done" [[ticket type] IS FINISHED
+                        departmentSchema.getDepartmentsByGroup(ticket.group._id, function (err, departments) {
+                          if (err) return callback(err)
+                          if (!departments) return callback('Group is not assigned to any departments. Exiting...')
+
+                          var teamMembers = _.flattenDeep(
+                            departments.map(function (department) {
+                              return department.teams.map(function (team) {
+                                return team.members.map(function (member) {
+                                  return member
+                                })
+                              })
+                            })
+                          )
+
+                          var members = _.concat(teamMembers, ticket.group.sendMailTo)
+
+                          var emails = _.chain(members)
+                            .filter(function (i) {
+                              if (_.isUndefined(i) || _.isUndefined(i.email)) return false
+                              if (i.deleted) return false
+
+                              return !i._id.equals(lastUpdate.userId)
+                            })
+                            .map(function (i) {
+                              return i.email
+                            })
+                            .uniq()
+                            .value()
+
+                          return callback(null, emails)
+                        })
+                      }
+                    } else if (lastUpdate.type === 'setAssignee') {
+                      if (lastUpdate.assigneeId && !lastUpdate.assigneeId.equals(lastUpdate.userId)) {
+                        // 3. Ticket was assigned to ME (auto status open): [ticket type] WAS ASSIGNED TO YOU
+                        return callback(null, [ticket.assignee.email])
+                      }
+                    }
+                  }
+                ],
+                function (err, emails) {
+                  if (err) return c()
+                  if (_.size(emails) < 1) return c()
+
+                  var email = new Email({
+                    views: {
+                      root: templateDir,
+                      options: {
+                        extension: 'handlebars'
+                      }
+                    }
+                  })
+
+                  // TODO: hack
+                  ticket = {
+                    uid: ticket.uid,
+                    status: {
+                      name: statusToString(ticket.status),
+                      html_color: statusToColor(ticket.status)
+                    },
+                    subject: ticket.subject,
+                    group: {
+                      name: ticket.group.name
+                    },
+                    owner: {
+                      fullname: ticket.owner.fullname,
+                      image: ticket.owner.image || 'defaultProfile.jpg'
+                    },
+                    assignee: {
+                      fullname: ticket.assignee ? ticket.assignee.fullname : '???'
+                    },
+                    date: ticket.date,
+                    type: {
+                      name: ticket.type.name
+                    },
+                    priority: {
+                      name: ticket.priority.name,
+                      html_color: ticket.priority.htmlColor
+                    },
+                    tags: ticket.tags.map(tag => ({
+                      name: tag.name
+                    })),
+                    issue: ticket.issue
+                  }
+
+                  Object.assign(context, {
+                    settings: {
+                      title: genSiteTitle.value,
+                      logo:
+                        genSiteUrl.value +
+                        (genCustomLogo.value ? `/assets/${genCustomLogoFilename.value}` : '/img/defaultLogoDark.png'),
+                      colors: {
+                        header_background: colorHeaderBG.value,
+                        header_primary: colorHeaderPrimary.value,
+                        tags: colorTags.value
+                      }
+                    },
+                    base_url: baseUrl,
+                    ticket: ticket
+                  })
+
+                  email
+                    .render('ticket-updated', context)
+                    .then(function (html) {
+                      var mailOptions = {
+                        to: emails.join(),
+                        subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                        html: html,
+                        generateTextFromHTML: true
+                      }
+
+                      mailer.sendMail(mailOptions, function (err) {
+                        if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+
+                        winston.debug('Sent [' + emails.length + '] emails.')
+                      })
+
+                      return c()
+                    })
+                    .catch(function (err) {
+                      winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                      return c(err)
+                    })
+                }
+              )
+            }
+          ],
+          function () {
+            // Blank
+          }
+        )
+      }
+    )
   })
 
   emitter.on('ticket:deleted', function (oId) {
@@ -639,9 +806,11 @@ function statusToString (status) {
         'gen:customlogofilename',
         'color:headerbg',
         'color:headerprimary',
+        'color:tags',
         'tps:enable',
         'tps:username',
         'tps:apikey',
+        'gen:siteurl',
         'mailer:enable'
       ],
       function (err, settings) {
@@ -653,9 +822,11 @@ function statusToString (status) {
         var genCustomLogoFilename = _.head(_.filter(settings, ['name', 'gen:customlogofilename']))
         var colorHeaderBG = _.head(_.filter(settings, ['name', 'color:headerbg']))
         var colorHeaderPrimary = _.head(_.filter(settings, ['name', 'color:headerprimary']))
+        var colorTags = _.head(_.filter(settings, ['name', 'color:tags']))
         var tpsEnabled = _.head(_.filter(settings, ['name', 'tps:enable']))
         var tpsUsername = _.head(_.filter(settings, ['name', 'tps:username']))
         var tpsApiKey = _.head(_.filter(settings), ['name', 'tps:apikey'])
+        var baseUrl = _.head(_.filter(settings, ['name', 'gen:siteurl'])).value
         var mailerEnabled = _.head(_.filter(settings), ['name', 'mailer:enable'])
         mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
 
@@ -759,20 +930,28 @@ function statusToString (status) {
                     // TODO: hack
                     ticket = {
                       uid: ticket.uid,
-                      status: statusToString(ticket.status),
+                      status: {
+                        name: statusToString(ticket.status),
+                        html_color: statusToColor(ticket.status)
+                      },
                       subject: ticket.subject,
                       group: {
                         name: ticket.group.name
                       },
                       owner: {
-                        fullname: ticket.owner.fullname
+                        fullname: ticket.owner.fullname,
+                        image: ticket.owner.image || 'defaultProfile.jpg'
+                      },
+                      assignee: {
+                        fullname: ticket.assignee ? ticket.assignee.fullname : '???'
                       },
                       date: ticket.date,
                       type: {
                         name: ticket.type.name
                       },
                       priority: {
-                        name: ticket.priority.name
+                        name: ticket.priority.name,
+                        html_color: ticket.priority.htmlColor
                       },
                       tags: ticket.tags.map(tag => ({
                         name: tag.name
@@ -795,9 +974,11 @@ function statusToString (status) {
                           (genCustomLogo.value ? `/assets/${genCustomLogoFilename.value}` : '/img/defaultLogoDark.png'),
                         colors: {
                           header_background: colorHeaderBG.value,
-                          header_primary: colorHeaderPrimary.value
+                          header_primary: colorHeaderPrimary.value,
+                          tags: colorTags.value
                         }
                       },
+                      base_url: baseUrl,
                       ticket: ticket,
                       comment: comment
                     }
@@ -884,9 +1065,11 @@ function statusToString (status) {
         'gen:customlogofilename',
         'color:headerbg',
         'color:headerprimary',
+        'color:tags',
         'tps:enable',
         'tps:username',
         'tps:apikey',
+        'gen:siteurl',
         'mailer:enable'
       ],
       function (err, settings) {
@@ -898,9 +1081,11 @@ function statusToString (status) {
         var genCustomLogoFilename = _.head(_.filter(settings, ['name', 'gen:customlogofilename']))
         var colorHeaderBG = _.head(_.filter(settings, ['name', 'color:headerbg']))
         var colorHeaderPrimary = _.head(_.filter(settings, ['name', 'color:headerprimary']))
+        var colorTags = _.head(_.filter(settings, ['name', 'color:tags']))
         var tpsEnabled = _.head(_.filter(settings, ['name', 'tps:enable']))
         var tpsUsername = _.head(_.filter(settings, ['name', 'tps:username']))
         var tpsApiKey = _.head(_.filter(settings), ['name', 'tps:apikey'])
+        var baseUrl = _.head(_.filter(settings, ['name', 'gen:siteurl'])).value
         var mailerEnabled = _.head(_.filter(settings), ['name', 'mailer:enable'])
         mailerEnabled = !mailerEnabled ? false : mailerEnabled.value
 
@@ -1005,20 +1190,28 @@ function statusToString (status) {
                     // TODO: hack
                     ticket = {
                       uid: ticket.uid,
-                      status: statusToString(ticket.status),
+                      status: {
+                        name: statusToString(ticket.status),
+                        html_color: statusToColor(ticket.status)
+                      },
                       subject: ticket.subject,
                       group: {
                         name: ticket.group.name
                       },
                       owner: {
-                        fullname: ticket.owner.fullname
+                        fullname: ticket.owner.fullname,
+                        image: ticket.owner.image || 'defaultProfile.jpg'
+                      },
+                      assignee: {
+                        fullname: ticket.assignee ? ticket.assignee.fullname : '???'
                       },
                       date: ticket.date,
                       type: {
                         name: ticket.type.name
                       },
                       priority: {
-                        name: ticket.priority.name
+                        name: ticket.priority.name,
+                        html_color: ticket.priority.htmlColor
                       },
                       tags: ticket.tags.map(tag => ({
                         name: tag.name
@@ -1041,9 +1234,11 @@ function statusToString (status) {
                           (genCustomLogo.value ? `/assets/${genCustomLogoFilename.value}` : '/img/defaultLogoDark.png'),
                         colors: {
                           header_background: colorHeaderBG.value,
-                          header_primary: colorHeaderPrimary.value
+                          header_primary: colorHeaderPrimary.value,
+                          tags: colorTags.value
                         }
                       },
+                      base_url: baseUrl,
                       ticket: ticket,
                       note: note
                     }

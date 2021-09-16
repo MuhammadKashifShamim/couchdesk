@@ -146,7 +146,9 @@ ticketSchema.pre('save', function (next) {
 })
 
 ticketSchema.post('save', function (doc, next) {
-  if (!this.wasNew) {
+  var self = this
+
+  if (!self.wasNew) {
     var emitter = require('../emitter')
     doc
       .populate(
@@ -172,7 +174,9 @@ ticketSchema.post('save', function (doc, next) {
       })
       .execPopulate(function (err, savedTicket) {
         if (err) return winston.warn(err)
-        emitter.emit('ticket:updated', savedTicket)
+
+        emitter.emit('ticket:updated', savedTicket, self.lastUpdate)
+        self.lastUpdate = undefined
 
         return next()
       })
@@ -251,6 +255,9 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
 
   var self = this
 
+  var prevStatus = self.status
+  var prevAssigneeId = self.assignee && (self.assignee._id || self.assignee)
+
   if (status === 0) {
     if (self.status !== 0) {
       self.assignee = undefined
@@ -268,12 +275,22 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
   }
 
   self.status = status
+
   var historyItem = {
     action: 'ticket:set:status:' + status,
     description: 'Ticket Status set to: ' + statusToString(status),
     owner: ownerId
   }
   self.history.push(historyItem)
+
+  self.lastUpdate = {
+    type: 'setStatus',
+    userId: ownerId,
+    status: self.status,
+    prevStatus: prevStatus,
+    assigneeId: self.assignee && (self.assignee._id || self.assignee),
+    prevAssigneeId: prevAssigneeId
+  }
 
   callback(null, self)
 }
@@ -290,8 +307,12 @@ ticketSchema.methods.setStatus = function (ownerId, status, callback) {
  */
 ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
   if (_.isUndefined(userId)) return callback('Invalid User Id', null)
+
   var permissions = require('../permissions')
   var self = this
+
+  var prevAssigneeId = self.assignee && (self.assignee._id || self.assignee)
+  var prevStatus = self.status
 
   if (self.status === 0) {
     self.status = 1
@@ -312,8 +333,16 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
       description: user.fullname + ' was set as assignee',
       owner: ownerId
     }
-
     self.history.push(historyItem)
+
+    self.lastUpdate = {
+      type: 'setAssignee',
+      userId: ownerId,
+      assigneeId: self.assignee && (self.assignee._id || self.assignee),
+      prevAssigneeId: prevAssigneeId,
+      status: self.status,
+      prevStatus: prevStatus
+    }
 
     return callback(null, self)
   })
@@ -331,24 +360,38 @@ ticketSchema.methods.setAssignee = function (ownerId, userId, callback) {
 ticketSchema.methods.clearAssignee = function (ownerId, callback) {
   var self = this
 
+  var prevAssigneeId = self.assignee && (self.assignee._id || self.assignee)
+  var prevStatus = self.status
+
   if ([2, 4].includes(self.status)) {
     self.status = 1
   }
 
   self.assignee = undefined
+
   var historyItem = {
     action: 'ticket:set:assignee',
     description: 'Assignee was cleared',
     owner: ownerId
   }
   self.history.push(historyItem)
+
+  self.lastUpdate = {
+    type: 'clearAssignee',
+    userId: ownerId,
+    assigneeId: self.assignee,
+    prevAssigneeId: prevAssigneeId,
+    status: self.status,
+    prevStatus: prevStatus
+  }
+
   callback(null, self)
 }
 
 ticketSchema.methods.setTicketOwner = function (ownerId, nextOwnerId, callback) {
   var self = this
-  self.owner = nextOwnerId
 
+  self.owner = nextOwnerId
   self.populate('owner', function (err, ticket) {
     if (err) return callback(err)
 
@@ -376,6 +419,7 @@ ticketSchema.methods.setTicketOwner = function (ownerId, nextOwnerId, callback) 
 ticketSchema.methods.setTicketType = function (ownerId, typeId, callback) {
   var typeSchema = require('./tickettype')
   var self = this
+
   self.type = typeId
   typeSchema.findOne({ _id: typeId }, function (err, type) {
     if (err) return callback(err)
@@ -386,7 +430,6 @@ ticketSchema.methods.setTicketType = function (ownerId, typeId, callback) {
       description: 'Ticket type set to: ' + type.name,
       owner: ownerId
     }
-
     self.history.push(historyItem)
 
     if (typeof callback === 'function') return callback(null, self)
@@ -408,6 +451,7 @@ ticketSchema.methods.setTicketPriority = function (ownerId, priority, callback) 
 
   var self = this
   self.priority = priority._id
+
   var historyItem = {
     action: 'ticket:set:priority',
     description: 'Ticket Priority set to: ' + priority.name,
@@ -472,7 +516,6 @@ ticketSchema.methods.setTicketDueDate = function (ownerId, dueDate, callback) {
     description: 'Ticket Due Date set to: ' + self.dueDate,
     owner: ownerId
   }
-
   self.history.push(historyItem)
 
   return callback(null, self)
@@ -509,7 +552,6 @@ ticketSchema.methods.setIssue = function (ownerId, issue, callback) {
     description: 'Ticket Issue was updated.',
     owner: ownerId
   }
-
   self.history.push(historyItem)
 
   return callback(null, self)
@@ -518,12 +560,12 @@ ticketSchema.methods.setIssue = function (ownerId, issue, callback) {
 ticketSchema.methods.setSubject = function (ownerId, subject, callback) {
   var self = this
   self.subject = subject
+
   var historyItem = {
     action: 'ticket:update:subject',
     description: 'Ticket Subject was updated.',
     owner: ownerId
   }
-
   self.history.push(historyItem)
 
   return callback(null, self)
@@ -992,7 +1034,8 @@ ticketSchema.statics.getTicketsWithObject = function (grpId, object, ownerIdForN
   }
 
   if (!_.isUndefined(object.assignedSelf) && !_.isNull(object.assignedSelf)) q.where('assignee', object.user)
-  if (!_.isUndefined(object.assignedOthers) && !_.isNull(object.assignedOthers)) q.where({ assignee: { $ne: object.user }})
+  if (!_.isUndefined(object.assignedOthers) && !_.isNull(object.assignedOthers))
+    q.where({ assignee: { $ne: object.user } })
   if (!_.isUndefined(object.unassigned) && !_.isNull(object.unassigned)) q.where({ assignee: { $exists: false } })
   if (!_.isUndefined(object.public) && !_.isNull(object.public)) q.where('public', object.public)
 
