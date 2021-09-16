@@ -47,6 +47,14 @@
           {{{ticket.issue}}}
         </div>
       </div>
+      <div style="background: white; border: 1px solid #ddd; border-radius: 10px; display: block; margin: 20px; padding: 10px;">
+        <div style="font-size: 18px;">
+          {{{comment.comment}}}
+        </div>
+        <div style="font-size: 14px; margin-top: 10px;">
+          - {{comment.owner.fullname}}
+        </div>
+      </div>
       <div style="display: table; margin: 0 auto;">
         <a href="{{base_url}}/tickets/{{ticket.uid}}" target="_blank" style="background: #ddd; border-radius: 5px; color: #000; display: block; font-size: 20px; height: 40px; line-height: 40px; margin-top: 20px; padding: 0 20px; text-align: center; text-decoration: none;">
           Open Ticket
