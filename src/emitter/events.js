@@ -171,8 +171,8 @@ function statusToColor (status) {
                     })
                   )
 
-                  var members = _.concat(teamMembers, ticket.group.members)
-                  var emailTo = _.concat(teamMembers, ticket.group.sendMailTo)
+                  var members = teamMembers // _.concat(teamMembers, ticket.group.members)
+                  var emailTo = teamMembers // _.concat(teamMembers, ticket.group.sendMailTo)
 
                   emailTo = _.chain(emailTo)
                     .filter(function (i) {
