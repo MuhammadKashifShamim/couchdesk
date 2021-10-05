@@ -264,6 +264,20 @@ function mainRoutes (router, middleware, controllers) {
     controllers.tickets.getDelegated,
     controllers.tickets.processor
   )
+  router.get(
+    '/tickets/working',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getWorking,
+    controllers.tickets.processor
+  )
+  router.get(
+    '/tickets/working/page/:page',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.tickets.getWorking,
+    controllers.tickets.processor
+  )
   router.get('/tickets/print/:uid', middleware.redirectToLogin, middleware.loadCommonData, controllers.tickets.print)
   router.get('/tickets/:id', middleware.redirectToLogin, middleware.loadCommonData, controllers.tickets.single)
   // router.post('/tickets/postcomment', middleware.redirectToLogin, controllers.tickets.postcomment);
@@ -350,7 +364,11 @@ function mainRoutes (router, middleware, controllers) {
   )
   router.post('/settings/general/uploadlogo', middleware.redirectToLogin, controllers.main.uploadLogo)
   router.post('/settings/general/uploadpagelogo', middleware.redirectToLogin, controllers.main.uploadPageLogo)
-  router.post('/settings/general/uploadloginbackground', middleware.redirectToLogin, controllers.main.uploadLoginBackground)
+  router.post(
+    '/settings/general/uploadloginbackground',
+    middleware.redirectToLogin,
+    controllers.main.uploadLoginBackground
+  )
   router.post('/settings/general/uploadfavicon', middleware.redirectToLogin, controllers.main.uploadFavicon)
   router.get(
     '/settings/permissions',

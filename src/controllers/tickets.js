@@ -359,6 +359,33 @@ ticketsController.getDelegated = function (req, res, next) {
   return next()
 }
 
+ticketsController.getWorking = function (req, res, next) {
+  var page = req.params.page
+  if (_.isUndefined(page)) page = 0
+
+  var filter = {
+    status: [2, 4]
+  }
+
+  var processor = {}
+  processor.title = 'Working Tickets'
+  processor.nav = 'tickets-working'
+  processor.renderpage = 'tickets'
+  processor.pagetype = 'working'
+  processor.filter = filter
+  processor.object = {
+    limit: 50,
+    page: page,
+    status: filter.status,
+    user: req.user._id,
+    filter: filter
+  }
+
+  req.processor = processor
+
+  return next()
+}
+
 ticketsController.filter = function (req, res, next) {
   var page = req.query.page
   if (_.isUndefined(page)) page = 0

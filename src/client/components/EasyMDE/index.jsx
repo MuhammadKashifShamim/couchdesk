@@ -214,7 +214,7 @@ class EasyMDE extends React.Component {
     }, 250)
     return (
       <Fragment>
-        <textarea ref={i => (this.element = i)} value={this.state.value} onChange={e => this.onTextareaChanged(e)} />
+        <textarea ref={i => (this.element = i)} value={this.state.value} onChange={e => this.onTextareaChanged(e)} style={{ color: 'black' }} />
         {this.props.showStatusBar && <div className='editor-statusbar uk-float-left uk-width-1-1' />}
       </Fragment>
     )

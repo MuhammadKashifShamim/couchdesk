@@ -48,9 +48,16 @@ class CreateTicketModal extends React.Component {
   constructor (props) {
     super(props)
 
+    const cookieParts = `; ${document.cookie}`.split(`; groups=`);
+    if (cookieParts.length === 2) {
+      try {
+        this.filterGroups = JSON.parse(decodeURI(cookieParts.pop().split(';').shift()))
+      } catch (e) {} // eslint-disable-line no-empty
+    }
+
     // FIXME: hack
-    const filter = document.getElementById('tickets-container')
-    this.filter = filter ? JSON.parse(filter.getAttribute('data-filter')) : {}
+    /* const filter = document.getElementById('tickets-container')
+    this.filter = filter ? JSON.parse(filter.getAttribute('data-filter')) : {} */
   }
 
   componentDidMount () {
@@ -58,8 +65,8 @@ class CreateTicketModal extends React.Component {
       () => this.props.groups.size,
       () => {
         let groupId
-        if (this.filter.groups && this.filter.groups.length > 0) {
-          groupId = this.filter.groups[0]
+        if (this.filterGroups && this.filterGroups.length > 0) {
+          groupId = this.filterGroups[0]
         } else if (this.props.groups.size > 0) {
           groupId = this.props.groups.first().get('_id')
         }
@@ -236,8 +243,8 @@ class CreateTicketModal extends React.Component {
     let defaultGroupValue
     if (mappedGroups.length === 1) {
       defaultGroupValue = mappedGroups[0].value
-    } else if (this.filter.groups && this.filter.groups.length > 0) {
-      defaultGroupValue = this.filter.groups[0]
+    } else if (this.filterGroups && this.filterGroups.length > 0) {
+      defaultGroupValue = this.filterGroups[0]
     } /* else {
       defaultGroupValue = head(mappedGroups) ? head(mappedGroups).value : ''
     } */
@@ -251,6 +258,7 @@ class CreateTicketModal extends React.Component {
               type='text'
               name={'subject'}
               className={'md-input'}
+              style={{ fontWeight: 'bold' }}
               data-validation={viewdata.ticketSettings.minSubject > 0 ? 'length' : undefined}
               data-validation-length={viewdata.ticketSettings.minSubject > 0 ? `min${viewdata.ticketSettings.minSubject}` : undefined}
               data-validation-error-msg={viewdata.ticketSettings.minSubject > 0 ? `Please enter a valid Subject. Subject must contain at least ${

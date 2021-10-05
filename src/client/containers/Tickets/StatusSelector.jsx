@@ -133,12 +133,16 @@ class StatusSelector extends React.Component {
             <li className='ticket-status ticket-open' onClick={() => this.changeStatus(1)}>
               <span>Open</span>
             </li>
-            <li className='ticket-status ticket-live' onClick={() => this.changeStatus(4)}>
-              <span>Live</span>
-            </li>
-            <li className='ticket-status ticket-pending' onClick={() => this.changeStatus(2)}>
-              <span>Pending</span>
-            </li>
+            {this.props.canSetLiveOrPending && (
+              <>
+                <li className='ticket-status ticket-live' onClick={() => this.changeStatus(4)}>
+                  <span>Live</span>
+                </li>
+                <li className='ticket-status ticket-pending' onClick={() => this.changeStatus(2)}>
+                  <span>Pending</span>
+                </li>
+              </>
+            )}
             <li className='ticket-status ticket-done' onClick={() => this.changeStatus(5)}>
               <span>Done</span>
             </li>
@@ -163,11 +167,13 @@ StatusSelector.propTypes = {
   ticketId: PropTypes.string.isRequired,
   status: PropTypes.number.isRequired,
   onStatusChange: PropTypes.func,
-  hasPerm: PropTypes.bool.isRequired
+  hasPerm: PropTypes.bool.isRequired,
+  canSetLiveOrPending: PropTypes.bool.isRequired
 }
 
 StatusSelector.defaultProps = {
-  hasPerm: false
+  hasPerm: false,
+  canSetLiveOrPending: false
 }
 
 export default StatusSelector

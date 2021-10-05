@@ -74,6 +74,7 @@ const showPriorityConfirm = () => {
 class SingleTicketContainer extends React.Component {
   @observable ticket = null
   @observable isSubscribed = false
+  @observable isHistoryOpened = false
 
   constructor (props) {
     super(props)
@@ -319,10 +320,10 @@ class SingleTicketContainer extends React.Component {
                 style={{ width: 360, maxWidth: 360, minWidth: 360 }}
               >
                 <div className='page-title-border-right relative' style={{ padding: '0 30px' }}>
-                  <span className="tag-list" style={{ display: 'inline-block' }}>
+                  {/* <span className="tag-list" style={{ display: 'inline-block' }}>
                     <span className="title-tag" style={{ background: this.ticket.priority.htmlColor }}>Ticket</span>
-                  </span>
-                  <p>#{this.ticket.uid}</p>
+                  </span> */}
+                  <p>Ticket #{this.ticket.uid}</p>
                   <StatusSelector
                     ticketId={this.ticket._id}
                     status={this.ticket.status}
@@ -331,6 +332,7 @@ class SingleTicketContainer extends React.Component {
                       this.ticket.assignee = assignee
                     }}
                     hasPerm={helpers.hasPermOverRole(this.ticket.owner.role, null, 'tickets:update', true) && isAdminOrAgent}
+                    canSetLiveOrPending={!this.ticket.assignee || (this.props.shared.sessionUser && (this.props.shared.sessionUser.role.isAdmin || this.ticket.assignee._id === this.props.shared.sessionUser._id))}
                   />
                 </div>
                 {/*  Left Side */}
@@ -348,6 +350,7 @@ class SingleTicketContainer extends React.Component {
                             name='publicSwitch'
                             className='onoffswitch-checkbox'
                             checked={this.ticket.public}
+                            disabled={!helpers.canUser('tickets:update', true)}
                             onChange={e => {
                               e.preventDefault()
                               socket.ui.setTicketPublic(this.ticket._id, e.target.checked)
@@ -616,10 +619,23 @@ class SingleTicketContainer extends React.Component {
                               ))}
                           </div>
                         </div>
+
+                        {helpers.canUser('agent:*', true) && (
+                          <div style={{ textAlign: 'center' }}>
+                            <a
+                              role={'button'}
+                              onClick={() => {
+                                this.isHistoryOpened = !this.isHistoryOpened
+                              }}
+                            >
+                              {this.isHistoryOpened ? 'Hide History' : 'Show History'}
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {helpers.canUser('agent:*', true) && (
+                    {this.isHistoryOpened && helpers.canUser('agent:*', true) && (
                       <div className='uk-width-1-1 padding-left-right-15'>
                         <div className='tru-card ticket-details pr-0 pb-0' style={{ height: 250 }}>
                           Ticket History
@@ -723,18 +739,20 @@ class SingleTicketContainer extends React.Component {
                       </a>
                     </div>
                   )}
-                  <div className='page-top-comments uk-float-right'>
-                    <a
-                      role='button'
-                      className='btn no-ajaxy'
-                      onClick={e => {
-                        e.preventDefault()
-                        helpers.scrollToBottom('.page-content-right', true)
-                      }}
-                    >
-                      Add Comment
-                    </a>
-                  </div>
+                  {helpers.canUser('comments:create', true) && (
+                    <div className='page-top-comments uk-float-right'>
+                      <a
+                        role='button'
+                        className='btn no-ajaxy'
+                        onClick={e => {
+                          e.preventDefault()
+                          helpers.scrollToBottom('.page-content-right', true)
+                        }}
+                      >
+                        Add Comment
+                      </a>
+                    </div>
+                  )}
                   <div
                     className='onoffswitch subscribeSwitch uk-float-right'
                     style={{ marginRight: 10, position: 'relative', top: 18 }}

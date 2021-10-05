@@ -401,8 +401,8 @@ class TicketsContainer extends React.Component {
                     <DropdownItem text={'Create'} onClick={() => this.props.showModal('CREATE_TICKET')} />
                     <DropdownSeparator />
                     <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
-                    <DropdownItem text={'Set Live'} onClick={() => this.onSetStatus(4)} />
-                    <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
+                    {/* <DropdownItem text={'Set Live'} onClick={() => this.onSetStatus(4)} />
+                    <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} /> */}
                     <DropdownItem text={'Set Done'} onClick={() => this.onSetStatus(5)} />
                     {helpers.canUser('tickets:closing', true) && (
                       <>

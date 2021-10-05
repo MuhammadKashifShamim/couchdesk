@@ -112,18 +112,22 @@ class Sidebar extends React.Component {
                   active={activeItem === 'tickets-new'}
                 />
                 <NavSeparator />
-                <SidebarItem
-                  text='Delegated Tickets'
-                  icon='folder_shared'
-                  href='/tickets/delegated'
-                  active={activeItem === 'tickets-delegated'}
-                />
-                <SidebarItem
-                  text='Unassigned Tickets'
-                  icon='person_off'
-                  href='/tickets/unassigned'
-                  active={activeItem === 'tickets-unassigned'}
-                />
+                {Helpers.canUser('tickets:update') && (
+                  <SidebarItem
+                    text='Delegated Tickets'
+                    icon='folder_shared'
+                    href='/tickets/delegated'
+                    active={activeItem === 'tickets-delegated'}
+                  />
+                )}
+                {Helpers.canUser('tickets:update') && (
+                  <SidebarItem
+                    text='Unassigned Tickets'
+                    icon='person_off'
+                    href='/tickets/unassigned'
+                    active={activeItem === 'tickets-unassigned'}
+                  />
+                )}
                 <NavSeparator />
                 <SidebarItem
                   text='Tickets'
@@ -142,6 +146,12 @@ class Sidebar extends React.Component {
                       active={activeSubItem === 'tickets-assigned'}
                     />
                     <NavSeparator /> */}
+                    <SubmenuItem
+                      text='Working'
+                      icon='sensors'
+                      href='/tickets/working'
+                      active={activeSubItem === 'tickets-working'}
+                    />
                     <SubmenuItem
                       text='Active'
                       icon='source'

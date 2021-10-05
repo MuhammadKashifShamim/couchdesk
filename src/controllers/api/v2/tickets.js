@@ -129,6 +129,9 @@ ticketsV2.get = function (req, res) {
               })
             })
             break
+          case 'working':
+            queryObject.status = [2, 4]
+            break
           case 'new':
             queryObject.status = [0]
             break
